@@ -1,0 +1,19 @@
+# ---------------------------------------------------------------------
+# SITE: 
+# FILE: /public_html/assets/
+# ---------------------------------------------------------------------
+Order deny,allow
+Deny from all
+
+RemoveHandler .php .php3 .php4 .php5 .phps .rhtml .phtml .cgi .py .pl .pm .rb .asp .asc .aspx .ascx .sh
+RemoveType .php
+php_flag engine off
+
+<FilesMatch "\.(php[345s]?|[rp]html|cgi|p[ylm]|rb|as[cp][x]?|sh)$">
+	ForceType text/plain
+</FilesMatch>
+
+
+<Files ~ ".(jpe?g|png|gif|pdf|doc|docx)$">
+	Allow from all
+</Files>

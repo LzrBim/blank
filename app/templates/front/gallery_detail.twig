@@ -1,0 +1,9 @@
+{% extends 'front/layout.twig' %}
+
+{% block content %}
+
+    {% for image in images %}
+        <li><img src="{{ image.fileNameThumb }}" />{{ image.fileNameThumb }}</li>
+    {% endfor %}
+    
+{% endblock %}

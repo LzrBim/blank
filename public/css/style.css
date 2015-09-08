@@ -1,0 +1,322 @@
+/*-----------------------------------------------------------------------------
+ * SITE:
+ * FILE: /css/style.css
+----------------------------------------------------------------------------- */
+
+body{
+	padding-top:70px;
+}
+
+/* COLORS
+----------------------------------------------------------------------------- */
+
+
+
+/* TYPOGRAPHY
+----------------------------------------------------------------------------- */
+
+h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .heading {
+	font-family:Georgia, "Times New Roman", Times, serif;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a {
+	text-decoration:none;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover {
+	text-decoration:underline;
+}
+
+h1, .h1 { font-size:30px; }
+h2, .h2 { font-size:26px; }
+h3, .h3 { font-size:22px; } 
+h4, .h4 { font-size:18px; }
+h5, .h5 { font-size:16px; }
+
+h1 { margin:25px 0; }
+h2 { margin:20px 0; }
+h3 { margin:15px 0; } 
+h4 { margin:10px 0; }
+h5 { margin:10px 0; }
+
+em { font-style:italic; }
+
+strong { font-weight:bold; }
+
+a {
+	color:#039;
+	text-decoration:none;
+}
+
+a:hover {
+	color: #332A2A;
+	cursor:pointer;
+}
+
+p {
+	margin:0 0 10px;
+	line-height:140%;
+}
+
+	p a {
+		text-decoration:underline;
+	}
+
+hr {
+	width:100%; height:1px;
+	line-height:1;
+	border-top:1px solid #CCC;
+	margin:10px 0;
+}
+
+
+/* STRUCTURE
+----------------------------------------------------------------------------- */
+
+#contentWrapper {
+	margin:0 0 60px;
+}
+
+#footerWrapper {
+	padding:40px 0;
+	background-color:#f7f7f7;
+}
+
+/* HOME
+----------------------------------------------------------------------------- */
+
+
+/* BLOG
+----------------------------------------------------------------------------- */
+
+/* FEATURED POSTS */
+.featuredPosts > ul {
+	list-style:none;
+	margin:0; padding:0;
+}
+	.featuredPosts ul > li {
+		margin:0 0 10px;
+	}
+	
+	.featuredPosts ul > li > a {
+		
+	}
+
+/* MAIN INDEX */
+.posts > ul {
+	list-style:none;
+	margin:0; padding:0;
+}
+
+	.posts > ul > li {
+		margin:0 0 40px; padding:0;
+	}
+	
+/* DETAIL INDEX */
+.post {
+	
+}
+
+	.post .title {
+		
+	}
+	
+	.post .description {
+		
+	}
+	
+	.post .attr {
+		
+	}
+
+/* SIDE BAR */
+.postSideBar {
+	
+}
+
+	.postCategory ul, .postTag ul {
+		list-style:none;
+		margin:0; padding:0;
+	}
+
+	.postSearch {
+		
+	}
+	
+	.postCategory {
+		
+	}
+	
+	.postTag {
+		
+	}
+	
+	.postArchive {
+		
+	}
+
+
+@media (min-width: 768px) {
+	
+}
+
+@media (min-width: 992px) { 
+	
+	
+}
+
+@media (min-width: 1200px) {
+	
+	
+}
+
+
+.calendar { 
+	width: 100%; 
+	margin:0 0 15px;
+	font-size: 0.75em; 
+	line-height: 1.25em; 
+	border-collapse: collapse; 
+	border-spacing: 0; 
+}
+
+.calendar th { text-align: center; }
+
+.calendar th span { display: none; }
+
+.calendar tr { display: block; }
+
+.calendar td,	.calendar th { display: none; }
+
+.calendar .calendarDay { margin: 1em 0 .5em 0; font-weight: bold; }
+
+.calendar .calendarMonth { display: block; }
+.calendar .calendarActive { display: block; }
+
+.calendar ul { 
+	display: block; 
+	list-style: none; 
+	margin: 0 1.25em 0 0; 
+	padding: 0; 
+}
+
+.calendar li { 
+	display: block; 
+	position: relative; 
+	margin: 0; 
+	padding: 0; 
+	height: 1.25em; 
+}
+
+.calendar li a { 
+	
+	text-overflow: ellipsis; 
+}
+
+.calendar tr td:nth-of-type(1n) .day:before { content: 'Sunday '; }
+.calendar tr td:nth-of-type(2n) .day:before { content: 'Monday '; }
+.calendar tr td:nth-of-type(3n) .day:before { content: 'Tueday '; }
+.calendar tr td:nth-of-type(4n) .day:before { content: 'Wednesday '; }
+.calendar tr td:nth-of-type(5n) .day:before { content: 'Thursday '; }
+.calendar tr td:nth-of-type(6n) .day:before { content: 'Friday '; }
+.calendar tr td:nth-of-type(7n) .day:before { content: 'Saturday '; }
+
+
+.calendar .calendarEmpty { display: none; }
+
+@media only screen and (min-width: 30em) { 
+
+
+	.calendar tr { display: table-row; }
+	
+	.calendar th, .calendar td { 
+		display: table-cell !important; 
+		margin: 0; 
+		width: 14.2857%; 
+		padding: 0.4166em; 
+		border: 1px solid #babcbf; 
+		vertical-align: top; }
+
+	.calendar .calendarEmpty { color: #bbb; }
+
+	.calendar td .dayNumber { display: block; float: right; margin: 0; font-weight: normal; }
+	.calendar td .dayNumber:before { display: none; }
+	.calendar td .calendarSuffix { display: none; }
+
+}
+
+@media only screen and (min-width: 40em) { 
+
+
+	.calendar th span { display: inline; }
+
+}
+
+@media only screen and (min-width: 40em) and (min-height: 20em) {
+
+	.calendar td { height: 2.5em; }
+
+}
+@media only screen and (min-width: 40em) and (min-height: 40em) {
+
+	.calendar td { height: 6.25em;}
+
+}
+
+
+/* LOADING
+----------------------------------------------------------------------------- */
+.loadingContainer {
+	position:relative;
+}
+
+.loading {
+	display:none;
+	position:absolute;
+	z-index:10001;
+	width:100%; height:100%;
+	background:rgba(255,255,255,.5) url(../images/widgets/loading.gif) no-repeat center center;
+}
+
+
+/* HELPERS
+----------------------------------------------------------------------------- */
+
+.t5 { margin-top:5px; }
+.b5 { margin-bottom:5px; }
+.l5 { margin-left:5px; }
+.tb5{ margin-top:5px; margin-bottom:5px; }
+.m5 { margin:5px; }
+
+.t10 { margin-top:10px; }
+.l10 { margin-left:10px; }
+.b10 { margin-bottom:10px; }
+.l10 { margin-left:10px; }
+.tb10{ margin-top:10px; margin-bottom:10px; }
+.m10 { margin:10px; }
+
+.t20 { margin-top:20px; }
+.b20 { margin-bottom:20px; }
+.l20 { margin-left:20px; }
+.r20 { margin-right:20px; }
+.tb20{ margin-top:20px; margin-bottom:20px; }
+.m20 { margin:20px; }
+
+.fl { float:left; }
+.fr { float:right; }
+
+.tal { text-align:left; }
+.tar { text-align:right; }
+.tac { text-align:center; }
+
+.ntm { margin-top:0; }
+.nbm { margin-bottom:0; }
+.nm { margin:0; }
+.np { padding:0; }
+
+.lg {	font-size:16px; }
+.sm { font-size:12px; }
+
+.lhn { line-height:1; }
+.vat { vertical-align:top; }
+.tdn { text-decoration:none; }

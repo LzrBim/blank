@@ -1,0 +1,11 @@
+{% extends 'front/layout.twig' %}
+
+{% block content %}
+
+	<h1>{{title}}</h1>
+
+    {% for gallery in galleries %}
+        <li><a href="/gallery/{{gallery.permalink}}">{{ gallery.title }}</a></li>
+    {% endfor %}
+    
+{% endblock %}

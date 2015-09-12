@@ -189,6 +189,163 @@ class BaseModel {
 	
 	public function numRows($result){ return mysqli_num_rows($result);  }
 	
+	public function input($db, $value, $type, $opts = array()) {  
+	
+		if(!mb_check_encoding($value, 'UTF-8')){
+			die('not utf'. $type.' '. $value);										
+		}
+		
+		if(isset($opts['isDie'])){
+			$isDie = true;	
+		} else {
+			$isDie = false;
+		}
+		
+		if($type == 'text' || $type == 'editor' || $type == 'string'){
+			$value = $this->stripScripts($value, $isDie);
+		}
+		
+		$value = $this->stripControlCharacters($value);
+		
+		if(!empty($opts['stripTags'])){
+			$value = strip_tags($value);
+		} 
+		
+		$value = mysqli_real_escape_string($db,$value);
+	
+		switch ($type) {
+			case "text": 
+				$value = ($value != "") ? "'".trim($value)."'" : "NULL";
+			break; 
+			
+			case "editor":
+				$value = ($value != "") ? "'".$value."'" : "NULL";
+			break; 
+			
+			case "date":
+				$value = ($value != "") ? "'".date('Y-m-d', strtotime($value))."'" : "NULL";
+			break; 
+			
+			case "datetime":
+				$value = ($value != "") ? "'".date('Y-m-d H:i:s', strtotime($value))."'" : "NULL";
+			break; 
+			
+			case "phone":
+				$value = ($value != "") ? "'".trim(preg_replace("/[^0-9]/", "", $value))."'" : "NULL";
+			break; 
+			
+			case "int":
+				$value = ($value != "") ? intval($value) : "NULL";
+			break; 
+			
+			case "time":
+				$value = ($value != "") ? intval($value) : "NULL";
+			break; 
+			
+			case "string":
+				$value = ($value != "") ? "'".$value."'" : "NULL";
+			break; 
+			
+			case "dec":
+				if($value != ""){
+					if(is_numeric($value)){
+						$value = $value;
+					} else {
+						$value = "NULL"; 
+					}
+				} else {
+					$value = "NULL";
+				}
+			break;
+		}
+		return $value;
+	}
+	
+	public function stripScripts($string, $isDie = false){
+		
+		$origString = $string;
+		$error = false;
+		
+		if(empty($string)){
+			return $string;
+		}	
+		
+		if(!mb_check_encoding($string, 'UTF-8')){
+			die('not utf'. $string);										
+		}
+	
+		$naughtyStrings = array(
+			'document.cookie'	=> '[removed-1]',
+			'document.write'	=> '[removed-2]',
+			'.parentNode'		=> '[removed-3]',
+			'.innerHTML'		=> '[removed-4]',
+			'window.location'	=> '[removed-5]',
+			'-moz-binding'		=> '[removed-6]',
+			'<!--'				=> '&lt;!--',
+			'-->'				=> '--&gt;',
+			'<![CDATA['			=> '&lt;![CDATA[' );
+	
+		foreach ($naughtyStrings as $pattern => $replacement){
+			
+			$count = 0;
+			$string = str_replace($pattern, $replacement, $string, $count); 
+			if($count){
+				wLog(3, 'Found a naughtyString='.$string.', on pattern='.$pattern.', originalString='.$origString);
+				$error = true;
+			}
+		}
+	
+		$naughtyRegexs = array(
+			"javascript\s*:"					=> "[removed-7]",
+			"expression\s*(\(|&\#40;)"			=> "[removed-8]", 
+			"vbscript\s*:"						=> "[removed-9]", 
+			"Redirect\s+302"					=> "[removed-10]",
+			"@<![\s\S]*?--[ \t\n\r]*>@"         => "[removed-11]",
+			"(<link[^>]+rel=\"[^\"]*stylesheet\"[^>]*>)|<script[^>]*>.*?<\/script>|<style[^>]*>.*?<\/style>|<!--.*?-->" => "[removed-12]"	
+	
+		);
+	
+		foreach ($naughtyRegexs as $pattern => $replacement){
+			
+			$count = 0;
+			$string = preg_replace("/".$pattern."/i", $replacement, $string, 5, $count);
+			
+			if($string == NULL){
+				wLog(3, 'Error during naughtyRegex, pattern='.$pattern);
+			}
+				
+			if($count){
+				wLog(3, 'Found a naughtyRegex, pattern='.$pattern.', originalString='.$origString);
+				$error = true;
+			}
+			
+		}
+	
+		if($error && $isDie){
+			die('Suspicious input detected. If you copy and pasted, please retype and try again.');	
+		}
+		
+		return $string;
+	}
+	
+	public function stripControlCharacters($str){
+		return preg_replace(
+			array(
+					'/\x00/', '/\x01/', '/\x02/', '/\x03/', '/\x04/',
+					'/\x05/', '/\x06/', '/\x07/', '/\x08/', '/\x09/', 
+					'/\x0B/', '/\x0E/', '/\x0F/', '/\x10/', '/\x11/',
+					'/\x12/','/\x13/','/\x14/','/\x15/', '/\x16/', '/\x17/', '/\x18/',
+					'/\x19/','/\x1A/','/\x1B/','/\x1C/','/\x1D/', '/\x1E/', '/\x1F/'
+			), 
+			array(
+					"", "", "", "", "",
+					"", "", "", "", "",
+					"", "", "", "", "",
+					"", "", "", "", "", "", "",
+					"", "", "", "", "", "", ""
+			), $str);
+	} 
+	
 	
 	/* COLLECTIONS
 	----------------------------------------------------------------------------- */

@@ -5,6 +5,7 @@ namespace App\Action;
 use Psr\Log\LoggerInterface;
 use Slim\Flash;
 
+
 class BaseAction {
 	
 	protected $logger;

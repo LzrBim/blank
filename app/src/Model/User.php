@@ -3,14 +3,14 @@
  * SITE:
  * FILE: /models/User.php
 ----------------------------------------------------------------------------- */ 
+namespace App\Model; 
 
-class User extends Core { 
+class User extends BaseModel { 
 	
 	//CORE ATTRIBUTES
 	public $_title = 'User';
-	public $_id = '';
-	public $_table = ''; 
-	protected $_realm = '';
+	public $_id = 'userId';
+	public $_table = 'user'; 
 	
 	//FIELDS
 	public $email; 
@@ -31,13 +31,7 @@ class User extends Core {
 	protected $FORGOT_PASSWORD_EXPIRES = 86400; //1 day
 	protected $MAX_LOGIN_ATTEMPTS = 5; //1 day
 	
-	public $_validateRules = array(
-		'rules' => array( 
-			'email' 		=> array( 'required' => true, 'email' => true )
-		)
-	);
 	
-
 	/* LOAD
 	----------------------------------------------------------------------------- */
 
@@ -47,27 +41,18 @@ class User extends Core {
 	
 	public function login($email, $password, $rememberMe = 0 ){
 		
-		//HARD ERRORS
-		if(empty($email)){
-			wLog(2, 'Email not set');
-			return false;
-		}
+		$app = Slim::getInstance();
+		$app->logger->info("Login Attempt Failed: ".$_POST['email']);
 		
-		if(empty($password)){
-			wLog(2, 'Password not set');
+		//HARD ERRORS
+		if(empty($email) || empty($password)){
+			wLog(2, 'Email or username not set');
 			return false;
 		}
 		
 		$email = $this->_formatEmail($email); /* Trim and Lower */
 		
-		//VALIDATE
-		if(!Sanitize::isValidEmail($email)){ 
-			addMessage('error', 'An error occured during login.  Your email address is invalid.');
-			wLog(2, 'Invalid email: "'.$email.'"');
-			return false;
-		} 
-		
-		if(!Sanitize::isValidPassword($password)){ 
+		if(!$this->isValidPassword($password)){ 
 			addMessage('error', 'An error occured during login.  Your password contained invalid characters.');
 			wLog(2, 'Invalid password: "'.$password.'"');
 			return false;
@@ -158,15 +143,8 @@ class User extends Core {
 			return false;
 		}
 		
-		if(Sanitize::isValidEmail($email)){ 
+		return $this->loadWhere("email = '".$email."'");
 		
-			$where = "email = '".$email."'";
-			return $this->loadWhere($where);
-			
-		} else {
-			wLog(3, 'Invalid Email Supplied');
-			return false;
-		}
 	}
 	 
 	public function loadByForgotPasswordToken($token){ 
@@ -176,7 +154,7 @@ class User extends Core {
 			return false; 
 		}
 		
-		$token = Sanitize::clean($token);
+		//$token = Sanitize::clean($token);
 		
 		$where = "forgotPasswordToken = '".$token."'";
 		
@@ -209,38 +187,27 @@ class User extends Core {
 	public function insert(){
 		
 		//HARD ERRORS
-		if(empty($this->email)) { 
-			wLog(4, 'No email supplied'); 
+		if(empty($this->email) || empty($this->password)) { 
 			return false;
 		}
-		
-		if(empty($this->password)) { 
-			wLog(4, 'No password supplied'); 
-			return false;
-		}
-		
-		//VALIDATE
-		if(!Sanitize::isValidEmail($this->email)){ 
-			addMessage('error', 'An error occured while saving.  Your email address is invalid.');
-			wLog(2, 'Invalid email: "'.$email.'"');
-			return false;
-		} 
-		
-		if(!Sanitize::isValidPassword($this->password)){ 
-			addMessage('error', 'An error occured during login.  Your password contained invalid characters.');
-			wLog(2, 'Invalid password: "'.$password.'"');
+			
+		if(!$this->isValidPassword($this->password)){
 			return false;
 		}	
 		
 		//SET DEFAULT ROLE
 		if(empty($this->role)){
-			$this->role = $this->_realm.'_user';
+			$this->role = 'user';
 		}
 		
 		$this->salt = $this->_getSalt();
 		$this->password = $this->_getPasswordHash($this->password, $this->salt);
 		
+		
+		
 		if(!$this->emailExists($this->email)){
+			
+			$db = \App\Lib\Database::get_instance();
 		
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(email, password, salt, firstName, lastName, role, status) 
@@ -440,7 +407,14 @@ class User extends Core {
 		}
 	}
 	
-	
+	private function isValidPassword($password){
+		preg_replace("/[^a-zA-Z0-9!@#\%\^&\*\._-]/", ' ', $password, -1 , $count);  
+		if(!$count){
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	
 	/* SESSION

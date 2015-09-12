@@ -22,7 +22,7 @@ $app->post('/login', function ($request, $response, $args) use ($app) {
 		
 	} else {
 		
-		return $response->withRedirect('/login/');
+		return $response->withRedirect('/login');
 		
 	}									
 	

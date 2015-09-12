@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d57949824d9b2e41e4f6740047064f83",
+    "hash": "ab6f9fb358530d8b48a44583e9f722ac",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -507,6 +507,52 @@
                 "templating"
             ],
             "time": "2015-08-26 08:58:31"
+        },
+        {
+            "name": "vlucas/valitron",
+            "version": "v1.2.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vlucas/valitron.git",
+                "reference": "c7342e025a95b2e400153bc10b059b16018220fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vlucas/valitron/zipball/c7342e025a95b2e400153bc10b059b16018220fe",
+                "reference": "c7342e025a95b2e400153bc10b059b16018220fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Valitron": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Vance Lucas",
+                    "email": "vance@vancelucas.com",
+                    "homepage": "http://www.vancelucas.com"
+                }
+            ],
+            "description": "Simple, elegant, stand-alone validation library with NO dependencies",
+            "homepage": "http://github.com/vlucas/valitron",
+            "keywords": [
+                "valid",
+                "validation",
+                "validator"
+            ],
+            "time": "2014-11-20 15:24:40"
         }
     ],
     "packages-dev": [],

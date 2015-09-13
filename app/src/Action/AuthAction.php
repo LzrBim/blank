@@ -1,13 +1,15 @@
 <?php
 
-
+namespace App\Action;
+use Psr\Log\LoggerInterface;
 use Valitron\Validator;
+use App\Lib\Help;
+use App\Model\User;
 
 class AuthAction extends BaseAction {
-   
+	
+	
 	public function login($args) {
-		
-		$this->logger->info("Login Attempt");
 		
 		$v = new Validator($_POST); 
 		$v->rule('required', ['email', 'password']);
@@ -23,7 +25,7 @@ class AuthAction extends BaseAction {
 			
 			$rememberMe = (isset($_POST['rememberMe']) ? 1 : 0);
 			
-			$user = new User();
+			
 						
 			if($user->login($_POST['email'], $_POST['password'], $rememberMe)){
 				
@@ -32,6 +34,7 @@ class AuthAction extends BaseAction {
 			}
 			
 			$this->logger->info("Login Attempt Failed: ".$_POST['email']);
+			
 			return false; 
 				
 		}		

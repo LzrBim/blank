@@ -75,6 +75,8 @@ $container['App\AdminController\PageController'] = function ($c) {
     return new App\AdminController\PageController($c['view'], $c['logger'], array('flash' => $c['flash']));
 };
 
+
+
 /*$container['App\Controller\GalleryController'] = function ($c) {
     return new App\Controller\GalleryController($c['view'], $c['logger'], $c['logger']);
 };*/

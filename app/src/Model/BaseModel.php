@@ -8,16 +8,14 @@ class BaseModel {
 	protected $_id = null;
 	protected $_table = null;
 	
-	public function __construct(){
-
-	
+	public function __construct(){ 
+		
 	}
 		
 	public function load($id, $childArgs = array()){
 		
 		if(empty($id)){
 			return false;
-			
 		}
 		
 		$query = "SELECT * FROM `".$this->_table."` WHERE `".$this->_id."` = ".$id;
@@ -32,11 +30,32 @@ class BaseModel {
 				
 				$row = mysqli_fetch_array($result);
 				
-				foreach($row as $var => $value){
-					
+				if(array_key_exists($var, $this)){
+				
 					$this->$var = $value;
 					
-				}
+				} else {
+					
+					//populate child objects:  row['photographer_firstName'] maps to $this->photographer->firstName
+					if(strpos($var,'_') !== false){
+						
+						$parts = explode('_', $var);
+						
+						if(isset($parts[0]) && isset($parts[1])){
+							
+							if(array_key_exists($parts[0], $this)){
+																				 
+								if(array_key_exists($parts[1], $this->$parts[0])){
+									$this->$parts[0]->$parts[1] = $value;						 
+								}
+							
+							}
+							
+						}
+						
+					}
+					
+				} 
 				
 				$this->loadHook();
 				
@@ -44,15 +63,11 @@ class BaseModel {
 				
 				return true;
 				
-			} else {
-				
-				$this->logger->info($this->_id.'='.$id.' not found');
-			
-			}
+			} 
 			
 		} else {
 			
-			$this->logger->info(mysqli_error($this->_db));
+			throw new AppException();
 			
 		}
 		
@@ -189,6 +204,7 @@ class BaseModel {
 	
 	public function numRows($result){ return mysqli_num_rows($result);  }
 	
+	
 	public function input($db, $value, $type, $opts = array()) {  
 	
 		if(!mb_check_encoding($value, 'UTF-8')){
@@ -211,7 +227,7 @@ class BaseModel {
 			$value = strip_tags($value);
 		} 
 		
-		$value = mysqli_real_escape_string($db,$value);
+		$value = mysqli_real_escape_string($db, $value);
 	
 		switch ($type) {
 			case "text": 
@@ -269,10 +285,6 @@ class BaseModel {
 		if(empty($string)){
 			return $string;
 		}	
-		
-		if(!mb_check_encoding($string, 'UTF-8')){
-			die('not utf'. $string);										
-		}
 	
 		$naughtyStrings = array(
 			'document.cookie'	=> '[removed-1]',
@@ -350,7 +362,7 @@ class BaseModel {
 	/* COLLECTIONS
 	----------------------------------------------------------------------------- */
 	
-	protected function loadCollection($query, $loadChildren = false){
+	protected function loadCollection($query){
 		
 		$db = \App\Lib\Database::get_instance();
 		
@@ -370,7 +382,6 @@ class BaseModel {
 						
 						foreach($row as $var => $value){
 							
-							
 							if(array_key_exists($var, $tempObject)){
 								$tempObject->$var = $value;
 							} 	
@@ -378,11 +389,6 @@ class BaseModel {
 						
 						$tempObject->loadHook();
 						
-						if($loadChildren){
-							
-							$tempObject->loadChildren();
-							
-						}
 						$objList[] = $tempObject;
 					} 
 				} 
@@ -400,7 +406,7 @@ class BaseModel {
 	/* FETCH
 	----------------------------------------------------------------------------- */
 	
-	public function fetch($where = '', $orderBy = '', $limit = '', $loadChildren = true){
+	public function fetch($where = '', $orderBy = '', $limit = '', $loadChildren = array){
 		
 		$query = "SELECT * FROM ".$this->_table." ";
 		

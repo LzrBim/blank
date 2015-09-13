@@ -26,6 +26,7 @@ class User extends BaseModel {
 	public $failedAttempts = 0;
 	public $status = 'active'; //'active', 'inactive', 'locked'
 	
+	
 	//SETTINGS
 	protected $COOKIE_TIME = 2592000; //30 days
 	protected $FORGOT_PASSWORD_EXPIRES = 86400; //1 day

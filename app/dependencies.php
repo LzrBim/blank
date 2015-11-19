@@ -59,6 +59,12 @@ $container['App\Controller\GalleryController'] = function ($c) {
     return new App\Controller\GalleryController($c['view'], $c['logger']);
 };
 
+$container['App\Controller\ContactController'] = function ($c) {
+    return new App\Controller\ContactController($c['view'], $c['logger']);
+};
+
+
+
 $container['App\Controller\AuthController'] = function ($c) {
     return new App\Controller\AuthController($c['view'], $c['logger'], array('flash' => $c['flash']));
 };
@@ -70,12 +76,6 @@ $container['App\Action\AuthAction'] = function ($c) {
 $container['App\AdminController\DashboardController'] = function ($c) {
     return new App\AdminController\DashboardController($c['view'], $c['logger'], array('flash' => $c['flash']));
 };
-
-$container['App\AdminController\PageController'] = function ($c) {
-    return new App\AdminController\PageController($c['view'], $c['logger'], array('flash' => $c['flash']));
-};
-
-
 
 /*$container['App\Controller\GalleryController'] = function ($c) {
     return new App\Controller\GalleryController($c['view'], $c['logger'], $c['logger']);

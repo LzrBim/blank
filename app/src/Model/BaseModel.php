@@ -1,5 +1,6 @@
 <?php
 namespace App\Model;
+use \App\lib\Database;
 
 class BaseModel {
 	
@@ -20,7 +21,7 @@ class BaseModel {
 		
 		$query = "SELECT * FROM `".$this->_table."` WHERE `".$this->_id."` = ".$id;
 		
-		$db = \App\Lib\Database::get_instance();
+		$db = Database::get_instance();
 		
 		$result = mysqli_query($db, $query);
 		
@@ -98,17 +99,13 @@ class BaseModel {
 						if(array_key_exists($parts[0], $this)){
 																			 
 							if(array_key_exists($parts[1], $this->$parts[0])){
+								
 								$this->$parts[0]->$parts[1] = $value;						 
 							}
-						
 						}
-						
 					}
-					
 				}
-				
 			} 
-			
 		}
 		
 		$this->loadHook();
@@ -132,7 +129,7 @@ class BaseModel {
 			
 			if($this->numRows($result) == 1){
 				
-				return $this->loadByData($this->fetchAssoc($result), $loadChildren);
+				return $this->loadByData($this->fetchAssoc($result), $childArgs);
 				
 			} else {
 				
@@ -160,7 +157,7 @@ class BaseModel {
 	
 	public function query($statement){
 		
-		$db = \App\Lib\Database::get_instance();
+		$db = Database::get_instance();
 		
 		$result = mysqli_query($db, $statement);
 		
@@ -180,7 +177,7 @@ class BaseModel {
 	
 	public function queryInsert($statement){
 		
-		$db = \App\Lib\Database::get_instance();
+		$db = Database::get_instance();
 		
 		$result = mysqli_query($db, $statement);
 		
@@ -188,7 +185,7 @@ class BaseModel {
 		
 			$this->{$this->_id} = mysqli_insert_id($db);
 			
-			return $result;
+			return true;
 			
 		} 
 		
@@ -196,7 +193,14 @@ class BaseModel {
 		
 	}	
 	
-	public function isLoaded(){ if(empty($this->getId())){ return true;	} else { return false;	} }
+	public function isLoaded(){ 
+	
+		if(!empty($this->{$this->_id})){ 
+			return true;	
+		} else { 
+			return false;	
+		} 
+	}
 	
 	public function getId(){ return $this->{$this->_id}; }
 	
@@ -364,7 +368,7 @@ class BaseModel {
 	
 	protected function loadCollection($query){
 		
-		$db = \App\Lib\Database::get_instance();
+		$db = Database::get_instance();
 		
 		$objList = array();
 			
@@ -406,7 +410,7 @@ class BaseModel {
 	/* FETCH
 	----------------------------------------------------------------------------- */
 	
-	public function fetch($where = '', $orderBy = '', $limit = '', $loadChildren = array){
+	public function fetch($where = '', $orderBy = '', $limit = ''){
 		
 		$query = "SELECT * FROM ".$this->_table." ";
 		
@@ -424,7 +428,7 @@ class BaseModel {
 			$query .= "LIMIT ".$limit." ";
 		}
 				
-		return $this->loadCollection($query, $loadChildren);
+		return $this->loadCollection($query);
 		
 	}
 	

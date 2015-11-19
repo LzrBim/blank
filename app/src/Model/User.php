@@ -9,14 +9,15 @@ class User extends BaseModel {
 	
 	//CORE ATTRIBUTES
 	public $_title = 'User';
-	public $_id = 'userId';
+	public $_id = 'userID';
 	public $_table = 'user'; 
 	
 	//FIELDS
+	public $userID;
 	public $email; 
 	public $password;
 	public $salt;
-	public $firstName;	
+	public $firstName;	 
 	public $lastName;	
 	public $role;
 	public $cookieHash;
@@ -32,115 +33,12 @@ class User extends BaseModel {
 	protected $FORGOT_PASSWORD_EXPIRES = 86400; //1 day
 	protected $MAX_LOGIN_ATTEMPTS = 5; //1 day
 	
-	
-	/* LOAD
-	----------------------------------------------------------------------------- */
-
-	
-	/* LOGIN
-	----------------------------------------------------------------------------- */
-	
-	public function login($email, $password, $rememberMe = 0 ){
-		
-		$app = Slim::getInstance();
-		$app->logger->info("Login Attempt Failed: ".$_POST['email']);
-		
-		//HARD ERRORS
-		if(empty($email) || empty($password)){
-			wLog(2, 'Email or username not set');
-			return false;
-		}
-		
-		$email = $this->_formatEmail($email); /* Trim and Lower */
-		
-		if(!$this->isValidPassword($password)){ 
-			addMessage('error', 'An error occured during login.  Your password contained invalid characters.');
-			wLog(2, 'Invalid password: "'.$password.'"');
-			return false;
-		}
-		
-		//BEGIN THE DATABASE VALIDATION
-		$unauthorizedUser = new $this;
-		$unauthorizedUser->loadByEmail($email);
-		
-		//DOES THIS USER EXIST?
-		if(!$unauthorizedUser->isLoaded()){
-			wLog(2, 'User '.$email.' failed logged in');
-			addMessage('error', 'Your email was incorrect');
-			return false;
-		}
-		
-		//ARE THEY ACTIVE?
-		if($unauthorizedUser->status != 'active'){
-			wLog(2, 'User '.$email.' tried to login while marked inactive');
-			addMessage('error', 'Your account has been disabled');
-			return false;
-		}
-		
-		//ARE THEY LOCKED OUT?
-		if($unauthorizedUser->failedAttempts >= $this->MAX_LOGIN_ATTEMPTS){
-			wLog(2, 'User '.$email.' was booted for exceeding max_login_attmps');
-			addMessage('error', 'You have been locked out for security reasons');
-			return false;
-		}
-		
-		//EDGE CASE - NO SALT
-		if(empty($unauthorizedUser->salt)){
-			wLog(3, 'User '.$email.' has not salt');
-			addMessage('error', 'Your user account is invalid - please contact administrator');
-			return false;
-		}
-		
-		//OKAY, PASSWORD MATCH?
-		
-		if($unauthorizedUser->password == $this->_getPasswordHash($password, $unauthorizedUser->salt)){
-		
-				$this->load($unauthorizedUser->getId());
-				
-				$this->_setSession();
-				
-				$this->_rememberMe($rememberMe);
-				
-				$this->_resetFailedAttemptInformation();
-				
-				addMessage('success', 'You were logged in successfully');
-				
-				wLog(2, 'User '.$email.' logged in');
-				
-				return true;
-		
-		} else {
-			
-			//ADD HAMMER PREVENTION
-			$this->_updateFailedAttempt($email);
-			
-			addMessage('error', 'Your password was incorrect');
-				
-			wLog(2, 'User '.$email.' failed login in');
-			
-			return false;
-			
-		} 
-			
-		return false;
-	}
-	
-	public function logout(){
-		
-		unset($_SESSION[$this->_realm.'_auth']);
-		unset($_SESSION[$this->_id]);
-		$this->_deleteCookie();
-		addMessage('success', 'You were logged out successfully');
-	
-	}
-	
 	/*  LOAD HELPERS
 	----------------------------------------------------------------------------- */
 	
 	public function loadByEmail($email){ 
 	
 		if(empty($email)){
-			wLog(3, 'No email supplied');
 			return false;
 		}
 		
@@ -151,15 +49,10 @@ class User extends BaseModel {
 	public function loadByForgotPasswordToken($token){ 
 	
 		if(empty($token)){
-			wLog(1, 'No token supplied');
 			return false; 
 		}
 		
-		//$token = Sanitize::clean($token);
-		
-		$where = "forgotPasswordToken = '".$token."'";
-		
-		$this->loadWhere($where);
+		$this->loadWhere("forgotPasswordToken = '".$token."'");
 		
 		if($this->isLoaded()){
 			
@@ -204,11 +97,9 @@ class User extends BaseModel {
 		$this->salt = $this->_getSalt();
 		$this->password = $this->_getPasswordHash($this->password, $this->salt);
 		
-		
-		
 		if(!$this->emailExists($this->email)){
 			
-			$db = \App\Lib\Database::get_instance();
+			$db = Database::get_instance();
 		
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(email, password, salt, firstName, lastName, role, status) 
@@ -351,16 +242,18 @@ class User extends BaseModel {
 	
 	
 	private function _updateCookieHash(){
+	
+		if(empty($this->cookieHash)){
 		
-		$this->hash = $this->_getCookieHash();
-		
-		$update = sprintf("UPDATE ".$this->_table."
-			SET cookieHash=%s 
-			WHERE ".$this->_id."=%d",
-			Sanitize::input($this->hash, "text"), 
-			Sanitize::input($this->getId(), "int"));
-		
-		$this->query($update);
+			$this->cookieHash = $this->_getCookieHash();
+			
+			$update = sprintf("UPDATE ".$this->_table." SET cookieHash=%s WHERE ".$this->_id."=%d",
+				Sanitize::input($this->cookieHash, "string"), 
+				Sanitize::input($this->getId(), "int"));
+			
+			$this->query($update);
+			
+		}
 		
 		return true;
 		
@@ -408,7 +301,7 @@ class User extends BaseModel {
 		}
 	}
 	
-	private function isValidPassword($password){
+	public function isValidPassword($password){
 		preg_replace("/[^a-zA-Z0-9!@#\%\^&\*\._-]/", ' ', $password, -1 , $count);  
 		if(!$count){
 			return true;
@@ -473,18 +366,13 @@ class User extends BaseModel {
 	}
 	
 	
-	private function _setSession(){
-		$_SESSION[$this->_realm.'_auth'] = 1;
-		$_SESSION[$this->_id] = $this->getId();
-		$_SESSION['role'] = $this->role;
-	}
+	
 	
 	
 	/* COOKIES
 	----------------------------------------------------------------------------- */
 	
-	public function 
-	cookieLogin($userID, $hash){
+	public function cookieLogin($userID, $hash){
 		
 		//validate
 		if(empty($userID)){ 
@@ -512,7 +400,7 @@ class User extends BaseModel {
 	}
 	
 	
-	private function _rememberMe($rememberMe = 0){
+	public function rememberMe($rememberMe = 0){
 		if($rememberMe == 1){
 			$this->_updateCookieHash();
 			$this->_setCookie();
@@ -548,35 +436,34 @@ class User extends BaseModel {
 	
 	/*  SECURITY
 	----------------------------------------------------------------------------- */
-
-	private function _updateFailedAttempt($email){
-		
-		if($this->loadByEmail($email)){
-				
-			if($this->lastFailedLogin){ /* we already set it, increase the failed attempts*/
-				
-				if(strtotime($this->lastFailedLogin) > (time() - (60 * 60)) ){ /* in the last hour */
-					$this->failedAttempts++;
-				}
-				
-			} else {
-
-				$this->lastFailedLogin = date(MYSQL_DATETIME_FORMAT, time());
-				$this->failedAttempts = 1;
-			}
-
-			$this->_updateFailedAttemptInformation();
-						
+	public function isLockedOut(){
+		if($this->failedAttempts >= $this->MAX_LOGIN_ATTEMPTS) {
 			return true;
+		}
+		return false;
+	}
+	
+	public function updateFailedAttempt(){
+				
+		if($this->lastFailedLogin){ /* we already set it, increase the failed attempts*/
+			
+			if(strtotime($this->lastFailedLogin) > (time() - (60 * 60)) ){ /* in the last hour */
+				$this->failedAttempts++;
+			}
 			
 		} else {
-			wLog(1, 'should not happen');
-			return false;
+
+			$this->lastFailedLogin = date(MYSQL_DATETIME_FORMAT, time());
+			$this->failedAttempts = 1;
 		}
+
+		$this->_updateFailedAttemptInformation();
+					
+		return true;
 		
 	}
 	
-	private function _updateFailedAttemptInformation(){
+	public function updateFailedAttemptInformation(){
 		
 		if(!$this->isLoaded()){
 			wLog(1, 'User not loaded');
@@ -598,7 +485,7 @@ class User extends BaseModel {
 		
 	}
 	
-	private function _resetFailedAttemptInformation(){
+	public function resetFailedAttemptInformation(){
 		
 		if(!$this->isLoaded()){
 			wLog(1, 'User not loaded');
@@ -659,7 +546,7 @@ class User extends BaseModel {
 	
 	}
 	
-	protected function _getPasswordHash($password, $salt){
+	public function getPasswordHash($password, $salt){
 		
 		return crypt($password, '$2y$10$'.$salt.'$');
 	}

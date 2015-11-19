@@ -8,18 +8,31 @@
 
 {% block content %}
 
-	<h1>{{title}}</h1>
- 
-  {% include 'partial/flash.twig' %}
-    
-	<form name="loginForm" action="/login" method="post">
-  
-  <input type="text" name="email" />
-  <input type="password" name="password" />
-  
-  <input type="submit" />
-  
-  </form>
+	<div class="container">
+		
+		<div class="row">
+		
+			<div class="col-sm-12">
+
+				<h1>{{title}}</h1>
+			 
+				{% include 'partial/flash.twig' %}
+				
+				<form name="loginForm" action="/login" method="post">
+				
+				<input type="text" name="email" class="form-control" />
+				
+				<input type="password" name="password" class="form-control" />
+				
+				<input type="submit" />
+				
+				</form>
+				
+		</div>
+		
+	</div>
+	
+</div>
   
    
 {% endblock %}

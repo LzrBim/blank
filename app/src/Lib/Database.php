@@ -21,8 +21,6 @@ class Database {
 			
 			if (mysqli_connect_error()) {
 				
-				//wLog(6, 'Error connecting to database ('.mysqli_connect_errno().'): '.mysqli_connect_error());
-				
 				redirect(HTTP_PATH.'error.php?mode=db');
 				
 			}

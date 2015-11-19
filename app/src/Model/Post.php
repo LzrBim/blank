@@ -35,20 +35,7 @@ class Post extends CorePerma {
 	
 	//COLLECTION
 	public $collection;
-	
-	//VALIDATION
-	public $_validateRules = array(
-		'rules' => array( 
-			'title' => array( 'required' => true ),
-			'description' => array( 'required' => true )
-		)
-	);
-	
-	public $_validateRulesUpdate = array(
-		'rules' => array( 
-			'permalink' => array( 'permalink' => true )
-		)
-	);
+
 	
 	private $_imageSettings = array(
  		

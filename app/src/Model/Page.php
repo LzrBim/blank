@@ -4,49 +4,14 @@
  * FILE: /models/Page.php
 ----------------------------------------------------------------------------- */
 
-class Page extends CorePerma {  
-	
-	//ATTRIBUTES
-	public $_title = 'Page';
-	public $_id = 'pageID'; 
-	public $_table = 'page';
-	protected $_modReWritePath = 'page/'; 
-
-	//FIELDS
-	public $pageID = 0;
-	public $title;
-	public $permalink;
-	public $metaTitle ;
-	public $metaDescription; 
-	public $metaKeywords; 
-	public $status;
-	public $type;
-	public $isHardCoded;
-	public $noDelete;
-	public $dateAdded;
-	public $dateModified;
+class Page extends PageBase {  
 	
 	//CHILDREN	
-	public $version;
-	public $promoBlocks = array();
+	public $pageVersion;
+	public $pageBlock = array();
 	
 	//PICKUPS
 	public $headline;
-	public $searchConcat;
-	
-	
-	public $_validateRules = array( 
-		'rules' => array( 
-			'title' => array( 'required' => true )
-		)
-	);
-	
-	public $_validateRulesUpdate = array(
-		'rules' => array( 
-			'permalink' => array( 'permalink' => true )
-		)
-	);
-	
 	
 	/* LOAD
 	----------------------------------------------------------------------------- */

@@ -1,86 +1,80 @@
 /*-----------------------------------------------------------------------------
- * SITE: 
+ * SITE: Cavan Images
  * FILE: /public_html/js/main.js
 ----------------------------------------------------------------------------- */
-
-"use strict";
 
 var tpjc = tpjc || {};
 
 var tpjc = (function ($, main) {
+											
+	'use strict';
 		
-	var settings,
+	var settings, 
 	options,
 	win,
 	page;
 		
 	main.init = function(page, options) { 
 		
-		this.page = page;
+		var self = this;
 		
-		this.options = options;		
+		self.page = page; 
+		
+		var defaults = {
+			isAuthorized : 0
+		};
+				
+		self.options = $.extend(defaults, options);
+		
+		//SETTINGS
+		self.settings = {
+  		ALGOLIA_APPLICATION_ID : 'IJ41M5D68H',
+  		ALGOLIA_SEARCH_ONLY_API_KEY : '67f4f2b954018dab1819d201d7475a3c'
+		};
 		
 		//SETUP		
-		this.win = {};
-		this.settings = {};
+		self.win = {};
+		self.algoliaClient = null;
+		self.algoliaIndexName = '';
+		self.activeCavanImageID = '';
 		
-		this.tLog('init('+ page +', '+ JSON.stringify(options) +')');
+		//self.tLog('init('+ page +', '+ JSON.stringify(options) +')');
 		
-		this.init_defaults();		
+		self.init_defaults();		
 			
 		/* CONTROLLER */
-		if (typeof(page) != 'undefined' && page != '') {
+		if (typeof(self.page) != 'undefined' && self.page !== '') {
 						
-			if(this.page == 'home'){
+			if(self.page == 'home'){
 		
-					
-			} else if(this.page == 'blog'){
+			
+			/* LOGIN */
+			} else if (self.page == 'login'){
 				
+				self.bind_login();
 				
-			} else if(this.page == 'blog-detail'){
+				self.validate_login();
 
+			} else if (self.page == 'login-forgot-password'){
+				
+				self.bind_forgot_password();
+				
+				self.validate_forgot_password();
+				
+			} else if (self.page == 'login-reset-password'){
+				
+				self.bind_reset_password();	
+				
+				self.validate_reset_password();				
+				
+		
 			
-			} else if (this.page == 'contact'){
-				
-				this.validate_contact_form();
-				
-			
-			} else if (this.page == 'login'){
-				
-				this.attach_login();
-				
-				
-			} else if (this.page == 'private'){
-				
-				this.attach_cart();
-				
-				this.attach_tool_tips();
-				
-				
-			} else if (this.page == 'search'){
-				
-				//this.attach_search();
-				//this.auto_complete();
-			
-			} else if (this.page == 'unit_search'){
-				
-				this.ajax_search();
-				
-			} else if (this.page == 'unit_auto_complete'){
-				
-				//this.auto_complete();
-					
-				
-			} else if (this.page == 'checkout'){
-				
-				this.validate_checkout();
-				
 			} else {
-				this.tLog('- no whitelisted page ');
+				self.tLog('- no whitelisted page ');
 			}
 					
 		} else {
-			this.tLog('- page undefined ');
+			self.tLog('- page undefined ');
 		}
 		
 	};
@@ -92,212 +86,148 @@ var tpjc = (function ($, main) {
 		
 		this.tLog('init_defaults()');
 		
+		//GATHER WINDOW INFO
 		this.set_window_info();
 		
 	};
+	
+	/* USER AUTH CHECK
+	----------------------------------------------------------------------------- */
+	main.is_authorized = function(){
+	
+		if(this.options.isAuthorized === "1"){
+			return true;
+		}
+		return false;
+		
+	};
+	
+	
+	/* ATTACH HOME
+	----------------------------------------------------------------------------- */
+	main.attach_home = function() { 
+		
+		var self = this; 
+		
+		self.tLog('attach_home()');
+		
+		$('#tpjc_thirdSlider').height((self.win.height - self.win.navHeight)).css('opacity', 1);
+		
+		var slider = $('#tpjc_thirdSlider').thirdSlider({
+			images : self.options.images													 
+		});
+		
+		$(window).on("debouncedresize", function( event ) {
+																						 
+			self.set_window_info();
+								
+			$('#tpjc_thirdSlider').height((self.win.height - self.win.navHeight));
+				
+		});
+		
+	
+		//Page title opacity on scroll
+		$(window).on('scroll', function(){
+	
+			var fadeStart =  100;
+			var fadeUntil =  450;
+	
+			var offset = $(document).scrollTop();
+			
+			var opacity = 0;
+			if(offset <= fadeStart){
+				opacity = 1;
+				
+			} else if( offset <= fadeUntil ){
+				opacity = 1 - ( offset / fadeUntil);
+				
+			}
+	
+			$('.vacCell').css('opacity',opacity).css('padding-top', offset* 0.9 );
+			
+			$('.topArrow').css('opacity',opacity);
+			
+			if(offset >= (self.win.height - self.win.navHeight)){
+				
+				$('#homeCuratedCon').find('.toolBar').addClass('homeToolBarFixed');
+				
+			} else {
+				
+				$('#homeCuratedCon').find('.toolBar').removeClass('homeToolBarFixed');
+				
+			}
+			
+		});
 
+		
+		//CURATED
+		var $grid = $('.grid');
+		
+		$grid.imagesLoaded( function() {
+			
+			$grid.masonry({
+				itemSelector: '.grid-item',
+				columnWidth: '.grid-sizer',
+				percentPosition: true,
+				gutter: 5
+				
+			});
+			
+			$grid.masonry('layout');
+			
+			//load the remainder of the big slider images
+			slider.lazy();
+			
+		});
+		
+	}; /* END attach_home() */
+	
+	
+
+	
 	
 	
 	/* GET WINDOW INFO
 	----------------------------------------------------------------------------- */
 	main.set_window_info = function() {
 		
-		self = this;
-		self.tLog('get_window_info()');
+		this.tLog('set_window_info()');
 		
-		self.win.width = $(window).width();
-		self.win.height = $(window).height();
+		this.win.width = $(window).width();
+		this.win.height = $(window).height();
 		
-		self.win.navHeight = $('#nav').outerHeight(false);
+		this.win.navHeight = $('#nav').outerHeight(false);
 		
 		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-			self.win.isMobile = true;
+			this.win.isMobile = true;
 		} else {
-			self.win.isMobile = false;
+			this.win.isMobile = false;
 		}
 
-		if( self.win.width < 768){
+		if( this.win.width < 768){
 			
-			self.win.breakpoint = 'xs';
+			this.win.breakpoint = 'xs';
 			
-		} else if( self.win.width >= 768 && self.win.width < 992) {
+		} else if( this.win.width >= 768 && this.win.width < 992) {
 			
-			self.win.breakpoint = 'sm';
+			this.win.breakpoint = 'sm';
 			
-		} else if( self.win.width >= 992 &&self. win.width < 1280) {
+		} else if( this.win.width >= 992 && this.win.width < 1280) {
 			
-			self.win.breakpoint = 'md';
+			this.win.breakpoint = 'md';
 			
 		} else {
-			self.win.breakpoint = 'lg'
+			this.win.breakpoint = 'lg';
 		}
 	
-		self.tLog('winheight='+self.win.height);
 
 	};
 	
-	
-	
-	/* ATTACH WINDOW RESIZE
-	----------------------------------------------------------------------------- */
-	
-	main.handle_resize = function(callback) {
-		
-		self = this;
-		self.tLog('handle_resize()');
-		
-		//DEBOUNCE
-		var delay = (function(){
-			var timer = 0;
-			return function(fx, ms){
-				clearTimeout (timer);
-				timer = setTimeout(fx, ms);
-			};
-		})();
-		
-		//BIND
-		$(window).resize(function() {										
-			delay(function(){
-				self.set_window_info();
-				callback();
-			}, 400);
-		});
-		
-		//TRIGGER
-		$( window ).load(function() {
-			//self.set_window_info();
-			callback();	
-		});
-		
-	}
-	
-	
-	/* ATTACH WINDOW RESIZE
-	----------------------------------------------------------------------------- */
-	 
-	main.attach_home_resize = function() { 
-		
-		self = this;
-		self.tLog('attach_home_resize()');
-		
-		this.resize(function () {
-			
-			//self.normalize_heights('.newsEventsCol', '.newsCarouselItem');
-			
-		}); 
-		
-	};
-	
-	
-	
-	/*-----------------------------------------------------------------------------
-		NORMALIZE HEIGHTS
-	----------------------------------------------------------------------------- */
-	
-	main.normalize_heights = function(parentElement, element, setLineHeight) {
-		
-		this.tLog('normalize_heights('+parentElement+', '+element+')');
-		
-		var items = $(parentElement).find(element), 
-    heights = [], 
-    tallest;
 
-		if (items.length) {
-			
-			items.each(function() { //add heights to array
-					heights.push($(this).outerHeight()); 
-			});
-			tallest = Math.max.apply(null, heights); //cache largest value
-			items.each(function() {
-													
-				$(this).css('min-height', tallest + 'px');
-			
-				if(setLineHeight){
-			
-					$(this).css('line-height', tallest + 'px');
-				}
-				
-			});
-			
-		}
-				
-	};
-	
-	/* DISPLAY MAP
-	|	<div id="mapCanvas1" class="mapCanvas" data-map-address="34 elm st."></div>
-	----------------------------------------------------------------------------- */
-	 
-	main.display_map = function() {
-		
-		self = this;
-		self.tLog('display_map()');
-		
-		$('.mapCanvas').each(function() {
-			var w = $(this).parent().width();
-			var h = w * ( 1 / (16/9) );
-			$(this).width(w).height(h);
-		});
-		
-		var geocoder;
-		var map;
-		
-		if($('.mapCanvas').length > 0) {
-			
-			$('.mapCanvas').each(function() {
-																		
-				var mapCanvas = $(this);
-				var mapCanvasID = mapCanvas.attr('id');
-				var address = mapCanvas.data('map-address');
-				
-				if(typeof(address) != 'undefined'){
-				
-					geocoder = new google.maps.Geocoder();
-					var latlng = new google.maps.LatLng(40.9648136, -72.1871827); /*TP Office*/
-					var mapOptions = {
-						zoom: 12,
-						center: latlng,
-						mapTypeId: google.maps.MapTypeId.ROADMAP
-					}
-					
-					if(mapCanvasID != 'undefined'){
-						
-						map = new google.maps.Map(document.getElementById(mapCanvasID), mapOptions);
-						
-						geocoder.geocode( { 'address': address}, function(results, status) {
-							if (status == google.maps.GeocoderStatus.OK) {
-								map.setCenter(results[0].geometry.location);
-								var marker = new google.maps.Marker({
-										map: map,
-										position: results[0].geometry.location
-								});
-								
-							} else {
-								
-								$(this).fadeOut('fast');
-								
-								mapCanvas.after('<p>No map available.</p>');
-							}
-						});
-					} else {
-						self.tLog('tpjc::display_map() - .mapCanvas had no ID');
-					}
-					
-				} else {
-					self.tLog('tpjc::display_map() - did not gather address from data attribute');
-				}
-						
-			});	
-				
-			
-		}
-	};
-	
-	
-	
 	/* SET VALIDATOR DEFAULTS  */
 	main.set_validator_defaults = function() {
 		
-		self = this;
+		var self = this;
 		self.tLog('set_validator_defaults()');
 		
 		$.validator.setDefaults({
@@ -334,135 +264,55 @@ var tpjc = (function ($, main) {
 		
 	};
 	
-	
-	
-	/* CONTACT PAGE VALIDATOR
+	/* MODAL
 	----------------------------------------------------------------------------- */
-	
-	main.validate_contact_form = function() {
+	main.show_modal_loading = function(modalEl) {
 		
-		self = this;
-		self.set_validator_defaults();
-		self.tLog('validate_contact_form()');
+		modalEl.find('input[type=submit]').attr('disabled',true);
+		modalEl.find('.modal-body').prepend('<div class="loadingOverlay"></div>').show();
 		
-		var formID = 'contactForm';
-	
-		$( '#' + formID ).validate({
-			rules: {
-				name: {
-					required: true
-				},
-				email: {
-					required: true,
-					email:true
-				}
-			},
-			onkeyup: false
-		}); 
 		
-
-
 	};
 	
+	main.hide_modal_loading = function(modalEl) {
 	
-	/* LOGIN PAGE
-	----------------------------------------------------------------------------- */
+		modalEl.find('button[type=submit]').attr('disabled', false);
+		modalEl.find('.loadingOverlay').remove();
+		
+		
+	};
 	
-	main.attach_login = function() {
+	main.show_modal_message = function(modalEl, level, message) {
 		
-		this.tLog('attach_login()');
+		var html = this.format_alert_message(level, message);
+		modalEl.find('.modal-body').prepend(html).alert();
 		
-		var self = this;
 		
-		this.set_validator_defaults();
+	};
 	
-		$("#loginForm").validate({
-			rules: {
-				email: {
-					required: true,
-					email:true
-				},
-				password: {
-					required: true,
-					minlength:5
-				}
-			},
-			onkeyup: false
-		});
+	main.format_alert_message = function(level, message) { 
 		
-		$("#forgotPasswordForm").validate({
-			rules: {
-				email: {
-					required: true,
-					email:true
-				}
-			}
-		});
-		
-		$("#resetPasswordForm").validate({
-			rules: {
-				password: {
-					required: true,
-					minlength:5
-				}
-			}
-		});
-		
-		/* TOGGLE */
-														 
-		$('#forgotPasswordButton').click(function(){
-																				
-			$('#loginFormContainer').slideUp('slow', function() {
-																												
-				$('#forgotPasswordFormContainer').removeClass('hide').show(600);
-				
-			});
-				
-			return false;
-		});		
-		
-		$('#backToLoginButton').click(function(){
-																					 
-			$('#forgotPasswordFormContainer').slideUp('slow', function() {
-																																 
-				$('#loginFormContainer').show('slow');
-			});
-			
-			return false;
-		});
-		
-		/* SET OPTIONS */
-		if(typeof(self.options.isForgotPassword) != 'undefined'){
-			
-			$('#forgotPasswordButton').click();
+		if(level == 'error'){
+			level = 'danger';
 		}
 	
+		var html = '<div class="alert alert-' +level+ ' alert-dismissable">';
+		html 		+= '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>';
+		html 		+= message;
+		html 		+= '</div>';
+    return html;
+		
 	};
 	
-
-	/* TEMPLATE
-	----------------------------------------------------------------------------- */
-	main.template = function(template, data) {
-		
-		return template.replace(/\{{([\w\.]*)\}}/g, function(str, key) {
-																											 
-			var keys = key.split("."), v = data[keys.shift()];
-			
-			for (var i = 0, l = keys.length; i < l; i++) v = v[keys[i]];
-			
-			return (typeof v !== "undefined" && v !== null) ? v : "";
-			
-		});
-		
-	};
 	
 	
 	/* TOOL TIPS
 	----------------------------------------------------------------------------- */
 	main.attach_tool_tips = function(){
 		
-		this.tLog('init_defaults()');
+		this.tLog('attach_tool_tips()');
 		$('[data-toggle="tooltip"]').tooltip({container: 'body'});
+		
 		
 	};
 
@@ -480,11 +330,15 @@ var tpjc = (function ($, main) {
 	----------------------------------------------------------------------------- */
 	
 	main.tLog = function(msg) {
+		
 		window.log=function(){
 			log.history=log.history||[];log.history.push(arguments);
-			if(this.console){console.log(Array.prototype.slice.call(arguments))}
+			if(this.console){
+				console.log(Array.prototype.slice.call(arguments));
+			}
 		};
 		console.log(msg);
+		
 	};
 	
 	return main;

@@ -21,7 +21,7 @@ class Database {
 			
 			if (mysqli_connect_error()) {
 				
-				redirect(HTTP_PATH.'error.php?mode=db');
+				die('No db');
 				
 			}
 			

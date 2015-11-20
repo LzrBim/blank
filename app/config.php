@@ -2,7 +2,7 @@
 
 define('MYSQL_HOST', '127.0.0.1');  
 define('MYSQL_USER', 'root'); 
-define('MYSQL_PASS', 'dooDooButter22');  
+define('MYSQL_PASS', '');  
 define('MYSQL_DB', 'blank_db_local'); 
 	
 error_reporting(E_ALL);

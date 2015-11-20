@@ -1,4 +1,34 @@
+# APP
+app/settings.php
 vendor/
 log/*
 cache/*
-app/settings.php
+
+# PUBLIC
+/public/assets
+/public/samples
+/public/css/*.min.*
+/public/css/*.concat.*
+/public/js/*.concat.*
+/public/js/*.min.*
+/public/adminCss/*.min.*
+/public/adminCss/*.concat.*
+/public/adminJs/*.concat.*
+/public/adminJs/*.min.*
+/public/unit
+/vendor
+/node_modules
+/tmp
+
+# TMP or Stashed Files #
+z_*
+y_*
+
+# OS generated files #
+.DS_Store
+.DS_Store?
+_Notes
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

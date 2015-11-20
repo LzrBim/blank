@@ -1,377 +1,351 @@
 /*-----------------------------------------------------------------------------
- * SITE: 
- * FILE: /public_html/js/main.js
+ * SITE: 3E
+ * FILE: /js/main.js
 ----------------------------------------------------------------------------- */
-
-"use strict";
-
 var tpjc = tpjc || {};
 
 var tpjc = (function ($, main) {
+											
+	'use strict';
 		
-	var settings, options, win, page;
+	var mode,
+	options,
+	settings;
 		
-	main.init = function(page, options) { 
+	main.init = function(mode, options) { 
+	
+		this.mode = mode;
 		
-		this.page = page;
+		var defaults = {
+			model: ''
+		};
+				
+		this.options = $.extend(defaults, options);
 		
-		this.options = options;		
+		this.tLog('MODE = '+this.mode);
 		
-		//SETUP		
-		this.win = {};
-		this.settings = {};
+		var optStr = '';
+		$.each(this.options, function(key, val) {                    
+				 optStr += key + " = " + val + ", ";
+		});
 		
-		this.tLog('init('+ page +', '+ JSON.stringify(options) +')');
+		this.tLog('OPTIONS = '+optStr);
 		
-		this.init_defaults();		
+		//LE CONTROLLER
+		if (typeof this.mode != 'undefined' && this.mode !== '') {
 			
-		/* CONTROLLER */
-		if (typeof(page) != 'undefined' && page != '') {
-						
-			if(this.page == 'home'){
-		
-					
-			} else if(this.page == 'blog'){
+			/* WHITELIST ALL MODES DEFINED */
+			if(this.mode == 'index'){
 				
+				this.index();
 				
-			} else if(this.page == 'blog-detail'){
-
+			} else if(this.mode == 'edit' || this.mode == 'add'){
+				
+				this.edit();
+				
+			} else if(this.mode == 'editRank'){
+				
+				this.attach_sortable();
+				
+			} else if(this.mode == 'login'){
+				
+				this.attach_login();
+				
+			} else { /* OTHER MODES */
 			
-			} else if (this.page == 'contact'){
+				if(this.mode == 'dashboard'){
+					this.dashboard();
+				}
 				
-				this.validate_contact_form();
-				
-			
-
-				
-			} else if (this.page == 'checkout'){
-				
-				this.validate_checkout();
-				
-			} else {
-				this.tLog('- no whitelisted page ');
 			}
 					
 		} else {
-			this.tLog('- page undefined ');
+			this.tLog('tpjc::init() - no mode');
+			
 		}
 		
+		this.init_defaults();
+	
 	};
 	
-
-	/* INIT DEFAULTS
+	/* MODE INIT
 	----------------------------------------------------------------------------- */
 	main.init_defaults = function() {
 		
-		this.tLog('init_defaults()');
+		var self = this; 
 		
-		this.set_window_info();
+		self.tLog('wtf')
 		
-    $('#side-menu').metisMenu();
+		$('#side-menu').metisMenu();
 		
-    $(window).bind("load resize", function() {
-        topOffset = 50;
-        width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
-        if (width < 768) {
-            $('div.navbar-collapse').addClass('collapse');
-            topOffset = 100; // 2-row-menu
-        } else {
-            $('div.navbar-collapse').removeClass('collapse');
-        }
-
-        height = ((this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height) - 1;
-        height = height - topOffset;
-        if (height < 1) height = 1;
-        if (height > topOffset) {
-            $("#page-wrapper").css("min-height", (height) + "px");
-        }
-    });
-
-    var url = window.location;
-    var element = $('ul.nav a').filter(function() {
-        return this.href == url || url.href.indexOf(this.href) == 0;
-    }).addClass('active').parent().parent().addClass('in').parent();
-    if (element.is('li')) {
-        element.addClass('active');
-    }
+		$(window).bind("load resize", function() {
 		
-	};
-
-	
-	
-	/* GET WINDOW INFO
-	----------------------------------------------------------------------------- */
-	main.set_window_info = function() {
+			var topOffset = 50;
 		
-		self = this;
-		self.tLog('get_window_info()');
-		
-		self.win.width = $(window).width();
-		self.win.height = $(window).height();
-		
-		self.win.navHeight = $('#nav').outerHeight(false);
-		
-		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-			self.win.isMobile = true;
-		} else {
-			self.win.isMobile = false;
-		}
-
-		if( self.win.width < 768){
+			var width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
 			
-			self.win.breakpoint = 'xs';
-			
-		} else if( self.win.width >= 768 && self.win.width < 992) {
-			
-			self.win.breakpoint = 'sm';
-			
-		} else if( self.win.width >= 992 &&self. win.width < 1280) {
-			
-			self.win.breakpoint = 'md';
-			
-		} else {
-			self.win.breakpoint = 'lg'
-		}
-	
-		self.tLog('winheight='+self.win.height);
-
-	};
-	
-	
-	
-	/* ATTACH WINDOW RESIZE
-	----------------------------------------------------------------------------- */
-	
-	main.handle_resize = function(callback) {
-		
-		self = this;
-		self.tLog('handle_resize()');
-		
-		//DEBOUNCE
-		var delay = (function(){
-			var timer = 0;
-			return function(fx, ms){
-				clearTimeout (timer);
-				timer = setTimeout(fx, ms);
-			};
-		})();
-		
-		//BIND
-		$(window).resize(function() {										
-			delay(function(){
-				self.set_window_info();
-				callback();
-			}, 400);
-		});
-		
-		//TRIGGER
-		$( window ).load(function() {
-			//self.set_window_info();
-			callback();	
-		});
-		
-	}
-	
-	
-	/* ATTACH WINDOW RESIZE
-	----------------------------------------------------------------------------- */
-	 
-	main.attach_home_resize = function() { 
-		
-		self = this;
-		self.tLog('attach_home_resize()');
-		
-		this.resize(function () {
-			
-			//self.normalize_heights('.newsEventsCol', '.newsCarouselItem');
-			
-		}); 
-		
-	};
-	
-	
-	
-	/*-----------------------------------------------------------------------------
-		NORMALIZE HEIGHTS
-	----------------------------------------------------------------------------- */
-	
-	main.normalize_heights = function(parentElement, element, setLineHeight) {
-		
-		this.tLog('normalize_heights('+parentElement+', '+element+')');
-		
-		var items = $(parentElement).find(element), 
-    heights = [], 
-    tallest;
-
-		if (items.length) {
-			
-			items.each(function() { //add heights to array
-					heights.push($(this).outerHeight()); 
-			});
-			tallest = Math.max.apply(null, heights); //cache largest value
-			items.each(function() {
-													
-				$(this).css('min-height', tallest + 'px');
-			
-				if(setLineHeight){
-			
-					$(this).css('line-height', tallest + 'px');
-				}
+			if (width < 768) {
 				
-			});
-			
-		}
+				$('div.navbar-collapse').addClass('collapse');
+				topOffset = 100; // 2-row-menu
 				
-	};
-	
-	/* DISPLAY MAP
-	|	<div id="mapCanvas1" class="mapCanvas" data-map-address="34 elm st."></div>
-	----------------------------------------------------------------------------- */
-	 
-	main.display_map = function() {
-		
-		self = this;
-		self.tLog('display_map()');
-		
-		$('.mapCanvas').each(function() {
-			var w = $(this).parent().width();
-			var h = w * ( 1 / (16/9) );
-			$(this).width(w).height(h);
-		});
-		
-		var geocoder;
-		var map;
-		
-		if($('.mapCanvas').length > 0) {
-			
-			$('.mapCanvas').each(function() {
-																		
-				var mapCanvas = $(this);
-				var mapCanvasID = mapCanvas.attr('id');
-				var address = mapCanvas.data('map-address');
+			} else {
 				
-				if(typeof(address) != 'undefined'){
+				$('div.navbar-collapse').removeClass('collapse');
 				
-					geocoder = new google.maps.Geocoder();
-					var latlng = new google.maps.LatLng(40.9648136, -72.1871827); /*TP Office*/
-					var mapOptions = {
-						zoom: 12,
-						center: latlng,
-						mapTypeId: google.maps.MapTypeId.ROADMAP
-					}
-					
-					if(mapCanvasID != 'undefined'){
-						
-						map = new google.maps.Map(document.getElementById(mapCanvasID), mapOptions);
-						
-						geocoder.geocode( { 'address': address}, function(results, status) {
-							if (status == google.maps.GeocoderStatus.OK) {
-								map.setCenter(results[0].geometry.location);
-								var marker = new google.maps.Marker({
-										map: map,
-										position: results[0].geometry.location
-								});
-								
-							} else {
-								
-								$(this).fadeOut('fast');
-								
-								mapCanvas.after('<p>No map available.</p>');
-							}
-						});
-					} else {
-						self.tLog('tpjc::display_map() - .mapCanvas had no ID');
-					}
-					
-				} else {
-					self.tLog('tpjc::display_map() - did not gather address from data attribute');
-				}
-						
-			});	
-				
-			
-		}
-	};
-	
-	
-	
-	/* SET VALIDATOR DEFAULTS  */
-	main.set_validator_defaults = function() {
+			}
 		
-		self = this;
-		self.tLog('set_validator_defaults()');
-		
-		$.validator.setDefaults({
-								
-			/*ignore: ':hidden',*/
-			ignore: '',
-			errorElement: 'span',
-			errorClass: 'help-block',
+			var height = ((this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height) - 1;
 			
-			highlight: function(element) {
-        $(element).closest('.form-group').addClass('has-error');
-			},
+			height = height - topOffset;
 			
-			unhighlight: function(element) {
-					$(element).closest('.form-group').removeClass('has-error');
-			},
-			
-			errorPlacement: function(error, element) {
-				if(element.parent('.input-group').length) {
-					error.insertAfter(element.parent());
-				} else {
-					error.insertAfter(element);
-				}
-			}, 
-		 
-			submitHandler: function(form) {
-				
-				self.tLog('- - submitHandler called');				
-				form.submit();
-				
+			if (height < 1){
+				height = 1;
+			}
+			if (height > topOffset) {
+				$("#page-wrapper").css("min-height", (height) + "px");
 			}
 		
 		});
 		
+		var url = window.location;
+		
+		var element = $('ul.nav a').filter(function() {
+		
+			return this.href == url || url.href.indexOf(this.href) == 0;
+		
+		}).addClass('active').parent().parent().addClass('in').parent();
+		
+		if (element.is('li')) {
+			element.addClass('active');
+		}
+		
 	};
 	
 	
+	/* MODE INIT
+	----------------------------------------------------------------------------- */
+	main.dashboard = function() {
+		
+		this.tLog('dashboard')
+		
+	};
 	
-	/* CONTACT PAGE VALIDATOR
+	main.index = function() {
+		
+		/*$('#tpjc_dataTable').DataTable( {
+				data: data
+		});*/
+		
+	};
+	
+	
+	main.edit = function() {
+			
+		/* OPTION OVERRIDES */
+		this.attach_edit_page_model_option_overrides();
+		
+		/* THE USUAL */
+		this.attach_editor();
+		
+		this.attach_validator();
+		
+		this.attach_edit_form_plugins();
+		
+		this.attach_crop_button();
+		
+		this.attach_remove_image();
+		
+		this.attach_edit_form_submit_button_clicks();
+		
+		/* RUN OPTIONS FIRST INCASE OF OVERRIDES */
+		this.attach_edit_page_model_options();
+					
+	};
+	
+		
+	/* MODEL OPTIONS
 	----------------------------------------------------------------------------- */
 	
-	main.validate_contact_form = function() {
+	main.attach_edit_page_model_option_overrides = function() {
 		
-		self = this;
-		self.set_validator_defaults();
-		self.tLog('validate_contact_form()');
-		
-		var formID = 'contactForm';
+		this.tLog('- attach_edit_page_model_options()');
 	
-		$( '#' + formID ).validate({
-			rules: {
-				name: {
-					required: true
-				},
-				email: {
-					required: true,
-					email:true
-				}
-			},
-			onkeyup: false
-		}); 
+		if(this.options.model.length){
+			
+			if(this.options.model == 'NewsletterBlock'){ 
+				
+				this.options.useTinyAbsolutePath = true;			
+				
+			}
 		
-
-
+		}
+		
 	};
+	
+	
+	/* CLASS NAME SWITCHES
+	----------------------------------------------------------------------------- */
+	main.attach_edit_page_model_options = function() {
+		
+		this.tLog('- attach_edit_page_model_options()');
+	
+		if(this.options.model.length){
+			
+			/* ADMIN USERS */
+			if(this.options.model == 'AdminUser'){
+
+				
+				if(this.mode == 'add'){
+					this.attach_admin_user_add_validate();
+				}
+			
+			}
+			
+			/* ACCOUNT USERS */		
+			if(this.options.model == 'AccountUser'){ 
+			
+				if(this.mode == 'edit'){
+					this.attach_account_user_group_tag_modal();
+				}
+			
+				
+			}
+			
+			/* ACCOUNT USERS */
+			if(this.options.model == 'AccountUserGroup'){
+
+				if(this.mode == 'edit'){
+					
+					this.attach_add_account_user_modal();
+					
+					this.attach_account_user_group_remove();
+
+				}
+			
+			}
+			
+			/* EMAIL TEMPLATE */
+			if(this.options.model == 'Discount'){ 
+			
+				this.validate_add_discount_form();
+				
+			}
+			
+			
+			
+			/* EMAIL TEMPLATE */
+			if(this.options.model == 'EmailTemplate'){ 
+			
+				this.attach_email_template_test_modal();
+				
+			}
+			
+			/* FAQ */
+			if(this.options.model == 'Faq'){ 
+			
+				this.attach_faq_tag_modal();
+				
+				this.attach_simple_editor();
+				
+			}
+			
+			
+			
+			/* GALLERY */
+			if(this.options.model == 'Gallery'){
+				
+				if(this.mode == 'add'){
+					
+					this.gallery_add_type_select();
+		
+				
+				
+				} else {
+					
+					this.form_change_monitor();
+				
+					/* Inline removal of Slider Images */
+					this.attach_remove_gallery_image();
+					
+				}
+				
+			}		
+			
+			/* ITEM */
+			if(this.options.model == 'Brief'){ 
+			
+				this.attach_remove_gallery_image();
+				
+			}
+			
+			
+			/* MENU */
+			if(this.options.model == 'Menu'){ 
+				
+				this.attach_menu_item_modal();
+				
+				$('#nestable').nestable({
+					group: 1
+				
+				}).on('change', function(){
+					
+					$('#nestableInput').val( JSON.stringify($('#nestable').nestable('serialize')) );
+				
+				}).trigger('change');
+		
+			}
+			
+			/* PAGE VERSIONS */
+			if(this.options.model == 'Page'){ 
+				
+				if(this.mode == 'edit'){
+					this.attach_permalink_builder();
+				}
+				
+			}
+			
+			/* PAGE VERSIONS */
+			if(this.options.model == 'PageVersion'){ 
+				
+				this.attach_add_page_version_block_modal();
+				
+				this.attach_insert_page_version_block_modal();
+				
+				this.attach_remove_page_version_block();
+				
+				this.attach_page_version_block_sortable();				
+				
+			}
+			
+			
+			
+			/* PAGE VERSION BLOCKS */
+			if(this.options.model == 'PageVersionBlock'){ 
+				
+				this.options.useTinyAbsolutePath = true;			
+				
+			}
+		
+			/* SLIDER */
+			if(this.options.model == 'Slider'){ 
+			
+				this.attach_simple_editor();
+				
+			}
+			
+			
+			
+		}
+		
+	};	
 	
 	
 	/* LOGIN PAGE
 	----------------------------------------------------------------------------- */
-	
 	main.attach_login = function() {
 		
-		this.tLog('attach_login()');
+		this.tLog('- attach_login()');
 		
 		var self = this;
 		
@@ -440,36 +414,15 @@ var tpjc = (function ($, main) {
 	
 	};
 	
-	
-	/* TOOL TIPS
-	----------------------------------------------------------------------------- */
-	main.attach_tool_tips = function(){
-		
-		this.tLog('init_defaults()');
-		$('[data-toggle="tooltip"]').tooltip({container: 'body'});
-		
-	};
-
-	/* RESET FORM
-	----------------------------------------------------------------------------- */
-	main.reset_form = function(formID) { 
-		
-		$('#' + formID).find('input:text, input:password, input:file, select, textarea').val('');
-    $('#' + formID).find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
-		
-	};
-	
-	
 	/* UTILS
 	----------------------------------------------------------------------------- */
-	
 	main.tLog = function(msg) {
-		window.log=function(){
-			log.history=log.history||[];log.history.push(arguments);
-			if(this.console){console.log(Array.prototype.slice.call(arguments))}
-		};
-		console.log(msg);
-	};
+		
+		if (typeof console !== "undefined"){
+			console.log(msg);
+		}
+		
+	};	
 	
 	return main;
 

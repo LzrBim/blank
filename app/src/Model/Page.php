@@ -1,17 +1,21 @@
 <?
 /*-----------------------------------------------------------------------------
  * SITE: 
- * FILE: /models/Page.php
+ * FILE: app/src/Model/Page.php
 ----------------------------------------------------------------------------- */
 
+namespace App\Model;
+
 class Page extends PageBase {  
+	
+	//ATTRIBUTES
+	protected $attributes = [];
+	
+	protected $relations = [];
 	
 	//CHILDREN	
 	public $pageVersion;
 	public $pageBlock = array();
-	
-	//PICKUPS
-	public $headline;
 	
 	/* LOAD
 	----------------------------------------------------------------------------- */
@@ -20,27 +24,23 @@ class Page extends PageBase {
 		
 		parent::__construct();
 		
-		$this->version = new PageVersion();
+		//$this->version = new PageVersion();
 		
-		$this->promoBlock = new PagePromoBlock();
+		//$this->promoBlock = new PagePromoBlock();
 		
 	}
 	
-	protected function loadChildren(){
+	public function with($with){
 		
-		$this->version->loadActiveByPage($this->getId());
+		/*$this->version->loadActiveByPage($this->getId());
 		
 		$this->promoBlocks = $this->promoBlock->fetchByPageAndSiteWide($this->getId());
 		
-		$this->_loadedChildren = true;
+		$this->_loadedChildren = true;*/
 		
 	}
 	
-	protected function loadHook(){
-		if($this->getId() == 1){
-			$this->permalink = HTTP_PATH;
-		}
-	}
+	
 	
 	/* PUBLIC FETCH
 	----------------------------------------------------------------------------- */
@@ -63,61 +63,7 @@ class Page extends PageBase {
 	/* ADMIN FETCH 
 	----------------------------------------------------------------------------- */
 
-	/* CRUD
-	----------------------------------------------------------------------------- */
-
 	
-	public function _insert(){
-		
-		$this->setPermalink($this->title);
-		
-		$insert = sprintf("INSERT INTO ".$this->_table." 
-			(title, permalink, metaTitle, metaDescription, metaKeywords, status, dateAdded) 
-			VALUES (%s, %s, %s, %s, %s, %s, %s)",
-			Sanitize::input($this->title, "text"),
-			Sanitize::input($this->permalink, "text"),
-			Sanitize::input($this->metaTitle, "text"),
-			Sanitize::input($this->metaDescription, "text"),
-			Sanitize::input($this->metaKeywords, "text"),
-			Sanitize::input($this->status, "text"),
-			'NOW()');
-		
-		if($this->query($insert)){ 
-		
-			$this->setInsertId();
-			
-			return true;			
-		
-		} else { 
-			addMessage('error','Error saving '.$this->_title);
-			return false;
-		} 
-	}
-	
-	public function _update(){
-	
-				
-		$update = sprintf("UPDATE ".$this->_table."
-			SET title=%s, permalink=%s, metaTitle=%s, metaDescription=%s, metaKeywords=%s, status=%s
-			WHERE ".$this->_id."=%d",
-			Sanitize::input($this->title, "text"),
-			Sanitize::input($this->permalink, "text"),
-			Sanitize::input($this->metaTitle, "text"),
-			Sanitize::input($this->metaDescription, "text"), 
-			Sanitize::input($this->metaKeywords, "text"),
-			Sanitize::input($this->status, "text"),
-			Sanitize::input($this->getId(), "int"));
-	
-		if($this->query($update)){ 
-		
-			addMessage('success', $this->_title.' was updated successfully');
-			return true;
-			
-		} else { 
-			addMessage('error','Error updating '.$this->_title);
-			return false;
-		}
-	}
 	
 	/* 	EXTEND CORE-PERMA FOR HARD CODED
 	----------------------------------------------------------------------------- */

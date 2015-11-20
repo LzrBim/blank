@@ -7,58 +7,7 @@
 {% endblock %}
 
 {% block content %}
-
-    <h1>{{}}</h1>
     
-    {% if responsive %}
-      <div class="table-responsive">
-    {% endif %}
-    <table{{ attributes }}>
-      {% if caption_needed %}
-        <caption>
-          {% if caption %}
-            {{ caption }}
-          {% else %}
-            {{ title }}
-          {% endif %}
-          {% if (summary is not empty) or (description is not empty) %}
-            <details>
-              {% if summary is not empty %}
-                <summary>{{ summary }}</summary>
-              {% endif %}
-              {% if description is not empty %}
-                {{ description }}
-              {% endif %}
-            </details>
-          {% endif %}
-        </caption>
-      {% endif %}
-      {% if header %}
-        <thead>
-          <tr>
-            {% for column in header %}
-              <th{{ column.attributes }} scope="col">
-                {{ column.content }}
-              </th>
-            {% endfor %}
-          </tr>
-        </thead>
-      {% endif %}
-      <tbody>
-        {% for row in rows %}
-          <tr{{ row.attributes }}>
-            {% for column in row.columns %}
-              <td{{ column.attributes }}>
-                {{ column.content }}
-              </td>
-            {% endfor %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% if responsive %}
-      </div>
-    {% endif %}
-   
+    <div id="#tpjc_dataTable"></div>
     
 {% endblock %}

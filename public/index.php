@@ -10,20 +10,27 @@ if (PHP_SAPI == 'cli-server') {
 	}
 }
 
-require __DIR__ . '/../vendor/autoload.php';
-
+//CONFIG
 require __DIR__ . '/../app/config.php';
 
+//AUTOLOADER
+require __DIR__ . '/../vendor/autoload.php';
+
+//BOOT APP
 $app = new \Slim\App($settings); 
 
-// Set up dependencies
+//DI DEPENDENCIES
 require __DIR__ . '/../app/dependencies.php'; 
 
-// Register middleware
+//EVIRONMENT
+require __DIR__ . '/../app/environment.php';
+
+//MIDDLEWARE
 require __DIR__ . '/../app/middleware.php';
 
-// Register routes
+//ROUTES
 require __DIR__ . '/../app/routes.php';
+require __DIR__ . '/../app/admin_routes.php';
 
-// Run!
+//FRONTBUTT
 $app->run();

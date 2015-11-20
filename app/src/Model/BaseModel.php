@@ -1,5 +1,6 @@
 <?php
 namespace App\Model;
+
 use \App\lib\Database;
 
 class BaseModel {
@@ -13,7 +14,7 @@ class BaseModel {
 		
 	}
 		
-	public function load($id, $childArgs = array()){
+	public function load($id, $with = array()){
 		
 		if(empty($id)){
 			return false;
@@ -31,32 +32,36 @@ class BaseModel {
 				
 				$row = mysqli_fetch_array($result);
 				
-				if(array_key_exists($var, $this)){
+				foreach($row as $var => $value){
 				
-					$this->$var = $value;
+					if(array_key_exists($var, $this)){
 					
-				} else {
-					
-					//populate child objects:  row['photographer_firstName'] maps to $this->photographer->firstName
-					if(strpos($var,'_') !== false){
+						$this->$var = $value;
 						
-						$parts = explode('_', $var);
+					} else {
 						
-						if(isset($parts[0]) && isset($parts[1])){
+						//populate child objects:  row['photographer_firstName'] maps to $this->photographer->firstName
+						if(strpos($var,'_') !== false){
 							
-							if(array_key_exists($parts[0], $this)){
-																				 
-								if(array_key_exists($parts[1], $this->$parts[0])){
-									$this->$parts[0]->$parts[1] = $value;						 
+							$parts = explode('_', $var);
+							
+							if(isset($parts[0]) && isset($parts[1])){
+								
+								if(array_key_exists($parts[0], $this)){
+																					 
+									if(array_key_exists($parts[1], $this->$parts[0])){
+										$this->$parts[0]->$parts[1] = $value;						 
+									}
+								
 								}
-							
+								
 							}
 							
 						}
 						
-					}
+					} 
 					
-				} 
+				}
 				
 				$this->loadHook();
 				
@@ -75,7 +80,7 @@ class BaseModel {
 		return false;
 	}
 	
-	public function loadByData($data, $childArgs = array()){
+	public function loadByData($data){
 		
 		if(empty($data)){
 			wLog(2, 'No data supplied');
@@ -115,7 +120,7 @@ class BaseModel {
 		return true;
 	}
 	
-	public function loadWhere($where, $childArgs = array()){
+	public function loadWhere($where, $with = array()){
 		
 		if(empty($where)){
 			return false;
@@ -154,7 +159,6 @@ class BaseModel {
 	
 	/* SQL
 	----------------------------------------------------------------------------- */
-	
 	public function query($statement){
 		
 		$db = Database::get_instance();
@@ -170,9 +174,7 @@ class BaseModel {
 			die('Invalid Query: '.mysqli_error($db));
 			
 		}
-		
-		return false;
-		
+				
 	}
 	
 	public function queryInsert($statement){
@@ -202,7 +204,7 @@ class BaseModel {
 		} 
 	}
 	
-	public function getId(){ return $this->{$this->_id}; }
+	public function id(){ return $this->{$this->_id}; }
 	
 	public function fetchAssoc($result){ return mysqli_fetch_assoc($result);  }
 	
@@ -552,7 +554,7 @@ class BaseModel {
 	}
 	
 	
-	public function getSelectOptionArray($pk = 0, $onlyActive = false){
+	public function getSelectOptionArray($pk = 0, $field = 'title', $opts = array()){
 		
 		$choices = array();
 		if(!$onlyActive){

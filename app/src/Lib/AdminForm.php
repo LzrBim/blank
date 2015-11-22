@@ -5,11 +5,21 @@
 ----------------------------------------------------------------------------- */
 namespace App\Lib;
 
+use \App\Lib\Form;
+
 class AdminForm extends Form {
 	
 	public function open($opts = array()){ 
 	
-		return '<form id="editForm" action="'.basename($_SERVER['SCRIPT_FILENAME']).'"  method="post" enctype="multipart/form-data" role="form">';
+		$defaults = array(
+			'id'		=> 'editForm',
+			'action'	=> $_SERVER['REQUEST_URI'],
+			'method'=> 'post'
+		);
+		
+		$opts = array_merge($defaults, $opts);
+	
+		return '<form id="'.$opts['id'].'" action="'.$opts['action'].'"  method="post" enctype="multipart/form-data" role="form">';
 		
 	}
 	

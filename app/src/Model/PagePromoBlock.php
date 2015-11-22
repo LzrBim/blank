@@ -4,7 +4,9 @@
  * FILE: /app/models/PagePromoBlock.php
 ----------------------------------------------------------------------------- */
 
-class PagePromoBlock extends Core {
+namespace App\Model;
+
+class PagePromoBlock extends BaseModel {
 	
 	//ATTRIBUTES
 	public $_title = 'Page Block';

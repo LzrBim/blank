@@ -7,13 +7,13 @@ namespace App\AdminController;
 
 use App\Model\Page;
 
-class PageController extends BaseController {
+class CommonController extends BaseController {
 	
-	public function index($request, $response, $args){
+	public function insert($request, $response, $args){
 	
-		$this->logger->debug("Admin Page Index");
-		
-		$page = new Page();
+		$this->logger->debug("Common Controller Add");
+		 
+		$obj = new $args['model'];
 		$pages = $page->fetchAll();
         
 		$this->view->render($response, 'admin/page.index.twig', [
@@ -29,28 +29,7 @@ class PageController extends BaseController {
 	
 	}
 	
-	public function add($request, $response, $args){
-	
-		$this->logger->debug("Admin Page Add");
-		
-		ob_start();
-		include('../app/src/crud/Page/add.php');
-		$form = ob_get_clean();
-        
-		$this->view->render($response, 'admin/edit.twig', [
-			'title' => 'Pages',
-			'form' => $form,
-			'jsPage' => 'add',
-			'jsOptions' => array(
-				'model' => 'Page'
-			)																			 
-		]);	
-		
-		return $response;
-	
-	}
-	
-	public function edit($request, $response, $args){
+	public function update($request, $response, $args){
 	
 		$this->logger->debug("Admin Page Edit");
 		

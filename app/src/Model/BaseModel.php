@@ -13,8 +13,8 @@ class BaseModel {
 	public function __construct(){ 
 		
 	}
-		
-	public function load($id, $with = array()){
+	
+	public function load($id){
 		
 		if(empty($id)){
 			return false;
@@ -32,42 +32,11 @@ class BaseModel {
 				
 				$row = mysqli_fetch_array($result);
 				
-				foreach($row as $var => $value){
-				
-					if(array_key_exists($var, $this)){
-					
-						$this->$var = $value;
-						
-					} else {
-						
-						//populate child objects:  row['photographer_firstName'] maps to $this->photographer->firstName
-						if(strpos($var,'_') !== false){
-							
-							$parts = explode('_', $var);
-							
-							if(isset($parts[0]) && isset($parts[1])){
-								
-								if(array_key_exists($parts[0], $this)){
-																					 
-									if(array_key_exists($parts[1], $this->$parts[0])){
-										$this->$parts[0]->$parts[1] = $value;						 
-									}
-								
-								}
-								
-							}
-							
-						}
-						
-					} 
-					
-				}
+				$this->loadByData($row); 
 				
 				$this->loadHook();
 				
-				$this->loadChildren($childArgs);
-				
-				return true;
+				return $this;
 				
 			} 
 			
@@ -75,6 +44,42 @@ class BaseModel {
 			
 			throw new AppException();
 			
+		}
+		
+		return false;
+	}
+		
+	public function loadBySlug($slug){
+		
+		if(empty($slug)){
+			die('slug was empty');
+			return false;
+		}
+		
+		echo $slug;
+		
+		$query = "SELECT * FROM `".$this->_table."` WHERE `slug` = '".$slug."'";
+		
+		$db = Database::get_instance();
+		
+		$result = mysqli_query($db, $query);
+		
+		if($result){
+			
+			if(mysqli_num_rows($result)){
+				
+				$row = mysqli_fetch_array($result);
+				
+				$this->loadByData($row); 
+				
+				return $this;
+				
+			} 
+			
+		} else {
+			
+			//throw new AppException();
+			return false;
 		}
 		
 		return false;
@@ -115,8 +120,6 @@ class BaseModel {
 		
 		$this->loadHook();
 		
-		$this->loadChildren($childArgs);
-		
 		return true;
 	}
 	
@@ -134,7 +137,7 @@ class BaseModel {
 			
 			if($this->numRows($result) == 1){
 				
-				return $this->loadByData($this->fetchAssoc($result), $childArgs);
+				return $this->loadByData($this->fetchAssoc($result));
 				
 			} else {
 				
@@ -368,7 +371,7 @@ class BaseModel {
 	/* COLLECTIONS
 	----------------------------------------------------------------------------- */
 	
-	protected function loadCollection($query){
+	protected function fetchCollection($query){
 		
 		$db = Database::get_instance();
 		
@@ -430,7 +433,7 @@ class BaseModel {
 			$query .= "LIMIT ".$limit." ";
 		}
 				
-		return $this->loadCollection($query);
+		return $this->fetchCollection($query);
 		
 	}
 	
@@ -541,7 +544,7 @@ class BaseModel {
 			$query .= "LIMIT ".$limit;
 		}
 		
-		return $this->loadCollection($query);
+		return $this->fetchCollection($query);
 	}
 	
 	
@@ -566,18 +569,18 @@ class BaseModel {
 		if(empty($pk)){ /* if the parent pk is empty => must be mode=add */
 		
 			foreach($list as $model){
-				$choices[] = array($model->title, $model->getId(), false);
+				$choices[] = array($model->title, $model->id(), false);
 			}
 			
 		} else {
 			
 			foreach($list as $model){
-				if($model->getId() == $pk){
+				if($model->id() == $pk){
 					$selected = true;
 				} else {
 					$selected = false;
 				}
-				$choices[] = array($model->title, $model->getId(), $selected);
+				$choices[] = array($model->title, $model->id(), $selected);
 			}
 			
 		}

@@ -8,7 +8,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="Third Perspective Web Design, Hamptons NY">
 
 {% block head %}
@@ -22,6 +22,9 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 	<link href="/css/style.css" rel="stylesheet">
+  <link href="/css/theme.css" rel="stylesheet">
+  <link href="/css/structure.css" rel="stylesheet">
+  <link href="/css/helper.css" rel="stylesheet">
   
 {% else %}
 
@@ -72,13 +75,23 @@
 <div id="content">{% block content %}{% endblock %}</div>
        
 <footer>
-
 {% block footer %}
 
-	&copy; Copyright 2011 by <a href="http://domain.invalid/">you</a>.
+	<div class="footerWrapper container">
+
+    <div class="row">
+  
+      <div class="col-sm-12">
+      
+      	&copy; Copyright 2011 by <a href="http://domain.invalid/">you</a>.
+      
+      </div><!-- /.col -->
+      
+    </div><!-- /.row -->
+    
+  </div><!-- /.footerWrapper -->
     
 {% endblock %}
-  
 </footer><!-- /footer -->
 
 {% if ENVIRONMENT == 'local' %}

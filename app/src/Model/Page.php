@@ -9,36 +9,65 @@ namespace App\Model;
 class Page extends PageBase {  
 	
 	//ATTRIBUTES
-	protected $attributes = [];
-	
-	protected $relations = [];
 	
 	//CHILDREN	
 	public $pageVersion;
-	public $pageBlock = array();
+	public $pageBlocks = array();
+	
 	
 	/* LOAD
 	----------------------------------------------------------------------------- */
-	
 	public function __construct(){
 		
 		parent::__construct();
 		
-		//$this->version = new PageVersion();
+		$this->version = new PageVersion();
 		
-		//$this->promoBlock = new PagePromoBlock();
+		$this->promoBlock = new PagePromoBlock();
 		
 	}
 	
 	public function with($with){
 		
-		/*$this->version->loadActiveByPage($this->getId());
+		if(!is_array($with)){
+			
+			$with = array($with);
+			
+		}
 		
-		$this->promoBlocks = $this->promoBlock->fetchByPageAndSiteWide($this->getId());
+		if($this->isLoaded()){
 		
-		$this->_loadedChildren = true;*/
+			if(count($with)){
+				
+				foreach($with as $relation){
+					
+					if($relation == '*'){
+						
+					} 
+					
+					if($relation == 'pageBlock'){
+						
+						$this->promoBlocks = $this->promoBlock->fetchByPageAndSiteWide($this->id());
+						
+					}
+					
+					if($relation == 'pageVersion'){
+						
+						$this->version->loadActiveByPage($this->id());
+						
+					}
+					
+				}
+				
+			}
+		
+		} else {
+			return false;
+		}
 		
 	}
+	
+	
 	
 	
 	
@@ -60,6 +89,8 @@ class Page extends PageBase {
 		return $this->loadCollection($query);
 
 	}
+	
+	
 	/* ADMIN FETCH 
 	----------------------------------------------------------------------------- */
 

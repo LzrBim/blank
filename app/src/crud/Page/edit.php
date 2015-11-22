@@ -4,19 +4,16 @@
  * FILE: /app/crud/Page/edit.php
 ----------------------------------------------------------------------------- */ 
 
+use \App\Lib\AdminForm;
+
 $form = new AdminForm(); 
 
 echo $form->open();
 
 /* HIDDEN*/
-echo $form->hidden('mode', 'update');
-echo $form->hidden($page->_id, $page->getId());
+echo $form->hidden('model', get_class($page));
 
-/* FIRST SECTION */
-$title = 'Edit Page';
-$content = '';
-
-ob_start();
+echo $form->hidden($page->_id, $page->id());
 
 echo $form->status($page->status);  
 
@@ -25,23 +22,22 @@ echo $form->input('title', 'Title', $page->title, array(
 	'help' => 'For administrative use only')
 );  
 
-
-if($page->getId() != 1 && !$page->isHardCoded){
-	echo $form->input('permalink', 'Permalink', $page->permalink, array('help' => 'URL: <span id="tjpc_permalink">'.HTTP_PATH.'page/<span>'.$page->permalink.'</span>/</span>') ); 
+if($page->id() != 1 && !$page->isHardCoded){
+	
+	echo $form->input('permalink', 'Permalink', $page->permalink, array('help' => 'URL: <span id="tjpc_permalink">page/<span>'.$page->permalink.'</span>/</span>') ); 
+	
 } else {
+	
 	echo $form->hidden('permalink', $page->permalink );
+	
 }
 
 echo $form->input('metaTitle', 'Meta Title', $page->metaTitle ); 
 
 echo $form->input('metaDescription', 'Meta Description', $page->metaDescription );
 
-$content = ob_get_clean();
-
-$adminView->box($title, $content, array('helpDoc' => 'pageEditHelp')); 
+echo $form->editor('asdf', 'desc Title', 'test' ); 
 
 echo $form->buttonsEdit();
 
 echo $form->close();
-
-echo $adminView->displayHelpModal('pageEditHelp', 'Page Edit Help', 'Page/edit_help.php');

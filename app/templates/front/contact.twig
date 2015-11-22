@@ -17,8 +17,23 @@
 				<div class="col-sm-12">
 
 					<h1>Contact Us</h1>
-				
-					
+          
+          {% include 'partial/flash.twig' %}
+          
+          <form id="contactForm" method="post" action="/contact">
+          
+          <input type="hidden" name="csrf_name" value="{{token.csrf_name}}" />
+          <input type="hidden" name="csrf_value" value="{{token.csrf_value}}" />
+          
+          <label>Email</label>
+          <input type="email" name="email" value="" />
+          
+          <label>Message</label>
+          <textarea name="message"></textarea>
+          
+          <input type="submit" value="submit" />
+          
+          </form>
 					
 				</div>
 				

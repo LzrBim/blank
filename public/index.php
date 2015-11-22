@@ -18,9 +18,11 @@ require __DIR__ . '/../vendor/autoload.php';
 
 //BOOT APP
 $app = new \Slim\App($settings); 
+$app->config('debug', true);
 
 //DI DEPENDENCIES
 require __DIR__ . '/../app/dependencies.php'; 
+require __DIR__ . '/../app/admin_dependencies.php'; 
 
 //EVIRONMENT
 require __DIR__ . '/../app/environment.php';

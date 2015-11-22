@@ -10,8 +10,22 @@ $app->group('/admin', function () use ($app) {
 	$app->get('/page/index', 'App\AdminController\PageController:index');	
 	
 		$app->get('/page/add', 'App\AdminController\PageController:add');
+		
+		$app->post('/page/add', 'App\AdminController\CommonController:insert');
 	
-		$app->get('/page/edit', 'App\AdminController\PageController:edit');
+		$app->get('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:edit');
+		
+		$app->post('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:update');
+		
+		
+	//PAGE VERSIONS
+	$app->get('/pageVersion/index/{pageID:[0-9]+}', 'App\AdminController\PageVersionController:index');	
+	
+		$app->get('/pageVersion/add/{pageID:[0-9]+}', 'App\AdminController\PageVersionController:add');
+	
+		$app->get('/pageVersion/edit/{id:[0-9]+}', 'App\AdminController\PageVersionController:edit');
+		
+		$app->get('/pageVersion/copy/{id:[0-9]+}', 'App\AdminController\PageVersionController:copy');
 		
 		
 	//GALLERY

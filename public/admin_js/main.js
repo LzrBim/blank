@@ -7,10 +7,7 @@ var tpjc = tpjc || {};
 var tpjc = (function ($, main) {
 											
 	'use strict';
-		
-	var mode,
-	options,
-	settings;
+	
 		
 	main.init = function(mode, options) { 
 	
@@ -30,6 +27,10 @@ var tpjc = (function ($, main) {
 		});
 		
 		this.tLog('OPTIONS = '+optStr);
+		
+		//SETTINGS
+		this.settings = {};
+		this.settings.HTTP_PATH = 'local.blank.com';
 		
 		//LE CONTROLLER
 		if (typeof this.mode != 'undefined' && this.mode !== '') {
@@ -73,8 +74,6 @@ var tpjc = (function ($, main) {
 	main.init_defaults = function() {
 		
 		var self = this; 
-		
-		self.tLog('wtf')
 		
 		$('#side-menu').metisMenu();
 		
@@ -143,25 +142,245 @@ var tpjc = (function ($, main) {
 	main.edit = function() {
 			
 		/* OPTION OVERRIDES */
-		this.attach_edit_page_model_option_overrides();
+		//this.attach_edit_page_model_option_overrides();
 		
 		/* THE USUAL */
 		this.attach_editor();
 		
 		this.attach_validator();
 		
-		this.attach_edit_form_plugins();
+		//this.attach_edit_form_plugins();
 		
-		this.attach_crop_button();
+		//this.attach_crop_button();
 		
-		this.attach_remove_image();
+		//this.attach_remove_image();
 		
-		this.attach_edit_form_submit_button_clicks();
+		//this.attach_edit_form_submit_button_clicks();
 		
 		/* RUN OPTIONS FIRST INCASE OF OVERRIDES */
-		this.attach_edit_page_model_options();
+		//this.attach_edit_page_model_options();
 					
 	};
+	
+	/* TINYMCE  */
+	main.attach_editor = function () {
+		
+		var self = this;
+		self.tLog('- attach_editor()');
+		
+		/* THIS REMOVES THE HOST NAME FROM URLS BEING INSERTED */
+		var relative_urls = false;
+		var convert_urls = true;
+		var remove_script_host = true;
+		var document_base_url = self.settings.HTTP_PATH;
+		
+		/* LOCAL - HARD CODED URLS */
+		/*if(window.location.hostname ==  '10.0.1.2' || self.options.useTinyAbsolutePath) { 
+			relative_urls = false;
+			convert_urls = false;
+			remove_script_host = false;
+			//document_base_url = "";
+
+		}*/
+		
+		tinymce.init({
+		 
+			relative_urls : relative_urls,
+			convert_urls: convert_urls,
+			remove_script_host : remove_script_host,
+			document_base_url : document_base_url,
+			
+			//skin_url: '3e/js/tinymce/skins/tpSkin/',
+		
+			content_css : "http://local.blank.com/css/style.css",
+		
+			selector:'.tinyMCE',
+			
+			object_resizing : "img",
+			
+			style_formats: [
+											
+				{	title: 'Heading 2', block: 'h2' },
+				{	title: 'Heading 3', block: 'h3'	},
+				{	title: 'Heading 4', block: 'h4'	},
+				{	title: 'Heading 5', block: 'h5'	},
+				
+				{	title: 'Image Left', selector: 'img',	styles: {
+					'float': 'left', 
+					'margin': '0 20px 0 20px'
+				}},
+				
+				{	title: 'Image Right', selector: 'img', styles: {
+					'float': 'right', 
+					'margin': '0 0 20px 20px'
+				}},
+				
+				{	title: 'Red', inline: 'span', classes: 'red' },
+				
+				{	title: 'Green', inline: 'span', classes: 'green' }
+				
+			
+			],
+		
+			plugins: ["advlist autolink lists link image charmap anchor searchreplace visualblocks code media table contextmenu paste"],
+			
+			
+			image_advtab: false, /* enable the Advance Image tab */
+			
+			setup : function(editor) {
+        
+				editor.addButton('tpjc_mediaButton', {
+					title : 'Add Video',
+					icon : 'mce-ico mce-i-media',
+					onclick : function() {
+						
+						editor.windowManager.open({
+							title: 'Insert Video',
+							body: [{
+								type:'label',
+								text:'Embed Code',
+								style:"font-weight:bold;"
+								
+							},{
+								type: 'textbox', 
+								name: 'embedCode', 
+								minWidth:320,
+								minHeight:150,
+								multiline: true,
+								tooltip: 'Paste the embed code obtained from Youtube Share => Embed'
+							}],
+							onsubmit: function(e) {
+								editor.insertContent('<div class="video-responsive">' + e.data.embedCode + '</div>');
+							}
+            });
+					}
+				});
+    	},
+
+	
+			menubar : false,		
+			toolbar: "bold italic | styleselect | alignleft aligncenter alignright | bullist table outdent indent hr | link unlink |  tpjc_mediaButton image | code",
+	
+			
+			/* type = file,image,flash */
+			file_browser_callback: function(field_name, url, type, win) {
+				
+				var windowTitle = '';
+				if(type == 'file'){
+					windowTitle = 'File & Link Browser';
+					
+				} else if(type == 'image'){
+					windowTitle = 'Image Browser';
+				} else {
+					windowTitle = 'Media';
+				}
+				
+				tinymce.activeEditor.windowManager.open({
+					title: windowTitle,
+					url: 'js/file_browser/index.php',
+					width: 640,
+					height: 400,
+					close_previous : "no",
+					buttons: [{
+							text: 'Close',
+							onclick: 'close'
+					}]
+				}, {
+					 field_name: field_name,
+					 type: type,
+					 win: win 
+				});	
+				
+				return false;
+					
+			}
+			
+		});		
+				
+	};
+	
+	/* SET VALIDATOR DEFAULTS  */
+	main.set_validator_defaults = function () {
+		
+		self = this;
+		self.tLog('- set_validator_defaults()');
+		
+		$.validator.setDefaults({
+								
+			/*ignore: ':hidden',*/
+			ignore: '',
+			errorElement: 'span',
+			errorClass: 'help-block',
+			
+			highlight: function(element) {
+        $(element).closest('.form-group').addClass('has-error');
+			},
+			
+			unhighlight: function(element) {
+					$(element).closest('.form-group').removeClass('has-error');
+			},
+			
+			errorPlacement: function(error, element) {
+				if(element.parent('.input-group').length) {
+					error.insertAfter(element.parent());
+				} else {
+					error.insertAfter(element);
+				}
+			}, 
+		 
+			submitHandler: function(form) {
+				
+				self.tLog('- - submitHandler called');
+				
+				$.blockUI({ message: $('#loading') });
+				
+				form.submit();
+			}
+		
+		});
+		
+	};
+	
+	/* VALIDATOR  */
+	main.attach_validator = function () {
+		
+		self = this;
+		self.tLog('- attach_validator()');
+		
+		if(typeof(self.options.validateRules) != 'undefined'){
+		
+			self.set_validator_defaults(); 
+			
+			var validator = $("#editForm").submit(function() {
+				// update underlying textarea before submit validation
+				tinyMCE.triggerSave();
+				
+			}).validate( self.options.validateRules );
+			
+			self.tLog('- - validate('+JSON.stringify(self.options.validateRules)+')');
+			
+		} else {
+			
+			self.tLog('- - attaching submitHandler w/o validation');
+			
+			/* since blockUI is called from the submit handler, we need to re-add it here*/
+
+			$("#editForm").submit(function() {
+																		 
+				self.tLog('- - submit() called');
+				
+				//$.blockUI({ message: '<h3><img src="images/loading.gif" /> Just a moment...</h3>' });
+				
+				$.blockUI({ message: $('#loading') });
+				
+				return true;
+			});
+			
+		}
+		
+	};
+	
+	
 	
 		
 	/* MODEL OPTIONS

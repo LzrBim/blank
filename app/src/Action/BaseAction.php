@@ -23,7 +23,7 @@ class BaseAction {
 			$this->f = $services['flash'];
 			
 		}
-   
+		
 	}
 	
 }

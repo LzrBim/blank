@@ -4,7 +4,9 @@
  * FILE: /app/models/PageVersionBlock.php
 ----------------------------------------------------------------------------- */
 
-class PageVersionBlock extends Core {
+namespace App\Model;
+
+class PageVersionBlock extends BaseModel {
 	
 	//ATTRIBUTES
 	public $_title = 'PageVersion Block';
@@ -50,11 +52,6 @@ class PageVersionBlock extends Core {
 			'title' => 'Section Headline',
 			'description' => '',
 			'status' => 'active'
-		),
-		4 => array(
-			'title' => 'Custom',
-			'description' => '',
-			'status' => 'active'
 		)
 		
 	);
@@ -76,7 +73,7 @@ class PageVersionBlock extends Core {
 			AND nbl.pageVersionID = ".$pageVersionID."
 			ORDER BY nbl.rank ASC";
 		
-		return $this->loadCollection($query);
+		return $this->fetchCollection($query);
 		
 	}	
 	

@@ -52,20 +52,20 @@ gulp.task('script', function() {
 ----------------------------------------------------------------------------- */
 gulp.task('adminCss', function() {
   return gulp.src([
-		'public/adminCss/style.css'
+		'public/admin_css/style.css'
 	])
 	.pipe(concat('all.concat.css'))
-	.pipe(gulp.dest('public/adminCss/'))
+	.pipe(gulp.dest('public/admin_css/'))
 	.pipe(rename('all.min.css'))
 	.pipe(minifyCss())		
-	.pipe(gulp.dest('public/adminCss/'));
+	.pipe(gulp.dest('public/admin_css/'));
 });
 
 /* ADMIN JS
 ----------------------------------------------------------------------------- */
 gulp.task('lintAdminScript', function() {
 	return gulp.src([
-		'public/adminJs/main.js'	
+		'public/admin_js/main.js'	
 	])
 	.pipe(jshint())
 	.pipe(jshint.reporter('default'));
@@ -74,15 +74,15 @@ gulp.task('lintAdminScript', function() {
 
 gulp.task('adminScript', function() {
 	return gulp.src([
-		'public/adminJs/main.js',
-		'public/adminJs/plugins/jquery.validate.min.js',
-		'public/adminJs/plugins/metisMenu.min.js',
+		'public/admin_js/main.js',
+		'public/admin_js/plugins/jquery.validate.min.js',
+		'public/admin_js/plugins/metisMenu.min.js',
 	])
 	.pipe(concat('all.concat.js'))
-	.pipe(gulp.dest('public/adminJs/'))
+	.pipe(gulp.dest('public/admin_js/'))
 	.pipe(rename('all.min.js'))
 	.pipe(uglify())
-	.pipe(gulp.dest('public/adminJs/'));
+	.pipe(gulp.dest('public/admin_js/'));
 	
 });
 
@@ -103,12 +103,12 @@ gulp.task('watch', function() {
 	
 	//ADMIN CSS
 	gulp.watch([ 
-		'public/adminCss/*.css'
+		'public/admin_css/*.css'
 	], ['adminCss']);		
 	
 	//ADMIN	JS
 	gulp.watch([
-		'public/adminJs/main.js',
+		'public/admin_js/main.js',
 	], ['lintAdminScript', 'adminScript']);
 		
 	

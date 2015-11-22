@@ -4,7 +4,9 @@
  * FILE: /app/models/PageVersion.php
 ----------------------------------------------------------------------------- */
 
-class PageVersion extends Core {  
+namespace App\Model;
+
+class PageVersion extends BaseModel {  
 	
 	//ATTRIBUTES
 	public $_title = 'Page Version';
@@ -21,36 +23,27 @@ class PageVersion extends Core {
 	public $dateModified;
 	
 	//CHILDREN
-	public $blocks;
+	public $block;
+	public $blocks = array();
 	
-	public $_validateRules = array( 
-		'rules' => array( 
-			'pageID' => array( 'required' => true )
-		)
-	);
-	
-	/* LOAD
-	----------------------------------------------------------------------------- */
-	
-	protected function loadChildren(){
+	public function __construct(){
 		
-		$block = new PageVersionBlock();
+		parent::__construct();
 		
-		$this->blocks = $block->fetchCollectionByParent($this->getId());
+		$this->block = new PageVersionBlock();
 		
 	}
-
 	
 	/* LOAD
 	----------------------------------------------------------------------------- */
 	
 	public function loadActiveByPage($pageID){
 		
-		if(empty($pageID)){
-			wLog(4, 'No pageID supplied');
-		}
-		
-		return $this->loadWhere("pageID = ".$pageID." AND status = 'active'", true);
+		if($this->loadWhere("pageID = ".$pageID." AND status = 'active'")){
+			
+			$this->blocks = $this->block->fetchCollectionByParent($this->id());
+			
+		}	
 		
 	}
 	

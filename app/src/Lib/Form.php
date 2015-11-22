@@ -4,6 +4,8 @@
 	* FILE: /app/lib/form.php
 ----------------------------------------------------------------------------- */
 
+namespace App\Lib;
+
 /*$opts = array(
 	'required' 		=> true,
 	'id' 					=> x,

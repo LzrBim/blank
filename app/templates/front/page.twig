@@ -8,8 +8,24 @@
 
 {% block content %}
 
-    <h1>{{title}}</h1>
+  <h1>{{page.version.headline}}</h1>
+  
+  {% for block in page.version.blocks %}
+   
+    {% if block.templateID == 1 %}
     
-   {{description}}
+      {% include 'partial/page_block_template_1.twig' %}
+    
+    {% elseif block.templateID == 2 %}
+    
+      {% include 'partial/page_block_template_2.twig' %}
+    
+    {% else %}
+    
+      Undefined block type      
+    
+    {% endif %}
+  
+	{% endfor %} 
    
 {% endblock %}

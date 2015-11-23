@@ -11,7 +11,11 @@ date_default_timezone_set('America/New_York');
 
 $settings = [ 
 	'settings' => [
-		// View settings 
+		
+		//App settings
+		'displayErrorDetails' => true, 
+		
+		//Twig settings
 		'view' => [
 			'template_path' => __DIR__ . '/templates',
 			'twig' => [
@@ -20,7 +24,8 @@ $settings = [
 				'auto_reload' => true
 			]
 		],
-		// monolog settings
+		
+		//Monolog settings
 		'logger' => [
 			'name' => 'app',
 			'path' => __DIR__ . '/../log/app.log'

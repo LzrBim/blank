@@ -8,7 +8,9 @@ class HomeController extends BaseController {
 	
 		$this->logger->info("Home page action dispatched");
         
-		$this->view->render($response, 'front/home.twig');
+		$this->view->render($response, 'front/home.twig', array(
+			'jsPage' => 'home'																												
+		));
 		
 		return $response;
 	

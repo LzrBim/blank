@@ -15,7 +15,8 @@ class PageController extends BaseController {
 					->with(['pageBlock', 'pageVersion']);
         
 		$this->view->render($response, 'front/page.twig', array(
-			'page' => $page			
+			'page' 		=> $page,
+			'jsPage' 	=> $args['slug']
 		));
 		
 		return $response;

@@ -6,81 +6,73 @@
 
 namespace App\Model;
 
+use App\Lib\Sanitize;
+
 trait SluggableTrait {
 	
 	/* LOAD
 	----------------------------------------------------------------------------- */
-	
-	public function loadBySlug($permalink, $childArgs = array()){
+	public function loadBySlug($slug, $with = array()){
 		
-		if(empty($permalink)){
-			wLog(3, 'No permalink supplied');
+		if(empty($slug)){
 			return false;
 		}
 		
 		$query = "SELECT * FROM ".$this->_table." 
-			WHERE permalink = '".$permalink."' 
+			WHERE slug = '".$slug."' 
 			AND status = 'active'";
 			
 		$result = $this->query($query);
 		
 		if($result && $this->numRows($result)){
 			
-			return $this->loadByData($this->fetchAssoc($result), $childArgs);
+			$this->loadByData($this->fetchAssoc($result));
+			
+			return $this;
 			
 		} else {
-			wLog(1, 'Permalink not loaded ='.$permalink);
+			wLog(1, 'slug not loaded ='.$slug);
 			return false;
 		}
 	}
 	
 	
-	/* PERMALINK	
+	/* slug	
 	----------------------------------------------------------------------------- */
 	
-	protected function buildPermalink($str){
+	protected function buildSlug($str){
 		
-		return cleanUrlString($str);
+		return Sanitize::sluggify($str);
 
 	}
 	
-	protected function setPermalink($str, $preventCollision = true){
+	protected function setSlug($str, $preventCollision = true){
 		
 		if(empty($str)){
-			wLog(4, 'Permalink init string empty');
 			return false;
 		}
 		
-		$this->permalink = $this->buildPermalink($str);
+		$this->slug = $this->buildSlug($str);
 		
-		if(empty($this->permalink)){
-			wLog(4, 'Permalink empty');
+		if(empty($this->slug)){
 			return false;
 		}
 		
 		if($preventCollision){
 		
-			if($this->permalinkExists($this->permalink)){
-				$this->permalink = $this->permalink.'-'.$this->getId();
+			if($this->slugExists($this->slug)){
+				
+				$this->slug = $this->slug.'-'.$this->id();
+				
 			}
 			
 		}
 	}
 	
 	
-	public function getPermalink(){
+	protected function slugExists($slug){
 		
-		if(!isset($this->_modReWritePath) || empty($this->_modReWritePath)){
-			wLog(4, 'no _modReWritePath set');
-		}
-		
-		return $this->_modReWritePath.$this->permalink.'/'; 
-	}
-	
-	
-	protected function permalinkExists($permalink){
-		
-		$where = "permalink = '".$permalink."'";
+		$where = "slug = '".$slug."'";
 		return $this->fetchCount($where);
 		
 	}

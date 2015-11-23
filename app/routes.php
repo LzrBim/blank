@@ -47,3 +47,15 @@ $app->post('/login', function ($request, $response, $args) use ($app) {
 	}									
 	
 });
+
+$app->get('/logout', function ($request, $response, $args) use ($app) {
+																			
+	$container = $app->getContainer();
+	
+	$authAction = $container->get('App\Action\AuthAction');
+																		
+	$authAction->logout();
+	
+	return $response->withRedirect('/login');									
+	
+});

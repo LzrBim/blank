@@ -1,7 +1,8 @@
 <?php
 namespace App\Model;
 
-use \App\lib\Database;
+use \App\Lib\Database;
+use \App\Lib\Sanitize;
 
 class BaseModel {
 	
@@ -56,8 +57,6 @@ class BaseModel {
 			return false;
 		}
 		
-		echo $slug;
-		
 		$query = "SELECT * FROM `".$this->_table."` WHERE `slug` = '".$slug."'";
 		
 		$db = Database::get_instance();
@@ -88,7 +87,7 @@ class BaseModel {
 	public function loadByData($data){
 		
 		if(empty($data)){
-			wLog(2, 'No data supplied');
+			//wLog(2, 'No data supplied');
 		}
 		
 		foreach($data as $var => $value){
@@ -126,7 +125,7 @@ class BaseModel {
 	public function loadWhere($where, $with = array()){
 		
 		if(empty($where)){
-			return false;
+			die('empty where');
 		}
 		
 		$query = "SELECT * FROM ".$this->_table." WHERE ".$where;
@@ -157,6 +156,21 @@ class BaseModel {
 	
 	protected function loadChildren($childArgs = array()){
 		
+	}
+	
+	public function delete(){
+		
+		return $this->_delete();
+		
+	}
+	
+	protected function _delete(){
+		
+		$update = sprintf("DELETE FROM `".$this->_table."`
+			WHERE ".$this->_id."=%d",
+		Sanitize::input($this->id(), "int"));
+		
+		return mysqli_query($this->_db, $update);
 	}
 	
 	

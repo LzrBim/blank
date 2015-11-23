@@ -10,9 +10,6 @@ $form = new AdminForm();
 
 echo $form->open();
 
-/* HIDDEN*/
-echo $form->hidden('model', get_class($page));
-
 echo $form->hidden($page->_id, $page->id());
 
 echo $form->status($page->status);  
@@ -24,7 +21,7 @@ echo $form->input('title', 'Title', $page->title, array(
 
 if($page->id() != 1 && !$page->isHardCoded){
 	
-	echo $form->input('permalink', 'Permalink', $page->permalink, array('help' => 'URL: <span id="tjpc_permalink">page/<span>'.$page->permalink.'</span>/</span>') ); 
+	echo $form->input('slug', 'Slug', $page->slug, array('help' => 'URL: <span id="tjpc_permalink">page/<span>'.$page->slug.'</span>/</span>') ); 
 	
 } else {
 	

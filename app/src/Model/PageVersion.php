@@ -54,15 +54,13 @@ class PageVersion extends BaseModel {
 	/* ADMIN FETCH 
 	----------------------------------------------------------------------------- */
 	
-	public function fetchAllByPage($parentID, $orderBy = '', $limit = ''){
+	public function fetchAllByPage($pageID, $orderBy = '', $limit = ''){
 		
-		if(empty($parentID)){
+		if(empty($pageID)){
 			return array();
 		}
 		
-		$where ="pageID = ".$parentID;
-		
-		return $this->fetch($where, $orderBy, $limit);	
+		return $this->fetch("pageID = ".$pageID, $orderBy, $limit);	
 	}	
 	
 	public function fetchAllByPageCount($parentID){

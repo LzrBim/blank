@@ -12,6 +12,8 @@ class GalleryController extends BaseController {
 	
 	public function index($request, $response, $args){
 		
+		$this->logger->info("Gallery index action dispatched");
+		
 		$gallery = new Gallery();
 		
 		$galleries = $gallery->fetchActive();
@@ -19,7 +21,7 @@ class GalleryController extends BaseController {
 		$this->view->render($response, 'front/gallery.twig', [
 			'title' => 'Galleries',
 			'galleries' => $galleries,
-			'jsPage' => 'home'																					 
+			'jsPage' => 'gallery'																					 
 		]);
 	
 		return $response;
@@ -38,7 +40,7 @@ class GalleryController extends BaseController {
 		$this->view->render($response, 'front/gallery_detail.twig', [
 			'title' => $gallery->title,
 			'images' => $gallery->galleryImages,
-			'jsPage' => 'gallery'																					 
+			'jsPage' => 'gallery-detail'																					 
 		]);
 	
 		return $response;

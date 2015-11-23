@@ -1,4 +1,2 @@
 <?php
-// Application middleware
-
 

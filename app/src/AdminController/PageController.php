@@ -16,7 +16,7 @@ class PageController extends BaseController {
 		$page = new Page();
 		$pages = $page->fetchAll();
         
-		$this->view->render($response, 'admin/page.index.twig', [
+		$this->view->render($response, 'admin/page_index.twig', [
 			'title' => 'Pages',
 			'pages' => $pages,
 			'jsPage' => 'index',
@@ -31,10 +31,12 @@ class PageController extends BaseController {
 	
 	public function add($request, $response, $args){
 	
-		$this->logger->debug("Admin Page Add");
+		$this->logger->debug("Admin - Page Add");
 		
 		ob_start();
+		
 		include('../app/src/crud/Page/add.php');
+		
 		$form = ob_get_clean();
         
 		$this->view->render($response, 'admin/edit.twig', [
@@ -47,6 +49,21 @@ class PageController extends BaseController {
 		]);	
 		
 		return $response;
+	
+	}
+	
+	
+	public function insert($request, $response, $args){
+	
+		$this->logger->debug("Admin Page Insert");
+		
+		$page = new Page();
+		$page->loadByData($request->getParsedBody());
+		$page->insert();
+		
+		$this->flash->addMessage('success', 'Page saved');
+		
+		return $response->withRedirect('/admin/page/edit/'.$page->id());
 	
 	}
 	
@@ -70,6 +87,20 @@ class PageController extends BaseController {
 		]);	
 		
 		return $response;
+	
+	}
+	
+	public function delete($request, $response, $args){
+	
+		$this->logger->debug("Admin Page Edit");
+		
+		$page = new Page();
+		$page->load($args['id']);
+		$page->delete();
+		
+		$this->flash->addMessage('success', 'Page deleted');
+		
+		return $response->withRedirect('/admin/page/index');
 	
 	}
 	

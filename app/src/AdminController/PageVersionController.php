@@ -2,20 +2,24 @@
 
 namespace App\AdminController;
 
+use App\Model\Page;
 use App\Model\PageVersion;
 
 class PageVersionController extends BaseController {
 	
 	public function index($request, $response, $args){
 	
-		$this->logger->debug("Admin Page Version Index");
+		$this->logger->debug("Admin Page Version Index, pageID = ".$args['pageID']);
+		
+		$pageVersion = new PageVersion();
+		$pageVersions = $pageVersion->fetchAllByPage($args['pageID']);
 		
 		$page = new Page();
-		$pages = $page->fetchAll();
+		$page->load($args['pageID']);	
         
-		$this->view->render($response, 'admin/pageVersion.index.twig', [
-			'title' => 'Pages',
-			'pages' => $pages,
+		$this->view->render($response, 'admin/pageVersion_index.twig', [
+			'title' => $page->title.' - Versions',
+			'pageVersions' => $pageVersions,
 			'jsPage' => 'index',
 			'jsOptions' => array(
 				'model' => 'Page'

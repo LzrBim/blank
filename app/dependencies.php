@@ -11,9 +11,12 @@ $container = $app->getContainer();
 // -----------------------------------------------------------------------------
 $container['view'] = function ($c) {
 	
-	$view = new \Slim\Views\Twig($c['settings']['view']['template_path'], $c['settings']['view']['twig']);
+	$settings = $c->get('settings');
 	
-	$view->addExtension(new Slim\Views\TwigExtension($c['router'], $c['request']->getUri()));
+	$view = new \Slim\Views\Twig($settings['view']['template_path'], $settings['view']['twig']);
+	
+	// Add extensions
+	$view->addExtension(new Slim\Views\TwigExtension($c->get('router'), $c->get('request')->getUri()));
 	
 	$view->addExtension(new Twig_Extension_Debug());
 	
@@ -42,53 +45,63 @@ $container['csrf'] = function ($c) {
 // -----------------------------------------------------------------------------
 $container['logger'] = function ($c) {
 	
-	$settings = $c['settings']['logger'];
-	
-	$logger = new \Monolog\Logger($settings['name']);
-	
+	$settings = $c->get('settings');
+  
+	$logger = new \Monolog\Logger($settings['logger']['name']);
+  
 	$logger->pushProcessor(new \Monolog\Processor\UidProcessor());
-	
-	$logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['path'], \Monolog\Logger::DEBUG));
-	
+  
+	$logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['logger']['path'], \Monolog\Logger::DEBUG));
+  
 	return $logger;
 	
 };
 
 
 // -----------------------------------------------------------------------------
-// Action factories
+// MIDDLEWARE
 // -----------------------------------------------------------------------------
 
-//http://thoughts.silentworks.co.uk/lazy-loading-controller-action/
+$container['adminGuard'] = function ($c) {
+	
+	return new App\Middleware\AdminGuard($c->get('logger'));
+	
+};
 
+
+// -----------------------------------------------------------------------------
+// CONTROLLERS
+// -----------------------------------------------------------------------------
+
+//VIEW ONLY
 $container['App\Controller\HomeController'] = function ($c) {	
-	return new App\Controller\HomeController($c['view'], $c['logger']);	 
+	return new App\Controller\HomeController($c->get('view'), $c->get('logger'));	 
 };
 
 $container['App\Controller\PageController'] = function ($c) {
-	return new App\Controller\PageController($c['view'], $c['logger']);
+	return new App\Controller\PageController($c->get('view'), $c->get('logger'));
 };
 
 $container['App\Controller\GalleryController'] = function ($c) {
-	return new App\Controller\GalleryController($c['view'], $c['logger']);
+	return new App\Controller\GalleryController($c->get('view'), $c->get('logger'));
 };
 
 
-
+//WITH FLASH - ACTIONS
 $container['App\Controller\ContactController'] = function ($c) {
-	return new App\Controller\ContactController($c['view'], $c['logger'], array('flash' => $c['flash']));
+	return new App\Controller\ContactController($c->get('view'), $c->get('logger'), array('flash' => $c['flash']));
 };
 
 $container['App\Controller\AuthController'] = function ($c) {
-	return new App\Controller\AuthController($c['view'], $c['logger'], array('flash' => $c['flash']));
+	return new App\Controller\AuthController($c->get('view'), $c->get('logger'), array('flash' => $c['flash']));
 };
 
 
 //FRONT ACTIONS
 $container['App\Action\ContactAction'] = function ($c) {
-	return new App\Action\ContactAction($c['logger'], array('flash' => $c['flash']));
+	return new App\Action\ContactAction($c->get('logger'), array('flash' => $c['flash']));
 };
 
 $container['App\Action\AuthAction'] = function ($c) {
-	return new App\Action\AuthAction($c['logger'], array('flash' => $c['flash']));
+	return new App\Action\AuthAction($c->get('logger'), array('flash' => $c['flash']));
 };

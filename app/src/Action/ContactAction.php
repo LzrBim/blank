@@ -8,18 +8,18 @@ class ContactAction extends BaseAction {
 	
 	public function contact($args) {
 				
-		$this->v->rule('required', ['email', 'message']);
-		$this->v->rule('email', 'email');
+		$this->validator->rule('required', ['email', 'message']);
+		$this->validator->rule('email', 'email');
 		
-		if(!$this->v->validate()) {
+		if(!$this->validator->validate()) {
 			
-			$this->f->addMessage("error", Help::flatErrors($this->v->errors()));
-			$this->l->info('Contact form failed validation');
+			$this->flash->addMessage("error", Help::flatErrors($this->v->errors()));
+			$this->logger->info('Contact form failed validation');
 			return false;
 		} 
 		
-		$this->f->addMessage("success", 'Your message was sent');
-		$this->l->info('Contact form passed validation');
+		$this->flash->addMessage("success", 'Your message was sent');
+		$this->logger->info('Contact form passed validation');
 	
 		return true;
 			

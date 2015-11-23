@@ -8,52 +8,52 @@ class AuthAction extends BaseAction {
 	
 	public function login($args) {
 		
-		$this->v->rule('required', ['email', 'password']);
-		$this->v->rule('email', 'email');
-		$this->v->rule('lengthBetween', 'password', 6, 10);
+		$this->validator->rule('required', ['email', 'password']);
+		$this->validator->rule('email', 'email');
+		$this->validator->rule('lengthBetween', 'password', 6, 10);
 		
-		if(!$this->v->validate()) {
-			$this->f->addMessage("error", Help::flatErrors($this->v->errors()));
+		if(!$this->validator->validate()) {
+			$this->flash->addMessage("error", Help::flatErrors($this->validator->errors()));
 			return false;
 		} 
 		
 		$unauthorizedUser = new User();
 	
 		$email = trim(strtolower($_POST['email'])); /* Trim and Lower */
+		
 		$password = $_POST['password']; 
+		
 		$rememberMe = (isset($_POST['rememberMe']) ? 1 : 0);
 	
 		if(!$unauthorizedUser->isValidPassword($password)){ 
-			$this->f->addMessage('error', 'An error occured during login.  Your password contained invalid characters.');
-			$this->l->debug( 'Invalid password: "'.$password.'"');
+			$this->flash->addMessage('error', 'An error occured during login.  Your password contained invalid characters.');
+			$this->logger->debug( 'Invalid password: "'.$password.'"');
 			return false;
 		}
 	
 		//BEGIN THE DATABASE VALIDATION
 		$unauthorizedUser->loadByEmail($email);
 		
-		//die('<pre>'.var_dump($unauthorizedUser, true).'</pre>');
-		$this->val = $unauthorizedUser->isLoaded();
-		$this->l->debug('bork - '.$this->val.' = '.$unauthorizedUser->userID);
+		//die(var_dump($unauthorizedUser));
 		
 		//DOES THIS USER EXIST?
 		if(!$unauthorizedUser->isLoaded()){
-			$this->f->addMessage('error', 'Email not found2');
-			$this->l->debug('User '.$email.' not found');
+			$this->flash->addMessage('error', 'Email not found');
+			$this->logger->debug('User '.$email.' not found');
 			return false;
 		}
 	
 		//ARE THEY ACTIVE?
 		if($unauthorizedUser->status != 'active'){
-			$this->f->addMessage('error', 'Your account has been disabled');
-			$this->l->debug('User '.$email.' tried to login while marked inactive');
+			$this->flash->addMessage('error', 'Your account has been disabled');
+			$this->logger->debug('User '.$email.' tried to login while marked inactive');
 			return false;
 		}
 	
 		//ARE THEY LOCKED OUT?
 		if($unauthorizedUser->isLockedOut()){
-			$this->f->addMessage('error', 'ou have been locked out for security reasons');
-			$this->l->notice('User '.$email.' was booted for exceeding max_login_attemps');
+			$this->flash->addMessage('error', 'ou have been locked out for security reasons');
+			$this->logger->notice('User '.$email.' was booted for exceeding max_login_attemps');
 			return false;
 		}
 	
@@ -80,19 +80,32 @@ class AuthAction extends BaseAction {
 			
 	}
 	
-	public function logout($user){
+	public function logout(){
+		
+		$user = new User();
+		
+		if(isset($_SESSION[$user->_id])){
+		
+			$user->load($_SESSION[$user->_id]);
+		
+			$user->deleteCookie();
+			
+		}
 		
 		unset($_SESSION['auth']);
+		
+		unset($_SESSION['role']);
+		
 		unset($_SESSION[$user->_id]);
-		$user->_deleteCookie();
-		addMessage('success', 'You were logged out successfully');
-	
+		
+		$this->flash->addMessage("success", 'You were logged out');
+		
 	}
 	
 	private function setSession($user){
 		
 		$_SESSION['auth'] = 1;
-		$_SESSION[$user->_id] = $user->getId();
+		$_SESSION[$user->_id] = $user->id();
 		$_SESSION['role'] = $user->role;
 		
 	}

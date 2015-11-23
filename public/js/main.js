@@ -9,10 +9,7 @@ var tpjc = (function ($, main) {
 											
 	'use strict';
 		
-	var settings, 
-	options,
-	win,
-	page;
+	var settings, options, win,	page;
 		
 	main.init = function(page, options) { 
 		
@@ -20,10 +17,11 @@ var tpjc = (function ($, main) {
 		
 		self.page = page; 
 		
+		//OPTIONS
 		var defaults = {
 			isAuthorized : 0
 		};
-				
+		
 		self.options = $.extend(defaults, options);
 		
 		//SETTINGS
@@ -32,13 +30,10 @@ var tpjc = (function ($, main) {
   		ALGOLIA_SEARCH_ONLY_API_KEY : '67f4f2b954018dab1819d201d7475a3c'
 		};
 		
-		//SETUP		
+		//WIN		
 		self.win = {};
-		self.algoliaClient = null;
-		self.algoliaIndexName = '';
-		self.activeCavanImageID = '';
-		
-		//self.tLog('init('+ page +', '+ JSON.stringify(options) +')');
+				
+		self.tLog('init('+ page +', '+ JSON.stringify(options) +')');
 		
 		self.init_defaults();		
 			
@@ -47,6 +42,11 @@ var tpjc = (function ($, main) {
 						
 			if(self.page == 'home'){
 		
+		
+			/* LOGIN */
+			} else if (self.page == 'contact'){
+				
+				self.validate_contact_form();
 			
 			/* LOGIN */
 			} else if (self.page == 'login'){
@@ -65,8 +65,7 @@ var tpjc = (function ($, main) {
 				
 				self.bind_reset_password();	
 				
-				self.validate_reset_password();				
-				
+				self.validate_reset_password();			
 		
 			
 			} else {
@@ -89,6 +88,24 @@ var tpjc = (function ($, main) {
 		//GATHER WINDOW INFO
 		this.set_window_info();
 		
+		this.set_menu_active();
+		
+	};
+	
+	main.set_menu_active = function(){
+	
+		var section = this.page.split("-",1);
+		var $el = $('#tpjc_section_'+section);
+		
+		if($el.length){
+			
+			$el.addClass('active');
+			
+		} else {
+			this.tLog('Error finding nav section');
+			
+		}	
+		
 	};
 	
 	/* USER AUTH CHECK
@@ -101,6 +118,74 @@ var tpjc = (function ($, main) {
 		return false;
 		
 	};
+	
+	
+	/* CONTACT PAGE VALIDATOR
+	----------------------------------------------------------------------------- */
+	
+	main.validate_contact_form = function() {
+		
+		self = this;
+		self.set_validator_defaults();
+		self.tLog('validate_contact_form()');
+		
+		var formID = 'contactForm';
+	
+		$( '#' + formID ).validate({
+			rules: {
+				message: {
+					required: true
+				},
+				email: {
+					required: true,
+					email:true
+				}
+			},
+			onkeyup: false
+		}); 
+		
+
+		/* FORM WITH AJAX SUBMIT */
+		
+		/*$( '#' + formID ).validate({
+			rules: {
+				name: "required",
+				email: {
+					required: true,
+					email: true
+				}
+			},
+			submitHandler: function(form) {
+				
+				$( '#' + formID ).find('input[type=submit]').attr('disabled','disabled');
+				$( '#' + formID ).find('loadingOverlay').show();
+				
+				var data = $( '#' + formID ).serialize();
+					
+				$.ajax({
+					type: "POST",
+					url: "ajax/inquire_submit.php",
+					data: data,
+					dataType: 'json',
+					cache: false,
+					success: function(html) {
+						
+						$( '#' + formID ).find('.modalSuccess').show();
+						
+					},
+					error: function(xhr) {
+						alert('An error occured while sending your message.  Please call 631-283-0042 for your inquiry.')
+						
+					}
+				}); //end ajax call
+			}
+		});//end .validate();*/
+		
+		
+	};
+	
+	
+	
 	
 	
 	/* ATTACH HOME
@@ -194,6 +279,7 @@ var tpjc = (function ($, main) {
 		this.tLog('set_window_info()');
 		
 		this.win.width = $(window).width();
+		
 		this.win.height = $(window).height();
 		
 		this.win.navHeight = $('#nav').outerHeight(false);
@@ -219,7 +305,6 @@ var tpjc = (function ($, main) {
 		} else {
 			this.win.breakpoint = 'lg';
 		}
-	
 
 	};
 	
@@ -228,6 +313,7 @@ var tpjc = (function ($, main) {
 	main.set_validator_defaults = function() {
 		
 		var self = this;
+		
 		self.tLog('set_validator_defaults()');
 		
 		$.validator.setDefaults({
@@ -246,10 +332,15 @@ var tpjc = (function ($, main) {
 			},
 			
 			errorPlacement: function(error, element) {
+				
 				if(element.parent('.input-group').length) {
+					
 					error.insertAfter(element.parent());
+					
 				} else {
+					
 					error.insertAfter(element);
+					
 				}
 			}, 
 		 

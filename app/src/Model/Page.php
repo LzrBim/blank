@@ -41,17 +41,13 @@ class Page extends PageBase {
 				
 				foreach($with as $relation){
 					
-					if($relation == '*'){
-						
-					} 
-					
-					if($relation == 'pageBlock'){
+					if($relation == '*' || $relation == 'pageBlock'){
 						
 						$this->promoBlocks = $this->promoBlock->fetchByPageAndSiteWide($this->id());
 						
 					}
 					
-					if($relation == 'pageVersion'){
+					if($relation == '*' || $relation == 'pageVersion'){
 						
 						$this->version->loadActiveByPage($this->id());
 						
@@ -65,29 +61,6 @@ class Page extends PageBase {
 			return false;
 		}
 		
-	}
-	
-	
-	
-	
-	
-	/* PUBLIC FETCH
-	----------------------------------------------------------------------------- */
-	public function fetchActiveContent($orderBy = '', $limit = ''){
-	
-		$query = "SELECT page.pageID, page.title, page.permalink, pageVersion.headline
-			FROM page, pageVersion
-			WHERE page.pageID = pageVersion.pageID
-			AND pageVersion.status = 'active' 
-			AND page.isHardCoded IS NULL
-			AND page.status = 'active'";
-		
-		if(!empty($limit)){
-			$query .= "LIMIT ".$limit;
-		}
-		
-		return $this->loadCollection($query);
-
 	}
 	
 	
@@ -120,8 +93,6 @@ class Page extends PageBase {
 				return $promoBlock;
 			}
 		}
-		
-		wLog(3, 'Page Promo Block not found: '.$pagePromoBlockID);
 		
 		return '';
 		
@@ -200,11 +171,7 @@ class Page extends PageBase {
 			AND page.status = 'active'
 			GROUP BY page.pageID
 			HAVING ".$str;
-		
-		/*if(!empty($limit)){
-			$query .= "LIMIT ".$limit;
-		}*/
-		
+	
 		return $this->loadCollection($query);
 	}
 	

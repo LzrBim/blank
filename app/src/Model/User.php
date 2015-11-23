@@ -39,6 +39,7 @@ class User extends BaseModel {
 	public function loadByEmail($email){ 
 	
 		if(empty($email)){
+			die('no email supplied');
 			return false;
 		}
 		
@@ -95,6 +96,9 @@ class User extends BaseModel {
 		}
 		
 		$this->salt = $this->_getSalt();
+		
+		$this->email = Sanitize::formatEmail($this->email);
+		
 		$this->password = $this->_getPasswordHash($this->password, $this->salt);
 		
 		if(!$this->emailExists($this->email)){
@@ -104,7 +108,7 @@ class User extends BaseModel {
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(email, password, salt, firstName, lastName, role, status) 
 				VALUES (%s, %s, %s, %s, %s, %s, %s)",
-				Sanitize::input($this->_formatEmail($this->email), "text"), 
+				Sanitize::input($this->email, "text"), 
 				Sanitize::input($this->password, "text"), 
 				Sanitize::input($this->salt, "text"), 
 				Sanitize::input($this->firstName, "text"),
@@ -133,19 +137,20 @@ class User extends BaseModel {
 	
 	public function update(){
 		
+		$this->email = Sanitize::formatEmail($this->email);
+		
 		if(!$this->isLoaded()) { 
-			wLog(2, 'User not loaded'); 
 			return false; 
 		}
 		
 		$update = sprintf("UPDATE ".$this->_table."
 			SET email=%s, firstName=%s, lastName=%s, status=%s
 			WHERE ".$this->_id."=%d",
-			Sanitize::input($this->_formatEmail($this->email), "text"),
+			Sanitize::input($this->email, "text"),
 			Sanitize::input($this->firstName, "text"),
 			Sanitize::input($this->lastName, "text"),
 			Sanitize::input($this->status, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			addMessage('success', 'User updated successfully');
@@ -162,12 +167,10 @@ class User extends BaseModel {
 	public function updatePassword($password){
 		
 		if(!$this->isLoaded()) { 
-			wLog(4, 'User not loaded');
 			return false;
 		}
 		
 		if(empty($password)) { 
-			wLog(4, 'Password was empty');
 			return false;
 		}
 		
@@ -177,9 +180,8 @@ class User extends BaseModel {
 			return false;
 		}
 		
-		//wLog(1, 'setting password to: '.$password);
-		
 		$this->salt = $this->_getSalt();
+		
 		$this->password = $this->_getPasswordHash($password, $this->salt);
 		
 		$update = sprintf("UPDATE ".$this->_table."
@@ -187,7 +189,7 @@ class User extends BaseModel {
 			WHERE ".$this->_id."=%d",
 			Sanitize::input($this->password, "text"),
 			Sanitize::input($this->salt, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			addMessage('success','Password updated successfully');
@@ -209,7 +211,7 @@ class User extends BaseModel {
 		$update = sprintf("UPDATE ".$this->_table."
 			SET forgotPasswordToken = NULL, forgotPasswordExpires = NULL
 			WHERE ".$this->_id."=%d",
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			
@@ -231,7 +233,7 @@ class User extends BaseModel {
 			WHERE ".$this->_id."=%d",
 			Sanitize::input($this->forgotPasswordToken, "text"), 
 			Sanitize::input($this->forgotPasswordExpires, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			return true;
@@ -249,7 +251,7 @@ class User extends BaseModel {
 			
 			$update = sprintf("UPDATE ".$this->_table." SET cookieHash=%s WHERE ".$this->_id."=%d",
 				Sanitize::input($this->cookieHash, "string"), 
-				Sanitize::input($this->getId(), "int"));
+				Sanitize::input($this->id(), "int"));
 			
 			$this->query($update);
 			
@@ -335,14 +337,12 @@ class User extends BaseModel {
 				
 				if(!empty($userID) && $this->load($userID)){
 					return true;
+				
 				} else {
-					$this->logout();
-					clearMessages();
 					return false;
 				}
 				
 			} else {
-				wLog(1, 'User::userSessionStart() - session pk not set');
 				return false;
 			}
 
@@ -351,15 +351,28 @@ class User extends BaseModel {
 			return $this->cookieLogin($_COOKIE[$this->_id], $_COOKIE['hash']);
 			
 		} else {
-			$_SESSION[$this->_realm.'_auth'] = 0;
+			$_SESSION['auth'] = 0;
 			return false;
 		}
 	}
 	
-	public function isAuthorized(){
-		if(isset($_SESSION[$this->_realm.'_auth']) 
-			&& $_SESSION[$this->_realm.'_auth'] == 1){    
-			return true;
+	
+	public static function isAuthorized($realm){
+		
+		if(isset($_SESSION['auth']) && $_SESSION['auth'] == 1){
+			
+			if(isset($_SESSION['role'])){
+			
+				if($realm == 'admin' && ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'god')){
+				
+					return true;
+					
+				}
+				
+				return false;
+				
+			}
+			
 		} else {
 			return false;
 		}
@@ -376,12 +389,10 @@ class User extends BaseModel {
 		
 		//validate
 		if(empty($userID)){ 
-			wLog(3, 'No pk supplied');
 			return false;
 		} 
 		
 		if(empty($hash)){ 
-			wLog(3, 'No hash supplied');
 			return false;
 		} 
 		
@@ -392,7 +403,7 @@ class User extends BaseModel {
 		if($this->loadWhere($this->_id." = ".$userID."	AND cookieHash = '".$hash."' AND status = 'active'")){
 	
 			$this->_setSession();
-			wLog(1, 'cookie_login success for userID='.$userID);
+			
 			return true;
 		
 		} 
@@ -410,27 +421,24 @@ class User extends BaseModel {
 	
 	private function _setCookie(){
 		
-		if(setcookie($this->_id, $this->getId(), time()+$this->COOKIE_TIME, "/", "")){
+		if(setcookie($this->_id, $this->id(), time()+$this->COOKIE_TIME, "/", "")){
 			//wLog(1, '_set_cookie - userID set');									   
-		} else {
-			wLog(1, '_set_cookie failed userID');
 		}
+		
 		if(setcookie("hash", $this->hash, time()+$this->COOKIE_TIME, "/", "")){
 			//wLog(1, '_set_cookie - hash set');									   
-		} else {
-			wLog(1, '_set_cookie failed hash');
-		}	
+		} 
 	}
 	
 	
-	private function _deleteCookie(){
+	public function deleteCookie(){
 		setcookie($this->_id, '', time()-60*60*24*30, "/");
 		setcookie("hash", '', time()-60*60*24*30, "/");
 	}
 	
 	
 	private function _getCookieHash(){
-		return md5('DustyPockets'.$this->getId().time());
+		return md5('DustyPockets'.$this->id().time());
 	}
 	
 	
@@ -466,7 +474,6 @@ class User extends BaseModel {
 	public function updateFailedAttemptInformation(){
 		
 		if(!$this->isLoaded()){
-			wLog(1, 'User not loaded');
 			return false;
 		}
 		
@@ -475,7 +482,7 @@ class User extends BaseModel {
 			WHERE ".$this->_id."=%d",
 			Sanitize::input($this->lastFailedLogin, "text"), 
 			Sanitize::input($this->failedAttempts, "int"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			return true;
@@ -488,13 +495,12 @@ class User extends BaseModel {
 	public function resetFailedAttemptInformation(){
 		
 		if(!$this->isLoaded()){
-			wLog(1, 'User not loaded');
 			return false;
 		}
 		
 		$update = "UPDATE ".$this->_table."
 			SET lastFailedLogin=NULL, failedAttempts=0 
-			WHERE ".$this->_id."=".$this->getId();
+			WHERE ".$this->_id."=".$this->id();
 	
 		if($this->query($update)){ 
 			return true;
@@ -521,14 +527,9 @@ class User extends BaseModel {
 	}
 	
 	public function emailExists($email){
-		$where = "email = '".$email."'";	
+		$where = "email = '".Sanitize::formatEmail($email)."'";	
 		return $this->fetchCount($where);
 		
-	}
-	
-	
-	public function _formatEmail($email){
-		return trim(strtolower($email));
 	}
 	
 	protected function getTempPassword( $length = 8 ) {

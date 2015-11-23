@@ -4,8 +4,11 @@
  * FILE: /models/Page.php
 ----------------------------------------------------------------------------- */
 namespace App\Model;
+use \App\Lib\Sanitize;
 
-class PageBase extends BaseModel {  
+class PageBase extends BaseModel {
+	
+	use SluggableTrait;
 	
 	//ATTRIBUTES
 	public $_title = 'Page';
@@ -15,7 +18,7 @@ class PageBase extends BaseModel {
 	//FIELDS
 	public $pageID = 0;
 	public $title;
-	public $permalink;
+	public $slug;
 	public $metaTitle ;
 	public $metaDescription; 
 	public $metaKeywords; 
@@ -28,13 +31,13 @@ class PageBase extends BaseModel {
 	
 	public function insert(){
 		
-		$this->setPermalink($this->title);
+		$this->setSlug($this->title);
 		
 		$insert = sprintf("INSERT INTO ".$this->_table." 
-			(title, permalink, metaTitle, metaDescription, metaKeywords, status, dateAdded) 
+			(title, slug, metaTitle, metaDescription, metaKeywords, status, dateAdded) 
 			VALUES (%s, %s, %s, %s, %s, %s, %s)",
 			Sanitize::input($this->title, "text"),
-			Sanitize::input($this->permalink, "text"),
+			Sanitize::input($this->slug, "text"),
 			Sanitize::input($this->metaTitle, "text"),
 			Sanitize::input($this->metaDescription, "text"),
 			Sanitize::input($this->metaKeywords, "text"),

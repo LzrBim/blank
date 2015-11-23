@@ -10,12 +10,12 @@ $app->group('/admin', function () use ($app) {
 	$app->get('/page/index', 'App\AdminController\PageController:index');	
 	
 		$app->get('/page/add', 'App\AdminController\PageController:add');
-		
-		$app->post('/page/add', 'App\AdminController\CommonController:insert');
+		$app->post('/page/add', 'App\AdminController\PageController:insert');
 	
 		$app->get('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:edit');
-		
 		$app->post('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:update');
+		
+		$app->get('/page/delete/{id:[0-9]+}', 'App\AdminController\PageController:delete');
 		
 		
 	//PAGE VERSIONS
@@ -34,9 +34,6 @@ $app->group('/admin', function () use ($app) {
 		$app->get('/gallery/add', 'App\AdminController\GalleryController:add');
 	
 		$app->get('/gallery/edit', 'App\AdminController\GalleryController:edit');
-																 
-	/*$this->map(['GET', 'DELETE', 'PATCH', 'PUT'], '', function ($request, $response, $args) {
-			// Find, delete, patch or replace user identified by $args['id']
-	})->setName('user');*/
+
 		
-})->add(new \App\Middleware\AdminGuard);
+})->add( 'adminGuard' );

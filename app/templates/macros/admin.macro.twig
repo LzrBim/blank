@@ -7,6 +7,10 @@
   {% elseif status == 'deleted' or  status == 'banned' %}
   
   	{% set class = 'danger' %}
+    
+  {% else %}
+  
+  	{% set class = 'default' %}
   
   {% endif %}
 

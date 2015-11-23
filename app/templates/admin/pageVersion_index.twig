@@ -12,19 +12,16 @@
     <thead>
     <tr>
     <th></th>
-    <th></th>
-    <th>Headline</th>
+    <th>Title</th>
     <th>Status</th>
     </tr>
     </thead>
     <tbody>
-    {% for page in pages %}
+    {% for pageVersion in pageVersions %}
       <tr>
-      <td><a href="/admin/pageVersions/index/{{page.pageID}}"><i class="glyphicon glyphicon-cog"></i> </a></td>
-      <td><a href="/admin/page/edit/{{page.pageID}}"><i class="glyphicon glyphicon-pencil"></i></a></td>
-      <td><a href="/admin/page/edit/{{page.pageID}}">{{page.title}}</a></td>
-      
-      <td>{{m.status(page.status)}}</td>
+      <td><a href="/admin/pageVersions/edit/{{pageVersion.pageVersionID}}"><i class="glyphicon glyphicon-pencil"></i> </a></td>
+      <td><a href="/admin/pageVersions/edit/{{pageVersion.pageVersionID}}">{{pageVersion.title}}</a></td>
+      <td>{{m.status(pageVersion.status)}}</td>
       </tr>
     {% endfor %}
     </table>

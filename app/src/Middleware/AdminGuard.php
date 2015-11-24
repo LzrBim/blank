@@ -27,7 +27,7 @@ class AdminGuard {
 		
 		if(!User::isAuthorized('admin')){
 			
-			return $response->withRedirect('/login/');
+			return $response->withRedirect('/login');
 			
 		} 
 		

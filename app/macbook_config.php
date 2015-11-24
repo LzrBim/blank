@@ -2,7 +2,7 @@
 
 define('MYSQL_HOST', '127.0.0.1');  
 define('MYSQL_USER', 'root'); 
-define('MYSQL_PASS', '');  
+define('MYSQL_PASS', 'dooDooButter22');  
 define('MYSQL_DB', 'blank_db_local'); 
 	
 error_reporting(E_ALL);
@@ -21,8 +21,7 @@ $settings = [
 			'twig' => [
 				'cache' => __DIR__ . '/../cache/twig',
 				'debug' => true,
-				'auto_reload' => true,
-				'optimizations' => -1
+				'auto_reload' => true
 			]
 		],
 		

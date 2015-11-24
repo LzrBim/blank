@@ -57,6 +57,18 @@ $container['logger'] = function ($c) {
 	
 };
 
+//Override the default Not Found Handler
+$container['notFoundHandler'] = function ($c) {
+	
+	return function ($request, $response) use ($c) {
+		
+		return $c->get('view')->render($response, 'front/404.twig', [
+			
+		]);
+		
+	};
+		
+};
 
 // -----------------------------------------------------------------------------
 // MIDDLEWARE
@@ -79,7 +91,9 @@ $container['App\Controller\HomeController'] = function ($c) {
 };
 
 $container['App\Controller\PageController'] = function ($c) {
-	return new App\Controller\PageController($c->get('view'), $c->get('logger'));
+	return new App\Controller\PageController($c->get('view'), $c->get('logger'), array(
+		'notFoundHandler' => $c['notFoundHandler']
+	));
 };
 
 $container['App\Controller\GalleryController'] = function ($c) {

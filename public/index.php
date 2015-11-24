@@ -11,7 +11,7 @@ if (PHP_SAPI == 'cli-server') {
 }
 
 //CONFIG
-require __DIR__ . '/../app/config.php';
+require __DIR__ . '/../app/macbook_config.php';
 
 //AUTOLOADER
 require __DIR__ . '/../vendor/autoload.php';

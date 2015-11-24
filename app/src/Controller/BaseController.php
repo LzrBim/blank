@@ -11,6 +11,7 @@ class BaseController {
 	protected $view;
 	protected $logger;
 	protected $flash;
+	protected $notFoundHandler;
 	
 	public function __construct(Twig $view, LoggerInterface $logger, $services = array()){
 		
@@ -21,6 +22,12 @@ class BaseController {
 		if(isset($services['flash'])){
 			
 			$this->flash = $services['flash'];
+			
+		}
+		
+		if(isset($services['notFoundHandler'])){
+			
+			$this->notFoundHandler = $services['notFoundHandler'];
 			
 		}
    
@@ -34,6 +41,12 @@ class BaseController {
     $token['csrf_value'] = $request->getAttribute('csrf_value');
 		
 		return $token;
+		
+	}
+	
+	public function error404($response){
+		
+		return $this->view->render($response, 'front/404.twig')->withStatus(404);
 		
 	}
 	

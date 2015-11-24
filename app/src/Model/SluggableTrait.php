@@ -28,12 +28,10 @@ trait SluggableTrait {
 			
 			$this->loadByData($this->fetchAssoc($result));
 			
-			return $this;
-			
-		} else {
-			wLog(1, 'slug not loaded ='.$slug);
-			return false;
-		}
+		} 
+		
+		return $this;
+		
 	}
 	
 	

@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Controller;
-
 class AuthController extends BaseController {
 	
 	public function index($request, $response, $args){

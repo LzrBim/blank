@@ -29,6 +29,10 @@ class Page extends PageBase {
 	
 	public function with($with){
 		
+		if(!$this->isLoaded()){
+			return false;
+		}
+		
 		if(!is_array($with)){
 			
 			$with = array($with);
@@ -66,21 +70,6 @@ class Page extends PageBase {
 	
 	/* ADMIN FETCH 
 	----------------------------------------------------------------------------- */
-
-	
-	
-	/* 	EXTEND CORE-PERMA FOR HARD CODED
-	----------------------------------------------------------------------------- */
-
-	public function getPermalink(){
-		if($this->isHardCoded){
-			return $this->permalink.'/'; 
-		} else {
-		
-			return $this->_modReWritePath.$this->permalink.'/'; 
-		}
-		
-	}
 	
 	/* 	CHILD HELPERS
 	----------------------------------------------------------------------------- */
@@ -135,9 +124,7 @@ class Page extends PageBase {
 		}
 		
 	}
-	
-	
-	
+
 	public function fetchFrontSearch($searchPhrase, $limit = ''){
 		
 		if(empty($searchPhrase)){

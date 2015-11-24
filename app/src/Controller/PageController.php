@@ -13,13 +13,22 @@ class PageController extends BaseController {
 		$page = new Page();
 		$page->loadBySlug($args['slug'])
 					->with(['pageBlock', 'pageVersion']);
-        
-		$this->view->render($response, 'front/page.twig', array(
-			'page' 		=> $page,
-			'jsPage' 	=> $args['slug']
-		));
+    
+		if($page->isLoaded()){
 		
-		return $response;
+			$this->view->render($response, 'front/page.twig', array(
+				'page' 		=> $page,
+				'jsPage' 	=> $args['slug']
+			));
+		
+			return $response;
+			
+		} else {
+			
+			return $this->error404($response);
+			
+			//return $response->withStatus(404);
+		}
 	
 	}
 }

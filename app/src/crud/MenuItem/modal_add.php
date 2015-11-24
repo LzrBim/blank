@@ -8,7 +8,7 @@ include(MODEL_PATH.'Page.php');
 
 $page = new Page();
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
   
 <!-- Modal -->
 <div class="modal fade" id="menuItemModal" tabindex="-1" role="dialog" aria-labelledby="menuItemModal" aria-hidden="true">

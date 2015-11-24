@@ -4,7 +4,7 @@
  * FILE: /app/crud/EventDate/modal_add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 ob_start(); 
 

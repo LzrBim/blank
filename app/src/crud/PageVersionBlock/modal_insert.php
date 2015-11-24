@@ -4,7 +4,7 @@
  * FILE: /app/crud/PageVersionBlock/modal_insert.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
   
 <!-- Modal -->
 <div class="modal fade" id="insertPageVersionBlockModal" tabindex="-1" role="dialog" aria-labelledby="insertPageVersionBlockModal" aria-hidden="true">

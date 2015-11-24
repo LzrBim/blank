@@ -4,7 +4,7 @@
  * FILE: /app/crud/FaqTag/modal_add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
   
 <!-- Modal -->
 <div class="modal fade" id="faqTagModal" tabindex="-1" role="dialog" aria-labelledby="faqTagModal" aria-hidden="true">

@@ -4,7 +4,7 @@
  * FILE: /app/crud/AdminUser/edit.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');

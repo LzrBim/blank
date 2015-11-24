@@ -4,7 +4,7 @@
  * FILE: /app/crud/Test/add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
 
 <div class="container padded">
 

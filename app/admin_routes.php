@@ -10,9 +10,11 @@ $app->group('/admin', function () use ($app) {
 	$app->get('/page/index', 'App\AdminController\PageController:index');	
 	
 		$app->get('/page/add', 'App\AdminController\PageController:add');
+		
 		$app->post('/page/add', 'App\AdminController\PageController:insert');
 	
 		$app->get('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:edit');
+		
 		$app->post('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:update');
 		
 		$app->get('/page/delete/{id:[0-9]+}', 'App\AdminController\PageController:delete');
@@ -22,6 +24,8 @@ $app->group('/admin', function () use ($app) {
 	$app->get('/pageVersion/index/{pageID:[0-9]+}', 'App\AdminController\PageVersionController:index');	
 	
 		$app->get('/pageVersion/add/{pageID:[0-9]+}', 'App\AdminController\PageVersionController:add');
+		
+		$app->post('/pageVersion/add/{pageID:[0-9]+}', 'App\AdminController\PageVersionController:insert');
 	
 		$app->get('/pageVersion/edit/{id:[0-9]+}', 'App\AdminController\PageVersionController:edit');
 		

@@ -4,7 +4,7 @@
  * FILE: /app/crud/AdminUser/editPassword.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'updatePassword');

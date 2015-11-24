@@ -4,7 +4,7 @@
  * FILE: /app/crud/ItemCategory/edit.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');

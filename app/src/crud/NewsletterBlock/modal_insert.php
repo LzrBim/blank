@@ -4,7 +4,7 @@
  * FILE: /app/crud/NewsletterBlock/modal_insert.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
   
 <!-- Modal -->
 <div class="modal fade" id="insertNewsletterBlockModal" tabindex="-1" role="dialog" aria-labelledby="insertNewsletterBlockModal" aria-hidden="true">

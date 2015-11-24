@@ -5,7 +5,7 @@
 ----------------------------------------------------------------------------- */ 
 
 $newsletterView = new NewsletterView(); 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 echo $form->open();
 

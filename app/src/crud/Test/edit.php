@@ -4,7 +4,7 @@
  * FILE: /app/crud/Test/add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
 
 <form id="editForm" class="form-horizontal" method="post" enctype="multipart/form-data">
 	<input type="hidden" name="mode" value="update" />

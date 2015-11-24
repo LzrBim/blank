@@ -4,7 +4,7 @@
  * FILE: /app/crud/DocumentLibrary/file_browser_ajax_add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
 
 <div class="box">
 

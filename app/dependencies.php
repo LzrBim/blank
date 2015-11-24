@@ -3,6 +3,7 @@
  * SITE: 
  * FILE: /app/dependencies.php
 ----------------------------------------------------------------------------- */
+
 // DIC configuration
 $container = $app->getContainer();
 

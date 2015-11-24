@@ -4,7 +4,7 @@
  * FILE: /app/crud/ItemCategory/modal_add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); ?>
+$form = new \App\Lib\AdminForm();?>
   
 <!-- Modal -->
 <div class="modal fade" id="itemCategoryModal" tabindex="-1" role="dialog" aria-labelledby="itemCategoryModal" aria-hidden="true">

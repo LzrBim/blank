@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------------- */
 
 namespace App\Model;
+use \App\Lib\Sanitize;
 
 class PageVersion extends BaseModel {  
 	
@@ -78,7 +79,7 @@ class PageVersion extends BaseModel {
 	/* CRUD
 	----------------------------------------------------------------------------- */
 	
-	public function _insert(){
+	public function insert(){
 		
 		$insert = sprintf("INSERT INTO ".$this->_table." 
 			(pageID, title, headline, status, dateAdded) 
@@ -89,20 +90,10 @@ class PageVersion extends BaseModel {
 			Sanitize::input($this->status, "text"),
 			'NOW()');
 		
-		if($this->query($insert)){ 
-		
-			$this->setInsertId();
-			
-			addMessage('success', $this->_title.' was saved successfully');
-			return true;
-				
-		} else { 
-			addMessage('error','Error saving '.$this->_title);
-			return false;
-		} 
+		return $this->queryInsert($insert);
 	}
 	
-	public function _update(){
+	public function update(){
 		
 		$update = sprintf("UPDATE ".$this->_table."
 			SET title=%s, headline=%s
@@ -111,15 +102,7 @@ class PageVersion extends BaseModel {
 			Sanitize::input($this->headline, "text"),
 			Sanitize::input($this->getId(), "int"));
 	
-		if($this->query($update)){ 
-		
-			addMessage('success', $this->_title.' was updated successfully');
-			return true;
-			
-		} else { 
-			addMessage('error','Error updating '.$this->_title);
-			return false;
-		}
+		return $this->query($update);
 	}	
 	
 	public function delete($verbose = TRUE){		
@@ -144,43 +127,17 @@ class PageVersion extends BaseModel {
 	public function publish($pageVersionID, $pageID = 0){
 		
 		if(empty($pageVersionID)){
-			wLog(3, 'No pageVersionID supplied');
-			return false;
+			die('No pageVersion ID supplied');
 		}
 		
 		if(empty($pageID)){
-			
-			wLog(2, 'No pageID supplied, looking up');
-			
-			$pv = $this->load($pageVersionID);
-			$pageID = $pv->pageID;
+			die('No pageVersion ID supplied');
 		}
 		
-		if(empty($pageID)){
-			wLog(3, 'No pageID found');
-			return false;
-		}
-		
-		$query = "UPDATE ".$this->_table." SET status = 'inactive' WHERE pageID = ".$pageID." AND status = 'active' ; ";
+		$query = "UPDATE ".$this->_table." SET status = IF( pageVersionID = ".$pageVersionID.", 'active', 'inactive')
+		WHERE pageID = ".$pageID;
 	
-		if($this->query($query)){ 
-		
-			$query = "UPDATE ".$this->_table." SET status = 'active' WHERE pageVersionID = ".$pageVersionID.";";
-		
-			if($this->query($query)){ 
-		
-				addMessage('success', $this->_title.' was published successfully');
-				return true;
-				
-			} else { 
-				addMessage('error','Error publishing '.$this->_title);
-				return false;
-			}
-			
-		} else { 
-			addMessage('error','Error publishing '.$this->_title);
-			return false;
-		}
+		return $this->query($query);
 	}	
 	
 		

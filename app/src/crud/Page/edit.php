@@ -6,7 +6,7 @@
 
 use \App\Lib\AdminForm;
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 echo $form->open();
 

@@ -16,7 +16,7 @@ class PageController extends BaseController {
 		$page = new Page();
 		$pages = $page->fetchAll();
         
-		$this->view->render($response, 'admin/page_index.twig', [
+		$this->view->render($response, 'admin/page/index.twig', [
 			'title' => 'Pages',
 			'pages' => $pages,
 			'jsPage' => 'index',
@@ -39,7 +39,7 @@ class PageController extends BaseController {
 		
 		$form = ob_get_clean();
         
-		$this->view->render($response, 'admin/edit.twig', [
+		$this->view->render($response, 'admin/page/edit.twig', [
 			'title' => 'Pages',
 			'form' => $form,
 			'jsPage' => 'add',
@@ -63,7 +63,7 @@ class PageController extends BaseController {
 		
 		$this->flash->addMessage('success', 'Page saved');
 		
-		return $response->withRedirect('/admin/page/edit/'.$page->id());
+		return $response->withRedirect('/admin/pageVersion/index/'.$page->id());
 	
 	}
 	
@@ -77,7 +77,7 @@ class PageController extends BaseController {
 		include('../app/src/crud/Page/edit.php');
 		$form = ob_get_clean();
         
-		$this->view->render($response, 'admin/edit.twig', [
+		$this->view->render($response, 'admin/page/edit.twig', [
 			'title' => 'Pages',
 			'form' => $form,
 			'jsPage' => 'edit',

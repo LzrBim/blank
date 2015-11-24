@@ -5,14 +5,18 @@
 ----------------------------------------------------------------------------- */
 
 namespace App\Model;
+use \App\Lib\Sanitize;
 
 class Page extends PageBase {  
 	
 	//ATTRIBUTES
 	
 	//CHILDREN	
-	public $pageVersion;
-	public $pageBlocks = array();
+	public $version;
+	public $versions = array();
+	
+	public $block;
+	public $blocks = array();
 	
 	
 	/* LOAD
@@ -23,47 +27,38 @@ class Page extends PageBase {
 		
 		$this->version = new PageVersion();
 		
-		$this->promoBlock = new PagePromoBlock();
+		$this->block = new PagePromoBlock();
 		
 	}
 	
 	public function with($with){
 		
-		if(!$this->isLoaded()){
-			return false;
-		}
+		if(!$this->isLoaded()){	return false;	}
 		
-		if(!is_array($with)){
-			
-			$with = array($with);
-			
-		}
+		if(!is_array($with)){	$with = array($with);	}
 		
 		if($this->isLoaded()){
-		
-			if(count($with)){
+			
+			foreach($with as $relation){
 				
-				foreach($with as $relation){
+				if($relation == '*' || $relation == 'block'){
 					
-					if($relation == '*' || $relation == 'pageBlock'){
-						
-						$this->promoBlocks = $this->promoBlock->fetchByPageAndSiteWide($this->id());
-						
-					}
-					
-					if($relation == '*' || $relation == 'pageVersion'){
-						
-						$this->version->loadActiveByPage($this->id());
-						
-					}
+					$this->blocks = $this->block->fetchByPageAndSiteWide($this->id());
 					
 				}
 				
+				if($relation == '*' || $relation == 'version'){
+					
+					$this->version->loadActiveByPage($this->id());
+					
+				}
 			}
+			
+			return $this;
+			
+		} 
 		
-		} else {
-			return false;
-		}
+		return false;	
 		
 	}
 	

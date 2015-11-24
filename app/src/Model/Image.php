@@ -25,12 +25,12 @@ class Image extends BaseModel {
 	
 	/* UPLOADER SETTINGS */	
 	private $_uploaderSettings = array(
-		'targetFileName' => '',
-		'allowedList' => 'jpg,gif,png',
-		'restrictToMime' => true,
-		'overwrite' => false,
-		'useHashPrevent' => true,
-		'maxFileSize' => 20971520
+		'targetFileName' 	=> '',
+		'allowedList' 		=> 'jpg,gif,png',
+		'restrictToMime' 	=> true,
+		'overwrite' 			=> false,
+		'useHashPrevent' 	=> true,
+		'maxFileSize' 		=> 20971520
 	);
 
 	

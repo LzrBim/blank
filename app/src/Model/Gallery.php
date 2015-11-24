@@ -4,6 +4,7 @@ namespace App\Model;
 class Gallery extends GalleryBase {
 	
 	//CHILDREN
+	public $galleryImage;
 	public $galleryImages = array();
 	
 	public function __construct(){
@@ -14,14 +15,35 @@ class Gallery extends GalleryBase {
 	
 	}
 	
-	public function loadChildren($childArgs = array()){
+	public function with($with){
 		
-		if(in_array('galleryImages', $childArgs)){
+		if(!$this->isLoaded()){	return false;	}
+		
+		if(!is_array($with)){	$with = array($with);	}
+		
+		if($this->isLoaded()){
 			
-			$this->galleryImages = $this->galleryImage->fetchByGallery($this->getId(), 'rank ASC', $limit = '');
+			foreach($with as $relation){
+				
+				if($relation == '*' || $relation == 'block'){
+					
+					$this->blocks = $this->block->fetchByPageAndSiteWide($this->id());
+					
+				}
+				
+				if($relation == '*' || $relation == 'version'){
+					
+					$this->version->loadActiveByPage($this->id());
+					
+				}
+			}
 			
-		}
-
+			return $this;
+			
+		} 
+		
+		return false;	
+		
 	}
 	
 }

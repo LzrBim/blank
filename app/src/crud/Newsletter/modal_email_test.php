@@ -4,7 +4,7 @@
  * FILE: /app/crud/Newsletter/modal_email_test.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 $content  = $form->hidden('newsletterID', $newsletter->getId());
 $content .= $form->input('email', 'Email Address', '', array('required' => true));

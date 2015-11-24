@@ -1,0 +1,35 @@
+{% extends 'admin/layout.twig' %}
+
+{% block head %}
+
+    {{ parent() }}
+    
+{% endblock %}
+
+{% block content %}
+    
+    {% include 'partial/flash.twig' %}
+    
+    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped indexTable">
+    <thead>
+    <tr>
+    <th class="control"></th>
+    <th class="control"></th>
+    <th class="title">Headline</th>
+    <th>Status</th>
+    <th class="control"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for page in pages %}
+      <tr>
+      <td><a href="/admin/pageVersion/index/{{page.pageID}}"><i class="glyphicon glyphicon-pencil"></i></a></td>
+      <td><a href="/admin/page/edit/{{page.pageID}}"><i class="glyphicon glyphicon-cog"></i></a></td>
+      <td><a href="/admin/page/edit/{{page.pageID}}">{{page.title}}</a></td>
+      <td>{{m.status(page.status)}}</td>
+      <td><a href="/admin/page/delete/{{page.pageID}}"><i class="glyphicon glyphicon-trash red"></i></a></td>
+      </tr>
+    {% endfor %}
+    </table>
+    
+{% endblock %}

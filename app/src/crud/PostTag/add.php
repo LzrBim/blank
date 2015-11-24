@@ -4,7 +4,7 @@
  * FILE: /app/crud/PostTag/add.php
 ----------------------------------------------------------------------------- */ 
 
-$form = new AdminForm(); 
+$form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'insert');

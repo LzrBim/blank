@@ -17,8 +17,9 @@ class PageVersionController extends BaseController {
 		$page = new Page();
 		$page->load($args['pageID']);	
         
-		$this->view->render($response, 'admin/pageVersion_index.twig', [
+		$this->view->render($response, 'admin/page/version_index.twig', [
 			'title' => $page->title.' - Versions',
+			'page' => $page,
 			'pageVersions' => $pageVersions,
 			'jsPage' => 'index',
 			'jsOptions' => array(
@@ -30,17 +31,65 @@ class PageVersionController extends BaseController {
 	
 	}
 	
+	public function add($request, $response, $args){
+	
+		$this->logger->debug("Admin PageVersion Add");
+		
+		$page = new Page();
+		$page->load($args['pageID']);
+		
+		ob_start();
+		include('../app/src/crud/PageVersion/add.php');
+		$form = ob_get_clean();
+        
+		$this->view->render($response, 'admin/edit.twig', [
+			'title' => 'Pages',
+			'form' => $form,
+			'jsPage' => 'edit',
+			'jsOptions' => array(
+				'model' => 'Page'
+			)																			 
+		]);	
+		
+		return $response;
+	
+	}	
+	
+	public function insert($request, $response, $args){
+	
+		$this->logger->debug("Admin PageVersion Insert");
+		
+		$pageVersion = new PageVersion();
+		$pageVersion->loadByData($request->getParsedBody());
+		
+		if($pageVersion->insert()){
+		
+			$this->flash->addMessage('success', 'PageVersion saved');
+		
+			return $response->withRedirect('/admin/pageVersion/edit/'.$pageVersion->id());
+			
+		} else {
+			
+			$this->flash->addMessage('success', 'Error saving version');
+		
+			return $response->withRedirect('/admin/pageVersion/add/'.$pageVersion->pageID);
+			
+		}
+	
+	}
+	
+	
 	public function edit($request, $response, $args){
 	
-		$this->logger->debug("Admin Page Edit");
+		$this->logger->debug("Admin PageVersion Edit");
 		
 		$page = new Page();
 		$page->load($args['id']);
 		ob_start();
-		include('../app/src/crud/Page/edit.php');
+		include('../app/src/crud/PageVersion/edit.php');
 		$form = ob_get_clean();
         
-		$this->view->render($response, 'admin/edit.twig', [
+		$this->view->render($response, 'admin/page/version_edit.twig', [
 			'title' => 'Pages',
 			'form' => $form,
 			'jsPage' => 'edit',

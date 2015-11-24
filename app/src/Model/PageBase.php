@@ -3,6 +3,7 @@
  * SITE: 
  * FILE: /models/Page.php
 ----------------------------------------------------------------------------- */
+
 namespace App\Model;
 use \App\Lib\Sanitize;
 

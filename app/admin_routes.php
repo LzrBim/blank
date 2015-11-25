@@ -4,6 +4,10 @@
 // -----------------------------------------------------------------------------
 $app->group('/admin', function () use ($app) {
 																 
+	$app->get('', function ($request, $response, $args) { 
+     return $response->withRedirect('/dashboard'); 
+	});
+	
 	$app->get('/dashboard', 'App\AdminController\DashboardController:index');
 	
 	//PAGE
@@ -29,7 +33,14 @@ $app->group('/admin', function () use ($app) {
 	
 		$app->get('/pageVersion/edit/{id:[0-9]+}', 'App\AdminController\PageVersionController:edit');
 		
+		$app->post('/pageVersion/edit/{id:[0-9]+}', 'App\AdminController\PageVersionController:update');
+	
+		//EXTRA
 		$app->get('/pageVersion/copy/{id:[0-9]+}', 'App\AdminController\PageVersionController:copy');
+		
+		$app->get('/pageVersion/publish/{id:[0-9]+}', 'App\AdminController\PageVersionController:publish');
+		
+		$app->get('/pageVersion/preview/{id:[0-9]+}', 'App\AdminController\PageVersionController:preview');
 		
 		
 	//GALLERY

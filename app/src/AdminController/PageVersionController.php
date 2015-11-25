@@ -83,10 +83,15 @@ class PageVersionController extends BaseController {
 	
 		$this->logger->debug("Admin PageVersion Edit");
 		
-		$page = new Page();
-		$page->load($args['id']);
+		$pageVersion = new PageVersion();
+		$pageVersion->load($args['id']);
+		
 		ob_start();
+		
 		include('../app/src/crud/PageVersion/edit.php');
+		include('../app/src/crud/PageVersionBlock/modal_add.php');
+		include('../app/src/crud/PageVersionBlock/modal_insert.php');
+		
 		$form = ob_get_clean();
         
 		$this->view->render($response, 'admin/page/version_edit.twig', [
@@ -94,7 +99,7 @@ class PageVersionController extends BaseController {
 			'form' => $form,
 			'jsPage' => 'edit',
 			'jsOptions' => array(
-				'model' => 'Page'
+				'model' => 'PageVersion'
 			)																			 
 		]);	
 		

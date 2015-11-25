@@ -5,8 +5,7 @@
 ----------------------------------------------------------------------------- */ 
 
 $form = new \App\Lib\AdminForm();
-
-$pageView = new PageView();
+$pageView = new App\AdminView\PageView();
 
 echo $form->open();
 
@@ -14,7 +13,7 @@ echo $form->open();
 echo $form->hidden('mode', 'update');
 echo $form->hidden('status', $pageVersion->status);
 echo $form->hidden('pageID', $pageVersion->pageID);
-echo $form->hidden($pageVersion->_id, $pageVersion->getId());
+echo $form->hidden($pageVersion->_id, $pageVersion->id());
 
 echo $form->input('headline', 'Headline', $pageVersion->headline);  ?>
 
@@ -22,7 +21,7 @@ echo $form->input('headline', 'Headline', $pageVersion->headline);  ?>
 
 foreach($pageVersion->blocks as $block){ 
 
-	$pageView->panel($block, $pageVersion->getId());
+	$pageView->panel($block, $pageVersion->id());
 	
 } ?>
 
@@ -35,9 +34,3 @@ echo $form->input('title', 'Version Note', $pageVersion->title);
 echo $form->buttonsEdit();
 
 echo $form->close();
-
-include('crud/PageVersionBlock/modal_add.php');
-
-include('crud/PageVersionBlock/modal_insert.php');
-
-

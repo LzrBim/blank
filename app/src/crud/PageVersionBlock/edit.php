@@ -13,12 +13,6 @@ echo $form->hidden('mode', 'update');
 echo $form->hidden($pageVersionBlock->_id, $pageVersionBlock->getId());
 echo $form->hidden('status', $pageVersionBlock->status);
 
-/* SECOND SECTION */
-$title = 'Edit Page Version Block';
-$content = '';
-
-ob_start();
-
 if($pageVersionBlock->isRepeating){
 	
 	echo $form->input('title', 'Title', $pageVersionBlock->title, array(
@@ -65,11 +59,6 @@ if($pageVersionBlock->templateID == 1){
   	'required' => true )
 	); 
 }
-
-
-$content = ob_get_clean();
-
-$adminView->box($title, $content); 
 
 echo $form->buttonsEdit();
 

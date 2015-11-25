@@ -6,10 +6,16 @@
 
 $form = new \App\Lib\AdminForm();
 
+use App\Model\PageVersionBlock;
+use App\Model\Gallery;
+use App\Model\Video;
+use App\Model\Faq;
+
 ob_start(); 
 
 echo $form->hidden('mode', 'insert');
-echo $form->hidden('pageVersionID', $pageVersion->getId()); ?>
+
+echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" role="tablist" style="margin-left:-15px; margin-right:-15px;">
@@ -26,6 +32,7 @@ echo $form->hidden('pageVersionID', $pageVersion->getId()); ?>
   <div role="tabpanel" class="tab-pane active" id="block" style="padding:0 15px;"><? 
   
     $pageVersionBlock = new PageVersionBlock();
+		
     echo $form->radioButtonGroup('templateID', 'Template', 1, $pageVersionBlock->getTemplateOptions()); 
 			
     echo $form->checkboxCollapsible('isRepeating', 'Make block re-useable', 'Yes', 

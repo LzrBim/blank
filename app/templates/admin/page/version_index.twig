@@ -21,29 +21,30 @@
     <tr>
     <th class="control"></th>
     <th>Title</th>
-    <th><div>Date Added</div></th>
-    <th></th>
-    <th></th>
+    <th>Date Added</th>
+    <th>Actions</th>
+    <th>Status</th>
     </tr>
     </thead>
     <tbody>
     {% for pageVersion in pageVersions %}
       <tr>
       
-      <td><a href="/admin/pageVersions/edit/{{pageVersion.pageVersionID}}"><i class="glyphicon glyphicon-pencil"></i> </a></td>
+      <td><a href="/admin/pageVersion/edit/{{pageVersion.pageVersionID}}"><i class="glyphicon glyphicon-pencil"></i> </a></td>
       
-      <td><a href="/admin/pageVersions/edit/{{pageVersion.pageVersionID}}">{{pageVersion.title}}</a></td>
+      <td><a href="/admin/pageVersion/edit/{{pageVersion.pageVersionID}}">{{pageVersion.title}}</a></td>
       
       <td>{{ pageVersion.dateAdded|date("m/d/Y g:ia") }}</td>
       
       <td>	
-      	{% if pageVersion.status == 'inactive' %}
-      		<a class="btn btn-success btn-xs" href="/admin/pageVersion/publish/{{pageVersion.pageVersionID}}">Publish</a>
-        {% endif %} 
-               			
+      		
       	<a class="btn btn-default btn-xs" href="/admin/pageVersion/copy/{{pageVersion.pageVersionID}}">Copy</a>			
       	
         <a class="btn btn-default btn-xs" href="#" onclick="window.open('/admin/pageVersion/preview/{{pageVersion.pageVersionID}}'); return false;" >Preview</a>
+        
+        {% if pageVersion.status == 'inactive' %}
+      		<a class="btn btn-success btn-xs" href="/admin/pageVersion/publish/{{pageVersion.pageVersionID}}">Publish</a>
+        {% endif %} 
       
       </td>
       

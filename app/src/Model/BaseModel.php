@@ -571,33 +571,31 @@ class BaseModel {
 	}
 	
 	
-	public function getSelectOptionArray($pk = 0, $field = 'title', $opts = array()){
+	public function getSelectOptionArray($id = 0, $field = 'title', $opts = array()){
+		
+		$defaults = array(
+			'status' => 'all'								
+		);
+		
+		$opts = array_merge($defaults, $opts);
 		
 		$choices = array();
-		if(!$onlyActive){
-			$list = $this->fetchAll('title');	
-		} else {
-			$list = $this->fetchActive('title');	
-		}
-	
-		if(empty($pk)){ /* if the parent pk is empty => must be mode=add */
 		
-			foreach($list as $model){
-				$choices[] = array($model->title, $model->id(), false);
-			}
+		if($opts['status'] == 'all'){
+			$list = $this->fetchAll($field);	
 			
 		} else {
-			
-			foreach($list as $model){
-				if($model->id() == $pk){
-					$selected = true;
-				} else {
-					$selected = false;
-				}
-				$choices[] = array($model->title, $model->id(), $selected);
-			}
+			$list = $this->fetchActive($field);	
 			
 		}
+			
+		foreach($list as $model){
+			
+			$selected = ($model->id() == $id ? true : false);
+			
+			$choices[] = array($model->{$field}, $model->id(), $selected);
+		}
+		
 		return $choices;
 		
 	}

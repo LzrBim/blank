@@ -11,7 +11,7 @@ $form = new \App\Lib\AdminForm();?>
 
 	<form action="ajax/insertPageVersionBlock.php" class="form-horizontal" method="post">
   
-  <?= $form->hidden('pageVersionID', $pageVersion->getId()); ?>
+  <?= $form->hidden('pageVersionID', $pageVersion->id()); ?>
   
   <div class="modal-dialog">
   

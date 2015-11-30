@@ -52,7 +52,6 @@ if($pageVersionBlock->templateID == 1){
     
   </div><!-- /.row --><?	
 
-	
 } elseif($pageVersionBlock->templateID == 3){
 	
 	echo $form->input('headline1', $pageVersionBlock->getTemplateTitle(3), $pageVersionBlock->headline1, array(

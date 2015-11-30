@@ -70,7 +70,7 @@ class EventDate extends Core {
 				WHERE ".$this->_id."=%d",
 			Sanitize::input($this->eventID, "int"),
 			Sanitize::input($this->recurringDate, "datetime"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		

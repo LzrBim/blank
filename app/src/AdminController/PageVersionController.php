@@ -1,7 +1,6 @@
 <?php
 
 namespace App\AdminController;
-
 use App\Model\Page;
 use App\Model\PageVersion;
 
@@ -70,7 +69,7 @@ class PageVersionController extends BaseController {
 			
 		} else {
 			
-			$this->flash->addMessage('success', 'Error saving version');
+			$this->flash->addMessage('error', 'Error saving version');
 		
 			return $response->withRedirect('/admin/pageVersion/add/'.$pageVersion->pageID);
 			
@@ -87,11 +86,9 @@ class PageVersionController extends BaseController {
 		$pageVersion->load($args['id']);
 		
 		ob_start();
-		
 		include('../app/src/crud/PageVersion/edit.php');
 		include('../app/src/crud/PageVersionBlock/modal_add.php');
 		include('../app/src/crud/PageVersionBlock/modal_insert.php');
-		
 		$form = ob_get_clean();
         
 		$this->view->render($response, 'admin/page/version_edit.twig', [
@@ -113,16 +110,18 @@ class PageVersionController extends BaseController {
 		$this->logger->debug("Copy PageVersion");
 		
 		$pageVersion = new PageVersion();
-		
-		if($pageVersion->makeCopy($args['id'])){
+		$copy = $pageVersion->makeCopy($args['id']);
+		if($copy){
 			
-			return $response;
+			$this->flash->addMessage('success', 'Version copied');
 			
 		} else {
 			
+			$this->flash->addMessage('error', 'Error creating copy');
+		
 		}
 		
-		
+		return $response->withRedirect('/admin/pageVersion/index/'.$copy->pageID);
 	
 	}
 }

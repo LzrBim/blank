@@ -72,7 +72,7 @@ class Page extends PageBase {
 		
 		foreach($this->promoBlocks as $promoBlock){
 			
-			if($promoBlock->getId() == $pagePromoBlockID){
+			if($promoBlock->id() == $pagePromoBlockID){
 				
 				return $promoBlock;
 			}
@@ -90,7 +90,7 @@ class Page extends PageBase {
 			
 			foreach($this->promoBlocks as $promoBlock){
 				
-				if($promoBlock->pageID == $this->getId()){
+				if($promoBlock->pageID == $this->id()){
 					$count++;
 				}
 			}
@@ -170,7 +170,7 @@ class Page extends PageBase {
 		
 		if(!$this->isHardCoded){
 			
-			$this->version->loadActiveByPage($this->getId());
+			$this->version->loadActiveByPage($this->id());
 			if(!$this->version->isLoaded()){
 				return true;
 			}

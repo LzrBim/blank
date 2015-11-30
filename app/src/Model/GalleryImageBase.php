@@ -98,7 +98,7 @@ class GalleryImageBase extends BaseModel {
 			
 			if($obj->image->insert($x)){
 				
-				$obj->imageID = $obj->image->getId();
+				$obj->imageID = $obj->image->id();
 				
 				$insert = sprintf("INSERT INTO ".$this->_table." 
 					(galleryID, imageID, description, status, rank) 
@@ -140,7 +140,7 @@ class GalleryImageBase extends BaseModel {
 		
 		if($this->image->insert()){
 			
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 			
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(galleryID, imageID, description, status, rank) 
@@ -177,7 +177,7 @@ class GalleryImageBase extends BaseModel {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -187,7 +187,7 @@ class GalleryImageBase extends BaseModel {
 			Sanitize::input($this->imageID, "int"),
 			Sanitize::input($this->description, "editor"), 
 			Sanitize::input($this->status, "text"),  
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		

@@ -90,7 +90,7 @@ class Post extends CorePerma {
 	
 	protected function loadChildren(){
 		
-		$this->tag->loadCollectionByParent($this->getId());
+		$this->tag->loadCollectionByParent($this->id());
 		
 		if(!empty($this->postCategoryID)){
 			$this->category->load($this->postCategoryID);
@@ -230,7 +230,7 @@ class Post extends CorePerma {
 	public function _insert(){
 		
 		if($this->image->insert()){
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 		}
 		
 		if(isset($_POST['noAbstract'])){ /* Clicked Just Shorten Post*/
@@ -272,12 +272,12 @@ class Post extends CorePerma {
 			
 			$update = sprintf("UPDATE ".$this->_table." SET permalink=%s WHERE ".$this->_id."=%d",
 					Sanitize::input($this->permalink, "text"),  
-					Sanitize::input($this->getId(), "int"));
+					Sanitize::input($this->id(), "int"));
 			
 			if($this->query($update)){ 
 						
 				//INSERT TAGS
-				$this->tag->updateTagsByTitleCsv($this->getId());
+				$this->tag->updateTagsByTitleCsv($this->id());
 				
 				addMessage('success','Post was saved successfully');				
 				return true;
@@ -300,7 +300,7 @@ class Post extends CorePerma {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -330,12 +330,12 @@ class Post extends CorePerma {
 			Sanitize::input($this->noAbstract, "int"), 
 			Sanitize::input($this->isFeatured, "int"),
 			Sanitize::input($this->status, "text"), 
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			
 			//UPDATE TAGS
-			$this->tag->updateTagsByTitleCsv($this->getId());
+			$this->tag->updateTagsByTitleCsv($this->id());
 			
 			addMessage('success', $this->_title.' was updated successfully');
 			return true;
@@ -350,7 +350,7 @@ class Post extends CorePerma {
 	
 	public function delete($verbose = TRUE){
 		$this->image->delete();
-		$this->tag->deleteAllTagLinksByParent($this->getId());
+		$this->tag->deleteAllTagLinksByParent($this->id());
 		$this->_delete($verbose);
 	}
 	
@@ -362,7 +362,7 @@ class Post extends CorePerma {
 		
 		$update = sprintf("UPDATE ".$this->_table."
 			SET imageID=0 WHERE ".$this->_id."=%d",
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			return $this->image->delete();
@@ -383,7 +383,7 @@ class Post extends CorePerma {
 		$update = sprintf("UPDATE ".$this->_table."
 			SET isFeatured=%d WHERE ".$this->_id."=%d",
 			Sanitize::input($this->isFeatured, "int"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			return true;
@@ -408,7 +408,7 @@ class Post extends CorePerma {
 		
 		$previous = new $this();
 		$result = $this->query("SELECT * FROM ".$this->_table."
-			WHERE ".$this->_id." < ".$this->getId()." 
+			WHERE ".$this->_id." < ".$this->id()." 
 			ORDER BY ".$this->_id." DESC 
 			LIMIT 1");
 		if($this->numRows($result) == 1){
@@ -422,7 +422,7 @@ class Post extends CorePerma {
 	public function getNextPost(){
 		$next = new $this();
 		$result = $this->query("SELECT * FROM ".$this->_table."
-			WHERE ".$this->_id." > ".$this->getId()." 
+			WHERE ".$this->_id." > ".$this->id()." 
 			ORDER BY ".$this->_id." ASC 
 			LIMIT 1");
 		if($this->numRows($result) == 1){

@@ -352,29 +352,3 @@ table.dataTable thead .sorting:after {
 .panel-yellow a:hover {
     color: #df8a13;
 }
-
-
-.padded { padding:0 20px;}
-.active 	{ color: #333; }
-.inactive		{ color: #999; }
-.pending	{ color: #00D; }
-.archive { color: #700; }
-.rejected { color: #C00; }
-.expired { color: #D00; }
-.info { color: #11A; }
-.green { color: #009900; }
-.red, .banned, .notapproved, .delete { color: #B24748; }
-.small { font-size:10px !important; color:#666;}
-.inactive img	{ opacity:0.3 ;filter:alpha(opacity=30); }
-
-.t10 { margin-top:10px; }
-.t20 { margin-top:20px; }
-.b10 { margin-bottom:10px; }
-.b20 { margin-bottom:20px; }
-.nbm { margin-bottom:0; }
-.vam { vertical-align:middle; }
-.sm { font-size:12px; }
-.xsm { font-size:11px; }
-.lhn { line-height:1; }
-.grey { color: #777; }
-.tar { text-align:right;}

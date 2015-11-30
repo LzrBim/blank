@@ -144,7 +144,7 @@ class EventImage extends Core {
 			
 			if($obj->image->insert($x)){
 				
-				$obj->imageID = $obj->image->getId();
+				$obj->imageID = $obj->image->id();
 				
 				$insert = sprintf("INSERT INTO ".$this->_table." 
 					(eventID, imageID, description, status, rank) 
@@ -186,7 +186,7 @@ class EventImage extends Core {
 		
 		if($this->image->insert()){
 			
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 			
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(eventID, imageID, description, status, rank) 
@@ -223,7 +223,7 @@ class EventImage extends Core {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -233,7 +233,7 @@ class EventImage extends Core {
 			Sanitize::input($this->imageID, "int"),
 			Sanitize::input($this->description, "editor"), 
 			Sanitize::input($this->status, "text"),  
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		

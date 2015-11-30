@@ -119,7 +119,7 @@ class Image extends BaseModel {
 				Sanitize::input($this->fileNameMain, "text"),
 				Sanitize::input($this->fileNameThumb, "text"),
 				Sanitize::input($this->fileNameSystem, "text"),
-				Sanitize::input($this->getId(), "int"));
+				Sanitize::input($this->id(), "int"));
 		
 			if($this->query($update)){ 
 				addMessage('success', $this->_title.' was saved successfully');
@@ -141,7 +141,7 @@ class Image extends BaseModel {
 			$update = sprintf("UPDATE ".$this->_table."
 					SET fileNameOriginal='', fileNameMain='', fileNameThumb='', fileNameSystem=''
 					WHERE ".$this->_id."=%d ",
-				Sanitize::input($this->getId(), "int"));
+				Sanitize::input($this->id(), "int"));
 		
 			if($this->query($update)){ 
 				addMessage('success', $this->_title.' was removed successfully');

@@ -39,7 +39,7 @@ class PageController extends BaseController {
 		
 		$form = ob_get_clean();
         
-		$this->view->render($response, 'admin/page/edit.twig', [
+		$this->view->render($response, 'admin/edit.twig', [
 			'title' => 'Pages',
 			'form' => $form,
 			'jsPage' => 'add',
@@ -51,7 +51,6 @@ class PageController extends BaseController {
 		return $response;
 	
 	}
-	
 	
 	public function insert($request, $response, $args){
 	
@@ -77,7 +76,7 @@ class PageController extends BaseController {
 		include('../app/src/crud/Page/edit.php');
 		$form = ob_get_clean();
         
-		$this->view->render($response, 'admin/page/edit.twig', [
+		$this->view->render($response, 'admin/edit.twig', [
 			'title' => 'Pages',
 			'form' => $form,
 			'jsPage' => 'edit',

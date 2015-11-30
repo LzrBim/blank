@@ -86,7 +86,7 @@ class PageVersionBlock extends BaseModel {
 			AND status = 'active'
 			ORDER BY dateAdded DESC";
 		
-		return $this->loadCollection($query);
+		return $this->fetchCollection($query);
 		
 	}	
 	
@@ -94,22 +94,20 @@ class PageVersionBlock extends BaseModel {
 	----------------------------------------------------------------------------- */
 
 	
-	public function _insert(){
+	public function insert(){
 		
 		$this->status = 'active';
 		
 		if(!$this->isModule()){
 			
 			if(empty($this->templateID)){   
-				wLog(3, 'No template supplied');
-				addMessage('error', 'No template supplied');
+				die('no templateID supplied');
 				return false;
 			}
 			
 			//REQUIRE A TITLE IF IT'S REPEATING
 			if($this->isRepeating && empty($this->title)){
-				addMessage('error', 'Title is required for repeating blocks');
-				wLog(3, 'No title supplied');
+				die('Repeating blocks require title');
 				return false;
 			}
 			
@@ -144,24 +142,12 @@ class PageVersionBlock extends BaseModel {
 			Sanitize::input($this->isRepeating, "int"), 	
 			Sanitize::input($this->status, "text"));
 		
-		if($this->query($insert)){ 
-			
-			$this->setInsertId();
-			
-			addMessage('success', $this->_title.' was saved successfully');
-			
-			return true;
-			
-		} else { 
-			addMessage('error','Error Updating '.$this->_title);
-			return false;
-		} 
+		return $this->queryInsert($insert);
 	}
 	
 	public function update(){
 		
 		//we should never update gallery or video links
-		
 		$update = sprintf("UPDATE ".$this->_table."
 			SET 
 			title=%s,
@@ -182,25 +168,14 @@ class PageVersionBlock extends BaseModel {
 			Sanitize::input($this->href2, "text"), 
 			Sanitize::input($this->isRepeating, "int"),
 			Sanitize::input($this->status, "text"), 
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
-		if($this->query($update)){ 
-			addMessage('success', $this->_title.' was updated successfully');
-			return true;
-			
-		} else { 
-			addMessage('error','Error updating '.$this->_title);
-			return false;
-		}
+		return $this->query($update);
 		
 	}
-	
 
-	
 	/* 
 	----------------------------------------------------------------------------- */
-
-	
 	public function makeCopy($pageVersionBlockID){
 		
 		if(empty($pageVersionBlockID)){
@@ -214,17 +189,14 @@ class PageVersionBlock extends BaseModel {
 		
 		//IF IT'S A REPEATING BLOCK || MODULE WE DONT NEED A COPY- RETURN 
 		if($copy->isRepeating || $copy->isModule()){
-			return $copy->getId();
+			return $copy->id();
 		}	
 		
 		if($copy->insert()){
 			
-			$copy->setInsertId();		
-			
-			return $copy->getId();
+			return $copy->id();
 			
 		}
-		addMessage('error', 'Error during copy');
 		return false;
 		
 	}	
@@ -232,17 +204,11 @@ class PageVersionBlock extends BaseModel {
 	
 	/* LINK TABLE CRUD
 	----------------------------------------------------------------------------- */
-	public function addPageVersionBlockLink($pageVersionBlockID, $pageVersionID){
+	public function insertLink($pageVersionBlockID, $pageVersionID){
 		
 		//HARD ERRORS
-		if(empty($pageVersionBlockID)){
-			wLog(2, 'pageVersionBlockID not set');
-			return false;
-		}
-		
-		if(empty($pageVersionID)){
-			wLog(2, 'pageVersionID not set');
-			return false;
+		if(empty($pageVersionBlockID) || empty($pageVersionID)){
+			die('empty ids');
 		}
 		
 		$insert = sprintf("INSERT INTO ".$this->_linkTable." 
@@ -252,54 +218,30 @@ class PageVersionBlock extends BaseModel {
 			Sanitize::input($pageVersionID, "int"), 
 			1000);
 		
-		if($this->query($insert)){ 
-			return true;
-			
-		} 
-		
-		return false;
-		
+		return $this->queryInsert($insert);
 		
 	}
 	
 	public function deletePageVersionBlockLink($pageVersionBlockID, $pageVersionID){
 		
 		//HARD ERRORS
-		if(empty($pageVersionBlockID)){
-			wLog(2, 'pageVersionBlockID not set');
-			return false;
-		}
-		
-		if(empty($pageVersionID)){
-			wLog(2, 'pageVersionID not set');
-			return false;
+		if(empty($pageVersionBlockID) || empty($pageVersionID)){
+			die('empty ids');
 		}
 		
 		$insert = "DELETE FROM ".$this->_linkTable." 
 			WHERE pageVersionBlockID = ".$pageVersionBlockID."
 			AND pageVersionID = ".$pageVersionID;
 		
-		if($this->query($insert)){ 
-			return true;
-			
-		} 
-		
-		return false;
-		
+		return $this->query($insert);
 		
 	}
 	
 	public function updatePageVersionBlockLinkRank($pageVersionBlockID, $pageVersionID, $counter){
 	
 		//HARD ERRORS
-		if(empty($pageVersionBlockID)){
-			wLog(2, 'pageVersionBlockID not set');
-			return false;
-		}
-		
-		if(empty($pageVersionID)){
-			wLog(2, 'pageVersionID not set');
-			return false;
+		if(empty($pageVersionBlockID) || empty($pageVersionID)){
+			die('empty ids');
 		}
 		
 		$update = "UPDATE ".$this->_linkTable." SET 
@@ -307,12 +249,7 @@ class PageVersionBlock extends BaseModel {
 			WHERE pageVersionBlockID=".$pageVersionBlockID."
 			AND pageVersionID=".$pageVersionID;
 		
-		if($this->query($update)){ 
-			return true;
-			
-		} 
-		
-		return false;
+		return $this->query($insert);
 	
 	
 	}
@@ -327,7 +264,7 @@ class PageVersionBlock extends BaseModel {
 		$query = "SELECT n.pageVersionID, n.title 
 			FROM pageVersion n, pageVersionBlockLink nbl
 			WHERE n.pageVersionID = nbl.pageVersionID
-			AND nbl.pageVersionBlockID=".$this->getId();
+			AND nbl.pageVersionBlockID=".$this->id();
 			
 		$result = $this->query($query);
 		if($result){
@@ -359,8 +296,8 @@ class PageVersionBlock extends BaseModel {
 
 		foreach($list as $block){
 			
-			if(!$pageVersion->has_block($block->getId())){
-				$choices[] = array(date('m/d/Y', strtotime($block->dateAdded)).' - '.$block->title, $block->getId(), false);
+			if(!$pageVersion->has_block($block->id())){
+				$choices[] = array(date('m/d/Y', strtotime($block->dateAdded)).' - '.$block->title, $block->id(), false);
 			}
 		}
 

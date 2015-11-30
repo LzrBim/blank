@@ -132,7 +132,7 @@ class Tag extends CorePerma {
 		
 		//DID THE TITLE CHANGE?
 		$originalTag = new $this;
-		$originalTag->load($this->getId());
+		$originalTag->load($this->id());
 		
 		if($this->title != $originalTag->title){
 			
@@ -152,7 +152,7 @@ class Tag extends CorePerma {
 			Sanitize::input($this->title, "text"),
 			Sanitize::input($this->permalink, "text"),
 			Sanitize::input($this->status, "text"),  
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		
@@ -177,7 +177,7 @@ class Tag extends CorePerma {
 	private function _deleteAllTagLinks(){
 		
 		$delete = sprintf("DELETE FROM ".$this->_linkTable." WHERE ".$this->_id."=%d",
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 		
 		if($this->query($delete)){
 			return true;
@@ -324,7 +324,7 @@ class Tag extends CorePerma {
 							wLog(1, 'Added new tag '.$addition->title);
 						}	
 						
-						$this->_insertTagLink($parentID, $addition->getId());
+						$this->_insertTagLink($parentID, $addition->id());
 					
 					} else {
 						wLog(2, 'Addition of empty tag');
@@ -340,7 +340,7 @@ class Tag extends CorePerma {
 
 					if($subtraction->load($id)){
 						
-						$this->_deleteTagLink($parentID, $subtraction->getId());
+						$this->_deleteTagLink($parentID, $subtraction->id());
 							
 					} else {
 						wLog(1, 'Subtracting a tag that doesnt exist, title='.$title);
@@ -429,7 +429,7 @@ class Tag extends CorePerma {
 	
 	public function has_tag($tagID){
 		foreach($this->collection as $tag){
-			if($tag->getId() == $tagID){
+			if($tag->id() == $tagID){
 				return true;
 			}
 		}
@@ -492,13 +492,13 @@ class Tag extends CorePerma {
 		if(empty($parentID)){ /* if the parent pk is empty => must be mode=add */
 		
 			foreach($list as $tag){
-				$choices[] = array($tag->title, $tag->getId(), false);
+				$choices[] = array($tag->title, $tag->id(), false);
 			}
 			
 		} else {
 			
 			foreach($list as $tag){
-				$choices[] = array($tag->title, $tag->getId(), $this->has_tag($tag->getId()));
+				$choices[] = array($tag->title, $tag->id(), $this->has_tag($tag->id()));
 			}
 			
 		}

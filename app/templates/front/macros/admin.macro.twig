@@ -1,0 +1,19 @@
+{% macro status(status) %}
+
+  {% if status == 'active'  or status == 'success' %}
+  
+  	{% set class = 'success' %}
+    
+  {% elseif status == 'deleted' or  status == 'banned' %}
+  
+  	{% set class = 'danger' %}
+    
+  {% else %}
+  
+  	{% set class = 'default' %}
+  
+  {% endif %}
+
+	<div class="label label-{{ class }}">{{status|capitalize}}</{{ tag }}>
+
+{% endmacro %}

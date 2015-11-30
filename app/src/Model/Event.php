@@ -101,9 +101,9 @@ class Event extends CorePerma implements GalleryInterface {
 	
 	protected function loadChildren(){
 		
-		$this->images = $this->eventImage->fetchAllByParent($this->getId());
+		$this->images = $this->eventImage->fetchAllByParent($this->id());
 		
-		$this->dates = $this->eventDate->fetchAllByParent($this->getId());
+		$this->dates = $this->eventDate->fetchAllByParent($this->id());
 		
 		if(!empty($this->eventCategoryID)){
 		
@@ -242,7 +242,7 @@ class Event extends CorePerma implements GalleryInterface {
 			
 			$update = sprintf("UPDATE ".$this->_table." SET permalink=%s WHERE ".$this->_id."=%d",
 				Sanitize::input($this->permalink, "text"),  
-				Sanitize::input($this->getId(), "int"));
+				Sanitize::input($this->id(), "int"));
 			
 			if($this->query($update)){ 
 				
@@ -268,7 +268,7 @@ class Event extends CorePerma implements GalleryInterface {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -286,7 +286,7 @@ class Event extends CorePerma implements GalleryInterface {
 			Sanitize::input($this->description, "editor"),
 			Sanitize::input($this->permalink, "text"), 
 			Sanitize::input($this->status, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			
@@ -304,7 +304,7 @@ class Event extends CorePerma implements GalleryInterface {
 		
 		$this->_delete($verbose);
 		
-		$this->eventDate->deleteAllByParent($this->getId());
+		$this->eventDate->deleteAllByParent($this->id());
 		
 		$this->image->delete($verbose);
 		
@@ -317,7 +317,7 @@ class Event extends CorePerma implements GalleryInterface {
 		
 		$update = sprintf("UPDATE ".$this->_table."
 			SET imageID=0 WHERE ".$this->_id."=%d",
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			return $this->image->delete();

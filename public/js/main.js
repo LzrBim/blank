@@ -26,8 +26,7 @@ var tpjc = (function ($, main) {
 		
 		//SETTINGS
 		self.settings = {
-  		ALGOLIA_APPLICATION_ID : 'IJ41M5D68H',
-  		ALGOLIA_SEARCH_ONLY_API_KEY : '67f4f2b954018dab1819d201d7475a3c'
+  		
 		};
 		
 		//WIN		

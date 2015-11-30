@@ -45,7 +45,7 @@ class Faq extends BaseModel {
 		
 	protected function loadChildren(){
 		
-		$this->tag->loadCollectionByParent($this->getId());
+		$this->tag->loadCollectionByParent($this->id());
 		
 	}
 	
@@ -106,12 +106,12 @@ class Faq extends BaseModel {
 			
 			$update = sprintf("UPDATE ".$this->_table." SET permalink=%s WHERE ".$this->_id."=%d",
 					Sanitize::input($this->permalink, "text"),  
-					Sanitize::input($this->getId(), "int"));
+					Sanitize::input($this->id(), "int"));
 			
 			if($this->query($update)){ 
 						
 				//INSERT TAGS
-				$this->tag->updateTagsByTagId($this->getId());
+				$this->tag->updateTagsByTagId($this->id());
 				
 				addMessage('success','FAQ was saved successfully');				
 				return true;
@@ -136,12 +136,12 @@ class Faq extends BaseModel {
 			Sanitize::input($this->description, "editor", false), 
 			Sanitize::input($this->status, "text"), 
 			Sanitize::input($this->rank, "int"), 
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			
 			//UPDATE TAGS
-			$this->tag->updateTagsByTagId($this->getId());
+			$this->tag->updateTagsByTagId($this->id());
 			
 			addMessage('success', $this->_title.' was updated successfully');
 			return true;
@@ -154,7 +154,7 @@ class Faq extends BaseModel {
 	
 	public function delete($verbose = TRUE){
 		
-		$this->tag->deleteAllTagLinksByParent($this->getId());
+		$this->tag->deleteAllTagLinksByParent($this->id());
 		$this->_delete($verbose);
 	}
 	

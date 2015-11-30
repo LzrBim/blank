@@ -93,7 +93,7 @@ class Slider extends Core {
 		/* IMAGE IS MANDATORY */
 		if($this->image->insert()){
 			
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 			
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(imageID, title, description, status, rank) 
@@ -132,7 +132,7 @@ class Slider extends Core {
 			Sanitize::input($this->title, "text"),
 			Sanitize::input($this->description, "editor"), 
 			Sanitize::input($this->status, "text"),  
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		

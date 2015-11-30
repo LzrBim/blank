@@ -60,7 +60,7 @@ class PageBase extends BaseModel {
 			Sanitize::input($this->metaDescription, "text"), 
 			Sanitize::input($this->metaKeywords, "text"),
 			Sanitize::input($this->status, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		return $this->query($update);
 	}
@@ -102,7 +102,7 @@ class PageBase extends BaseModel {
 		
 		if(!$this->isHardCoded){
 			
-			$this->version->loadActiveByPage($this->getId());
+			$this->version->loadActiveByPage($this->id());
 			
 			if(!$this->version->isLoaded()){
 				return true;

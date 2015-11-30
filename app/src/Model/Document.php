@@ -84,7 +84,7 @@ class Document extends Core {
 					SET fileName=%s
 					WHERE ".$this->_id."=%d",
 				Sanitize::input($this->fileName, "text"),
-				Sanitize::input($this->getId(), "int"));
+				Sanitize::input($this->id(), "int"));
 		
 			if($this->query($update)){ 
 				addMessage('success', $this->_title.' was saved successfully');

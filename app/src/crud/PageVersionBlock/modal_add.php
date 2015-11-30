@@ -10,6 +10,7 @@ use App\Model\PageVersionBlock;
 use App\Model\Gallery;
 use App\Model\Video;
 use App\Model\Faq;
+use App\AdminView\ModalView;
 
 ob_start(); 
 
@@ -18,8 +19,7 @@ echo $form->hidden('mode', 'insert');
 echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
 
 <!-- Nav tabs -->
-<ul class="nav nav-tabs" role="tablist" style="margin-left:-15px; margin-right:-15px;">
-
+<ul class="nav nav-tabs" role="tablist">
   <li class="active"><a href="#block" data-toggle="tab">Blocks</a></li>
   <li><a href="#gallery" data-toggle="tab">Gallery</a></li>
   <li><a href="#video" data-toggle="tab">Video</a></li>
@@ -27,9 +27,9 @@ echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
 </ul>
 
 <!-- Tab panes -->
-<div class="tab-content" style="margin-left:-15px; margin-right:-15px; padding:15px;background:#FFF; border-left:1px solid #ddd; border-bottom:1px solid #ddd; border-right:1px solid #ddd;">
+<div class="tab-content">
 
-  <div role="tabpanel" class="tab-pane active" id="block" style="padding:0 15px;"><? 
+  <div role="tabpanel" class="tab-pane active" id="block"><? 
   
     $pageVersionBlock = new PageVersionBlock();
 		
@@ -41,7 +41,7 @@ echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
   </div><!-- /.block tab panel -->
   
   
-  <div role="tabpanel" class="tab-pane" id="gallery" style="padding:0 15px;"><? 
+  <div role="tabpanel" class="tab-pane" id="gallery"><? 
 		
 		//selectSearch($name, $title, $choices = array(), $opts = array())
 		$gallery = new Gallery();
@@ -52,7 +52,7 @@ echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
   </div><!-- /.gallery tab panel -->
   
   
-  <div role="tabpanel" class="tab-pane" id="video" style="padding:0 15px;"><? 
+  <div role="tabpanel" class="tab-pane" id="video"><? 
 		
 		//selectSearch($name, $title, $choices = array(), $opts = array())
 		$video = new Video();
@@ -62,13 +62,13 @@ echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
      
   </div><!-- /.video tab panel -->
   
-  <div role="tabpanel" class="tab-pane" id="faq" style="padding:0 15px;"><? 
+  <div role="tabpanel" class="tab-pane" id="faq"><? 
 		
 		//selectSearch($name, $title, $choices = array(), $opts = array())
-		$faqTag = new FaqTag();
+		/*$faqTag = new FaqTag();
 		echo $form->selectSearch('faqTagID', 'FAQ', $faqTag->getSelectOptionArray(), array(
 			'emptyOption' => 'Please select a tag'
-		)); ?>
+		));*/ ?>
      
   </div><!-- /.video tab panel -->
   
@@ -76,4 +76,4 @@ echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
 
 $content = ob_get_clean();
 
-$adminView->displayModal('addPageVersionBlockModal', 'Add A Block', $content, 'pageVersionBlock.php');
+ModalView::modal('addPageVersionBlockModal', 'Add A Block', $content, ['action' => '/admin/pageVersionBlock/insert']);

@@ -35,12 +35,19 @@ $app->group('/admin', function () use ($app) {
 		
 		$app->post('/pageVersion/edit/{id:[0-9]+}', 'App\AdminController\PageVersionController:update');
 	
-		//EXTRA
+		//EXTRA METHODS
 		$app->get('/pageVersion/copy/{id:[0-9]+}', 'App\AdminController\PageVersionController:copy');
 		
 		$app->get('/pageVersion/publish/{id:[0-9]+}', 'App\AdminController\PageVersionController:publish');
 		
 		$app->get('/pageVersion/preview/{id:[0-9]+}', 'App\AdminController\PageVersionController:preview');
+		
+		//VERSION BLOCKS
+		$app->post('/pageVersionBlock/insert/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:insert');
+		
+		$app->post('/pageVersionBlock/insertLink/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:insertLink');
+		
+		$app->get('/pageVersionBlock/preview/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:preview');
 		
 		
 	//GALLERY

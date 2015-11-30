@@ -75,7 +75,7 @@ class PostCategory extends CorePerma {
 		
 		//DID THE TITLE CHANGE?
 		$original = new $this;
-		$original->load($this->getId());
+		$original->load($this->id());
 		
 		if($this->title != $original->title){
 			
@@ -95,7 +95,7 @@ class PostCategory extends CorePerma {
 			Sanitize::input($this->title, "text"),
 			Sanitize::input($this->description, "editor"), 
 			Sanitize::input($this->status, "text"), 
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			addMessage('success', $this->_title.' was saved successfully');

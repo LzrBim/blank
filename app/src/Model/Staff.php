@@ -129,7 +129,7 @@ class Staff extends CorePerma {
 	public function insert(){
 		
 		if($this->image->insert()){
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 		}
 		
 		$insert = sprintf("INSERT INTO ".$this->_table." SET 
@@ -205,7 +205,7 @@ class Staff extends CorePerma {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -284,7 +284,7 @@ class Staff extends CorePerma {
 		
 		$update = sprintf("UPDATE ".$this->_table."
 			SET imageID=0 WHERE ".$this->_id."=%d",
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			return $this->image->delete();

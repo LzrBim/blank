@@ -54,7 +54,7 @@ class PageBlockTemplate extends Core {
 			WHERE ".$this->_id."=%d",
 			Sanitize::input($this->template, "text"),
 			Sanitize::input($this->status, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		

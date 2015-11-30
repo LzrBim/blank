@@ -145,7 +145,7 @@ class PagePromoBlock extends BaseModel {
 	public function insert(){
 		
 		if($this->image->insert()){
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 		}
 		
 		$insert = sprintf("INSERT INTO ".$this->_table." 
@@ -183,7 +183,7 @@ class PagePromoBlock extends BaseModel {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -201,7 +201,7 @@ class PagePromoBlock extends BaseModel {
 			Sanitize::input($this->href2, "text"),
 			Sanitize::input($this->href3, "text"),
 			Sanitize::input($this->status, "text"), 
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 			addMessage('success', $this->_title.' was updated successfully');

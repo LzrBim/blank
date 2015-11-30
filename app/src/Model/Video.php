@@ -86,7 +86,7 @@ class Video extends BaseModel {
 		
 		/* IMAGE */
 		if($this->image->insert()){
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 		}
 		
 		$insert = sprintf("INSERT INTO ".$this->_table." 
@@ -106,7 +106,7 @@ class Video extends BaseModel {
 			
 			$update = sprintf("UPDATE ".$this->_table." SET permalink=%s WHERE ".$this->_id."=%d",
 					Sanitize::input($this->permalink, "text"),  
-					Sanitize::input($this->getId(), "int"));
+					Sanitize::input($this->id(), "int"));
 			
 			if($this->query($update)){ 
 						
@@ -133,7 +133,7 @@ class Video extends BaseModel {
 			$this->image->update();
 		} else {
 			if($this->image->insert()){
-				$this->imageID = $this->image->getId();
+				$this->imageID = $this->image->id();
 			}
 		}
 		
@@ -145,7 +145,7 @@ class Video extends BaseModel {
 			Sanitize::input($this->embed, "string"), 
 			Sanitize::input($this->permalink, "text"),
 			Sanitize::input($this->status, "text"),  
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 															

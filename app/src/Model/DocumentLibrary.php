@@ -59,7 +59,7 @@ class DocumentLibrary extends Core {
 	}
 	
 	protected function loadChildren(){
-		$this->tag->loadCollectionByParent($this->getId());
+		$this->tag->loadCollectionByParent($this->id());
 	}
 	
 	/*-----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class DocumentLibrary extends Core {
 		
 		if($this->document->insert()){
 			
-			$this->documentID = $this->document->getId();
+			$this->documentID = $this->document->id();
 			
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(documentID, title, status) 
@@ -86,7 +86,7 @@ class DocumentLibrary extends Core {
 				addMessage('success', $this->_title.' was saved successfully');
 				
 				//INSERT TAGS
-				$this->tag->updateTagsByTitleCsv($this->getId());
+				$this->tag->updateTagsByTitleCsv($this->id());
 				
 				return true;
 				
@@ -107,7 +107,7 @@ class DocumentLibrary extends Core {
 				SET title=%s
 				WHERE ".$this->_id."=%d",
 			Sanitize::input($this->title, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		
@@ -115,7 +115,7 @@ class DocumentLibrary extends Core {
 			$this->document->update();
 			
 			//UPDATE TAGS
-			$this->tag->updateTagsByTitleCsv($this->getId());
+			$this->tag->updateTagsByTitleCsv($this->id());
 		
 			addMessage('success', $this->_title.' was saved successfully');
 			return true;
@@ -130,7 +130,7 @@ class DocumentLibrary extends Core {
 	
 	public function delete($verbose = TRUE){
 		$this->document->delete();
-		$this->tag->deleteAllTagLinksByParent($this->getId());
+		$this->tag->deleteAllTagLinksByParent($this->id());
 		$this->_delete($verbose);
 	}
 	

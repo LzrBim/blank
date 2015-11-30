@@ -1,0 +1,19 @@
+{% macro error_message(errors) %}
+
+  {% if errors %}
+  
+    <span class="help-block">
+    
+      <ul>
+        {% for err in errors %}
+        
+          <li>{{ err }}</li>
+          
+        {% endfor %}
+      </ul>
+      
+    </span>
+    
+  {% endif %}
+  
+{% endmacro %}

@@ -153,11 +153,7 @@ class BaseModel {
 	protected function loadHook(){
 		
 	}
-	
-	protected function loadChildren($childArgs = array()){
-		
-	}
-	
+
 	public function delete(){
 		
 		return $this->_delete();
@@ -204,14 +200,14 @@ class BaseModel {
 		
 			$this->{$this->_id} = mysqli_insert_id($db);
 			
-			return true;
+			return $this->{$this->_id};
 			
 		} 
 		
 		return false;
 		
 	}	
-	
+
 	public function isLoaded(){ 
 	
 		if(!empty($this->{$this->_id})){ 
@@ -226,7 +222,6 @@ class BaseModel {
 	public function fetchAssoc($result){ return mysqli_fetch_assoc($result);  }
 	
 	public function numRows($result){ return mysqli_num_rows($result);  }
-	
 	
 	public function input($db, $value, $type, $opts = array()) {  
 	

@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------------- */
 
 namespace App\Model;
+use \App\Lib\Help;
 use \App\Lib\Sanitize;
 
 class PageVersion extends BaseModel {  
@@ -100,7 +101,7 @@ class PageVersion extends BaseModel {
 			WHERE ".$this->_id."=%d",
 			Sanitize::input($this->title, "text"),
 			Sanitize::input($this->headline, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		return $this->query($update);
 	}	
@@ -109,7 +110,7 @@ class PageVersion extends BaseModel {
 		
 		foreach($this->blocks as $block){
 			
-			$block->deletePageVersionBlockLink($block->getId(), $this->getId());
+			$block->deletePageVersionBlockLink($block->id(), $this->id());
 			
 			if(!$block->isRepeating){
 
@@ -124,18 +125,15 @@ class PageVersion extends BaseModel {
 	/* ADMIN METHODS
 	----------------------------------------------------------------------------- */
 	
-	public function publish($pageVersionID, $pageID = 0){
+	public function publish($pageVersionID, $pageID){
 		
-		if(empty($pageVersionID)){
-			die('No pageVersion ID supplied');
+		if(empty($pageVersionID) || empty($pageID)){
+			die('No pageVersion ID or pageID supplied');
 		}
 		
-		if(empty($pageID)){
-			die('No pageVersion ID supplied');
-		}
-		
-		$query = "UPDATE ".$this->_table." SET status = IF( pageVersionID = ".$pageVersionID.", 'active', 'inactive')
-		WHERE pageID = ".$pageID;
+		$query = "UPDATE ".$this->_table." 
+			SET status = IF( pageVersionID = ".$pageVersionID.", 'active', 'inactive')
+			WHERE pageID = ".$pageID;
 	
 		return $this->query($query);
 	}	
@@ -144,7 +142,7 @@ class PageVersion extends BaseModel {
 	public function makeCopy($pageVersionID){
 		
 		if(empty($pageVersionID)){
-			wLog(3, 'No pageVersionID supplied');
+			die('No pageVersionID supplied');
 			return false;
 		}
 		
@@ -157,26 +155,20 @@ class PageVersion extends BaseModel {
 		$copy->headline = $original->headline;
 		$copy->status = 'inactive';
 		
-		reTitleCopied($copy->title);
+		Help::copyTitle($copy->title);
 		
 		if($copy->insert()){
-			
-			$copy->setInsertId();
-			
+				
 			//DUPLICATE VERSION BLOCKS AND BLOCK LINKS
 			foreach($original->blocks as $block){
 				
-				$newBlockID = $block->makeCopy($block->getId());
-				wLog(1, 'copied block');
+				$newBlockID = $block->makeCopy($block->id());
 	
-				$block->addPageVersionBlockLink($newBlockID, $copy->getId());
-				wLog(1, 'addPageVersionBlockLink('.$copy->getId().', '.$newBlockID.')');
+				$block->addPageVersionBlockLink($newBlockID, $copy->id());
+				
 			}			
 			
-			clearMessages();
-			addMessage('success', $this->_title.' was copied successfully');
-			
-			return $copy->getId();
+			return $copy;
 			
 		}
 		return false;
@@ -191,13 +183,11 @@ class PageVersion extends BaseModel {
 		
 		foreach($this->blocks as $block){
 			
-			if($block->getId() == $pageVersionBlockID){
+			if($block->id() == $pageVersionBlockID){
 				
 				return $block->display();
 			}
 		}
-		
-		wLog(3, 'pageVersionBlock Block not found: '.$pageVersionBlockID);
 		
 		return '';
 		
@@ -207,7 +197,7 @@ class PageVersion extends BaseModel {
 		
 		foreach($this->blocks as $block){
 			
-			if($block->getId() == $pageVersionBlockID){
+			if($block->id() == $pageVersionBlockID){
 				
 				return true;
 			}

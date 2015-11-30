@@ -49,7 +49,7 @@ class GalleryBase extends BaseModel {
 			Sanitize::input($this->description, "editor"), 
 			Sanitize::input($this->permalink, "text"), 
 			Sanitize::input($this->status, "text"),  
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 			
 			return true;

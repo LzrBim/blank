@@ -46,7 +46,7 @@ class State extends Core {
 			
 			$selected = ($state->stateID == $stateID)? true : false ;
 			
-			$choices[] = array($state->title, $state->getId(), $selected);
+			$choices[] = array($state->title, $state->id(), $selected);
 		}
 		return $choices;
 		

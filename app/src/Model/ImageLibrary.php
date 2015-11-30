@@ -80,7 +80,7 @@ class ImageLibrary extends Core {
 	}
 	
 	protected function loadChildren(){
-		$this->tag->loadCollectionByParent($this->getId());
+		$this->tag->loadCollectionByParent($this->id());
 	}
 	
 	/* CRUD
@@ -90,7 +90,7 @@ class ImageLibrary extends Core {
 		
 		if($this->image->insert()){
 			
-			$this->imageID = $this->image->getId();
+			$this->imageID = $this->image->id();
 			
 			$insert = sprintf("INSERT INTO ".$this->_table." 
 				(imageID, title, status) 
@@ -106,7 +106,7 @@ class ImageLibrary extends Core {
 				addMessage('success', $this->_title.' was saved successfully');
 				
 				//INSERT TAGS
-				$this->tag->updateTagsByTitleCsv($this->getId());
+				$this->tag->updateTagsByTitleCsv($this->id());
 				
 				return true;
 				
@@ -128,14 +128,14 @@ class ImageLibrary extends Core {
 				SET title=%s
 				WHERE ".$this->_id."=%d",
 			Sanitize::input($this->title, "text"),
-			Sanitize::input($this->getId(), "int"));
+			Sanitize::input($this->id(), "int"));
 	
 		if($this->query($update)){ 
 		
 			$this->image->update();
 			
 			//UPDATE TAGS
-			$this->tag->updateTagsByTitleCsv($this->getId());
+			$this->tag->updateTagsByTitleCsv($this->id());
 		
 			addMessage('success', $this->_title.' was saved successfully');
 			return true;
@@ -152,7 +152,7 @@ class ImageLibrary extends Core {
 		
 		$this->image->delete();
 		
-		$this->tag->deleteAllTagLinksByParent($this->getId());
+		$this->tag->deleteAllTagLinksByParent($this->id());
 		
 		$this->_delete($verbose);
 	}

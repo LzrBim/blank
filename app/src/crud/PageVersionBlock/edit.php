@@ -10,7 +10,7 @@ echo $form->open();
 
 /* HIDDEN*/
 echo $form->hidden('mode', 'update');
-echo $form->hidden($pageVersionBlock->_id, $pageVersionBlock->getId());
+echo $form->hidden($pageVersionBlock->_id, $pageVersionBlock->id());
 echo $form->hidden('status', $pageVersionBlock->status);
 
 if($pageVersionBlock->isRepeating){

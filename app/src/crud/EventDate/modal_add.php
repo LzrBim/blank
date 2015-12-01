@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 ob_start(); 
 
-echo $form->hidden('eventID', $event->getId()); ?>
+echo $form->hidden('eventID', $event->id()); ?>
 	
 <div class="row">
 

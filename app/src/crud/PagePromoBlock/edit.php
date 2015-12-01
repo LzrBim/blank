@@ -10,7 +10,7 @@ echo $form->open();
 
 /* HIDDEN*/
 echo $form->hidden('mode', 'update');
-echo $form->hidden($pagePromoBlock->_id, $pagePromoBlock->getId());
+echo $form->hidden($pagePromoBlock->_id, $pagePromoBlock->id());
 echo $form->hidden('imageID', $pagePromoBlock->imageID);
 
 /* FIRST SECTION */
@@ -129,7 +129,7 @@ if($pagePromoBlock->type == 'promo' || $pagePromoBlock->type == 'promo2'){
 					'class' => 'danger', 
 					'size'	=> 'xs',
 					'icon' 	=> 'remove',
-					'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$pagePromoBlock->getId().'"'
+					'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$pagePromoBlock->id().'"'
 				)
 			)
 		);

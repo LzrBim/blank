@@ -57,21 +57,20 @@ class PageVersionBlock extends BaseModel {
 	);
 	
 	
-	/* 	FETCH
+	/* ADMIN FETCH
+	 * called by PageVersion with
 	----------------------------------------------------------------------------- */
-	public function fetchCollectionByParent($pageVersionID){
+	public function fetchByVersion($pageVersionID){
 		
 		if(empty($pageVersionID)){
-			wLog(3, 'No pageVersionID supplied');
 			return array();
 		}
 		
-		//wLog(1, 'fetching all page version blocks for pageVersionID='.$pageVersionID);
-		$query = "SELECT nb.* 
-			FROM pageVersionBlock nb, pageVersionBlockLink nbl
-			WHERE nb.pageVersionBlockID = nbl.pageVersionBlockID
-			AND nbl.pageVersionID = ".$pageVersionID."
-			ORDER BY nbl.rank ASC";
+		$query = "SELECT pVB.* 
+			FROM pageVersionBlock pVB, pageVersionBlockLink pVBL
+			WHERE pVB.pageVersionBlockID = pVBL.pageVersionBlockID
+			AND pVBL.pageVersionID = ".$pageVersionID."
+			ORDER BY pVBL.rank ASC";
 		
 		return $this->fetchCollection($query);
 		

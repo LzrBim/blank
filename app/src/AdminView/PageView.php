@@ -152,18 +152,13 @@ class PageView {
   	
   }
 	
-	/* ADMIN HELPERS
+	/* PAGE VERSION BLOCK PANELS
 	----------------------------------------------------------------------------- */
-	
 	public function panel($pageVersionBlock, $pageVersionID){ 
 	
-		if(empty($pageVersionID)){
-			
-			wLog(2, 'No pageVersionID supplied');
-			
-		} ?>
+		if(empty($pageVersionID)){ die('no PageVersionID'); } ?>
   
-  	<div id="pageVersionBlockID_<?= $pageVersionBlock->getId(); ?>" class="panel panel-default pageVersionBlockPanel">
+  	<div id="pageVersionBlockID_<?= $pageVersionBlock->id(); ?>" class="panel panel-default pageVersionBlockPanel">
   
       <div class="panel-heading"><?= $pageVersionBlock->getPanelTitle(); ?>
       
@@ -171,7 +166,7 @@ class PageView {
 				
 					if(!$pageVersionBlock->isModule()){ ?>
           	<a class="btn btn-xs btn-default" 
-          		href="pageVersionBlock.php?mode=edit&pageVersionBlockID=<?= $pageVersionBlock->getId(); ?>&pageVersionID=<?= $pageVersionID; ?>">
+          		href="/admin/pageVersionBlock/edit/<?= $pageVersionBlock->id(); ?>?pageVersionID=<?= $pageVersionID; ?>">
           			<i class="glyphicon glyphicon-pencil"></i> Edit Block</a><?
 					
 					} ?>
@@ -179,8 +174,8 @@ class PageView {
           <a class="btn btn-xs btn-default" 
           data-tpjc-action="remove_page_version_block" 
           data-tpjc-page-version-id="<?= $pageVersionID; ?>" 
-          data-tpjc-page-version-block-id="<?= $pageVersionBlock->getId(); ?>" 
-          href="pageVersionBlock.php?mode=deleteBlockLink&pageVersionBlockID=<?= $pageVersionBlock->getId(); ?>&pageVersionID=<?= $pageVersionID; ?>">
+          data-tpjc-page-version-block-id="<?= $pageVersionBlock->id(); ?>" 
+          href="/admin/pageVersionBlock/delete/<?= $pageVersionBlock->id(); ?>?pageVersionID=<?= $pageVersionID; ?>">
           <i class="glyphicon glyphicon-trash"></i> Remove Block</a>
           
           <a class="btn btn-xs btn-default tpjc_dragHandle"><i class="glyphicon glyphicon-sort"></i></a>

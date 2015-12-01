@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'insert');
-echo $form->hidden('eventID', $event->getId());
+echo $form->hidden('eventID', $event->id());
 
 /* FIRST SECTION */
 

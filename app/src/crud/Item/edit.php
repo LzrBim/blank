@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($item->_id, $item->getId());
+echo $form->hidden($item->_id, $item->id());
 echo $form->hidden('imageID', $item->imageID);
 
 /* FIRST SECTION */
@@ -30,7 +30,7 @@ echo $form->input('title', 'Title', $item->title, array(
 
 echo $form->editor('description', 'Body', $item->description);
 
-$selectCategoryOptions = $item->category->getSelectOptionArray($item->getId());
+$selectCategoryOptions = $item->category->getSelectOptionArray($item->id());
 
 $addCategoryButton = $adminView->get_button(array(
 	'text' 	=> 'Add New Category', 
@@ -53,7 +53,7 @@ if(!$imageCount) { //if there are no images display add button
 	
 	$imageButton = $adminView->get_button(array(
 		'text' 	=> 'Add Images', 
-		'href' 	=> 'itemImage.php?mode=add&amp;itemID='.$item->getId(), 
+		'href' 	=> 'itemImage.php?mode=add&amp;itemID='.$item->id(), 
 		'class' => 'primary',
 		'size'	=> 'sm',
 		'icon' 	=> 'plus'
@@ -63,7 +63,7 @@ if(!$imageCount) { //if there are no images display add button
 	
 	$imageButton = $adminView->get_button(array(
 		'text' 	=> 'Edit Images', 
-		'href' 	=> 'itemImage.php?mode=index&amp;itemID='.$item->getId(), 
+		'href' 	=> 'itemImage.php?mode=index&amp;itemID='.$item->id(), 
 		'class' => 'primary',
 		'size'	=> 'sm',
 		'badge' => $imageCount
@@ -104,7 +104,7 @@ if($item->image->isLoaded()){
 				'class' => 'danger', 
 				'size'	=> 'xs',
 				'icon' 	=> 'remove',
-				'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$item->getId().'"'
+				'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$item->id().'"'
 			)
 		)
 	);

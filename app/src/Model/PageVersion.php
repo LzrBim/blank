@@ -36,6 +36,28 @@ class PageVersion extends BaseModel {
 		
 	}
 	
+	public function with($with){
+		
+		if(!$this->isLoaded()){	return false;	}
+
+		if(!is_array($with)){	$with = array($with);	}
+			
+		foreach($with as $relation){
+			
+			if($relation == '*' || $relation == 'block'){
+				
+				$this->blocks = $this->block->fetchByVersion($this->id());
+				
+			}
+			
+		}
+		
+		return $this;
+			
+		
+		
+	}
+	
 	/* LOAD
 	----------------------------------------------------------------------------- */
 	

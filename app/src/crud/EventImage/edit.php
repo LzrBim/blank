@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($eventImage->_id, $eventImage->getId());
+echo $form->hidden($eventImage->_id, $eventImage->id());
 echo $form->hidden('eventImageID', $eventImage->imageID);
 
 /* FIRST SECTION */

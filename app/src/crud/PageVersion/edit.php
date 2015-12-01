@@ -23,9 +23,7 @@ foreach($pageVersion->blocks as $block){
 
 	$pageView->panel($block, $pageVersion->id());
 	
-} ?>
-
-</div><!-- /#sortable -->
+} ?></div><!-- /#sortable -->
 
 <div id="addedBlockContainer"></div><? 
 

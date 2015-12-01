@@ -6,7 +6,7 @@
 
 $form = new \App\Lib\AdminForm();
 
-$content  = $form->hidden('newsletterID', $newsletter->getId());
+$content  = $form->hidden('newsletterID', $newsletter->id());
 $content .= $form->input('email', 'Email Address', '', array('required' => true));
 
 $adminView->displayModal('emailNewsletterBlockModal', 'Email A Newsletter Test', $content, 'ajax/emailNewsletterTest.php');

@@ -11,7 +11,7 @@ $form = new \App\Lib\AdminForm();?>
 
 	<form action="ajax/insertNewsletterBlock.php" class="form-horizontal" method="post">
   
-  <?= $form->hidden('newsletterID', $newsletter->getId()); ?>
+  <?= $form->hidden('newsletterID', $newsletter->id()); ?>
   
   <div class="modal-dialog">
   
@@ -42,7 +42,7 @@ $form = new \App\Lib\AdminForm();?>
 							
 							$newsletterBlock = new NewsletterBlock(); 
 							
-							echo $form->selectSearch('newsletterBlockID', 'Newsletter Block', $newsletterBlock->getInsertBlockSelectArray($newsletter->getId())); ?>
+							echo $form->selectSearch('newsletterBlockID', 'Newsletter Block', $newsletterBlock->getInsertBlockSelectArray($newsletter->id())); ?>
                          
             </div><!-- /.col -->
             

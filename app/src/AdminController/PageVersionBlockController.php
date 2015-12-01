@@ -5,7 +5,7 @@ use App\Model\Page;
 use App\Model\PageVersion;
 use App\Model\PageVersionBlock;
 
-class PageVersionController extends BaseController {
+class PageVersionBlockController extends BaseController {
 	
 	public function index($request, $response, $args){
 	
@@ -43,21 +43,27 @@ class PageVersionController extends BaseController {
 	
 		$this->logger->debug("Admin PageVersion Edit");
 		
+		$pageVersionBlock = new PageVersionBlock();
+		$pageVersionBlock->load($args['id']);
+		
 		$pageVersion = new PageVersion();
-		$pageVersion->load($args['id']);
+		$pageVersion->load($request->getParam('pageVersionID'));
+		
+		$page = new Page();
+		$page->load($pageVersion->pageID);
 		
 		ob_start();
-		include('../app/src/crud/PageVersion/edit.php');
-		include('../app/src/crud/PageVersionBlock/modal_add.php');
-		include('../app/src/crud/PageVersionBlock/modal_insert.php');
+		include('../app/src/crud/PageVersionBlock/edit.php');
 		$form = ob_get_clean();
         
-		$this->view->render($response, 'admin/page/version_edit.twig', [
-			'title' => 'Pages',
+		$this->view->render($response, 'admin/page/block_edit.twig', [
+			'title' => 'Block',
+			'subTitle' => $page->title.' - '.$pageVersion->title,
+			'pageVersionID' => $pageVersion->id(),
 			'form' => $form,
 			'jsPage' => 'edit',
 			'jsOptions' => array(
-				'model' => 'PageVersion'
+				'model' => 'PageVersionBlock'
 			)																			 
 		]);	
 		
@@ -69,8 +75,8 @@ class PageVersionController extends BaseController {
 	
 		$this->logger->debug("Admin Page Version Block Link  Insert");
 		
-		$pVBID = Sanitize::paranoid($request->getParam('pageVersionBlockID')));
-		$pID = Sanitize::paranoid($request->getParam('pageVersionID')));
+		$pVBID = Sanitize::paranoid($request->getParam('pageVersionBlockID'));
+		$pID = Sanitize::paranoid($request->getParam('pageVersionID'));
 		
 		$pageVersionBlock = new PageVersionBlock();
 		$linkID = $pageVersionBlock->insertLink($pVBID, $pID);
@@ -81,7 +87,7 @@ class PageVersionController extends BaseController {
 		
 		return $response->write(json_encode([
 			'pageVersionBlockLinkID' => 0,
-			'message' = 'Crap'
+			'message' => 'Crap'
 		]));
 		
 	}

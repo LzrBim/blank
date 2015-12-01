@@ -11,7 +11,7 @@ echo $form->open();
 
 /* HIDDEN*/
 echo $form->hidden('mode', 'update');
-echo $form->hidden($newsletter->_id, $newsletter->getId());
+echo $form->hidden($newsletter->_id, $newsletter->id());
 
 /* SECOND SECTION */
 $title = 'Edit Newsletter';
@@ -23,7 +23,7 @@ ob_start();  ?>
 
 foreach($newsletter->blocks as $block){ 
 
-	$newsletterView->panel($block, $newsletter->getId());
+	$newsletterView->panel($block, $newsletter->id());
 	
 } ?>
 

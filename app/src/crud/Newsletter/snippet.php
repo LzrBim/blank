@@ -11,7 +11,7 @@ $form = new \App\Lib\AdminForm();
 echo $form->open();
 
 /* HIDDEN*/
-echo $form->hidden($newsletter->_id, $newsletter->getId());
+echo $form->hidden($newsletter->_id, $newsletter->id());
 
 /* SECOND SECTION */
 $title = 'Edit Newsletter';

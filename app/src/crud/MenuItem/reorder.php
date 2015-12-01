@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($menu->_id, $menu->getId());
+echo $form->hidden($menu->_id, $menu->id());
 echo $form->hidden('menuTreeID', $menu->menuTreeID);
 
 /* SECTION 1 - MENU ORDER VIA NESTABLE */

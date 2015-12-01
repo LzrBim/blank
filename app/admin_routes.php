@@ -43,6 +43,8 @@ $app->group('/admin', function () use ($app) {
 		$app->get('/pageVersion/preview/{id:[0-9]+}', 'App\AdminController\PageVersionController:preview');
 		
 		//VERSION BLOCKS
+		$app->get('/pageVersionBlock/edit/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:edit');
+		
 		$app->post('/pageVersionBlock/insert/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:insert');
 		
 		$app->post('/pageVersionBlock/insertLink/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:insertLink');

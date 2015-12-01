@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($listing->_id, $listing->getId());
+echo $form->hidden($listing->_id, $listing->id());
 echo $form->hidden('imageID', $listing->imageID);
 
 /* FIRST SECTION */
@@ -87,7 +87,7 @@ if($listing->image->isLoaded()){
 				'class' => 'danger', 
 				'size'	=> 'xs',
 				'icon' 	=> 'remove',
-				'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$listing->getId().'"'
+				'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$listing->id().'"'
 			)
 		)
 	);

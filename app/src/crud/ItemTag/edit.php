@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($itemTag->_id, $itemTag->getId());
+echo $form->hidden($itemTag->_id, $itemTag->id());
 
 /* FIRST SECTION */
 

@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($postCategory->_id, $postCategory->getId());
+echo $form->hidden($postCategory->_id, $postCategory->id());
 
 /* FIRST SECTION */
 

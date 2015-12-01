@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 ob_start(); 
 
-echo $form->hidden('newsletterID', $newsletter->getId()); ?>
+echo $form->hidden('newsletterID', $newsletter->id()); ?>
 	
 <div class="row">
 

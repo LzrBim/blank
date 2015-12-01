@@ -75,5 +75,5 @@ echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
 </div><!-- /.tab-content --><?  
 
 $content = ob_get_clean();
-
+ 
 ModalView::modal('addPageVersionBlockModal', 'Add A Block', $content, ['action' => '/admin/pageVersionBlock/insert']);

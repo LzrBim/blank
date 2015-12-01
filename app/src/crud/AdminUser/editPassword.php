@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'updatePassword');
-echo $form->hidden($user->_id, $user->getId());
+echo $form->hidden($user->_id, $user->id());
 
 /* FIRST SECTION */
 

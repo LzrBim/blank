@@ -5,7 +5,7 @@ namespace App\AdminView;
 class ModalView {
 	
 	/* MAIN FUNCTION */
-	public static function modal($id, $title, $content, $opts = array()){ 
+	public static function modal($id, $title, $content, $opts = []){ 
 	
 		if(empty($id)){ return ''; }
 		
@@ -21,7 +21,7 @@ class ModalView {
     <!-- Modal -->
     <div id="<?= $id; ?>" class="modal fade" tabindex="-1" role="dialog">
     
-      <form id="<?= $id; ?>Form" action="<?= $action; ?>" class="<?= $opts['formClass']; ?>" method="post">
+      <form id="<?= $id; ?>Form" action="<?= $opts['action']; ?>" class="<?= $opts['formClass']; ?>" method="post">
       
       <div class="modal-dialog">
       
@@ -38,7 +38,7 @@ class ModalView {
             
               <div class="col-xs-12">
               
-              	<div id="<?= $id; ?>Message"></div>
+              	<div class="tpjc_modalAlert"></div>
               
               </div>
                 

@@ -25,8 +25,7 @@ var tpjc = (function ($, main) {
 		var defaults = {
 			validateRules: '',
 			model: '',
-			useTinyAbsolutePath: false,
-			images: []
+			useTinyAbsolutePath: false
 		};
 				
 		this.options = $.extend(defaults, options);
@@ -153,8 +152,7 @@ var tpjc = (function ($, main) {
 					}
 				
 				}
-				
-				
+
 			}
 					
 		} else {
@@ -166,12 +164,24 @@ var tpjc = (function ($, main) {
 	
 	};
 	
+	/* DEFAULT PAGE
+	----------------------------------------------------------------------------- */
+	tpjc.defaults = function() {
+	
+		this.tLog('- defaults()');
+		
+		$('.alert').alert(); 	
+		
+		//$('[data-toggle="tooltip"]').tooltip({container: 'body'});
+	
+	};	
+	
 	
 	/* MODE INIT
 	----------------------------------------------------------------------------- */
 	main.index = function() {
 		
-		this.attach_result_table_checkboxes();
+		//this.attach_result_table_checkboxes();
 		
 		if(this.options.model == 'Item' || this.options.model == 'Post'){
 			this.attach_toggle_featured();

@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'insert');
-echo $form->hidden('itemID', $item->getId());
+echo $form->hidden('itemID', $item->id());
 
 /* FIRST SECTION */
 

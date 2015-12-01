@@ -83,7 +83,8 @@ class PageVersionController extends BaseController {
 		$this->logger->debug("Admin PageVersion Edit");
 		
 		$pageVersion = new PageVersion();
-		$pageVersion->load($args['id']);
+		$pageVersion->load($args['id'])
+								->with('block');
 		
 		ob_start();
 		include('../app/src/crud/PageVersion/edit.php');

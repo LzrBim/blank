@@ -5,11 +5,11 @@ tpjc.attach_edit_form_plugins = function() {
 		
 	this.tLog('- attach_edit_form_plugins()');
 	
-	$(".tpjc_multiSelect").chosen(); /* MULTI-SELECTS */
+	//$(".tpjc_multiSelect").chosen(); /* MULTI-SELECTS */
 		
-	$(".tpjc_searchSelect").chosen();	
+	//$(".tpjc_searchSelect").chosen();	
 		
-	$('.tpjc_datePicker').datepicker();
+	//$('.tpjc_datePicker').datepicker();
 	
 	/*$('.tpjc_timePicker').timepicker({
 	
@@ -19,7 +19,7 @@ tpjc.attach_edit_form_plugins = function() {
 	
 	//$('.tpjc_price').mask("(999) 999-9999");
 	
-	$(".tpjc_phoneMask").mask("(999) 999-9999");
+	//$(".tpjc_phoneMask").mask("(999) 999-9999");
 	
 	//this.tLog('- formatCurrency()');
 	
@@ -36,23 +36,7 @@ tpjc.attach_edit_form_plugins = function() {
 };
 
 	
-/* DEFAULT PAGE
------------------------------------------------------------------------------ */
-tpjc.defaults = function() {
 
-	this.tLog('- defaults()');
-	
-	var self = this; 
-	
-	$('.alert').alert(); 	
-	
-	$('[data-toggle="tooltip"]').tooltip({container: 'body'});
-	
-	$('.boxCollapseButton').click(function(e){
-		$(this).find('i').toggleClass('glyphicon-minus glyphicon-plus', 200);
-	});
-
-};	
 
 
 /* RESULT TABLE CHECKBOXES
@@ -228,9 +212,9 @@ tpjc.attach_editor = function() {
 		remove_script_host : remove_script_host,
 		document_base_url : document_base_url,
 		
-		skin_url: '3e/js/tinymce/skins/tpSkin/',
+		//skin_url: '3e/js/tinymce/skins/tpSkin/',
 	
-		content_css : "3e/js/tinymce/style.css",
+		content_css : self.settings.HTTP_PATH + "css/style.css",
 	
 		selector:'.tinyMCE',
 		
@@ -252,7 +236,9 @@ tpjc.attach_editor = function() {
 			{	title: 'Image Right', selector: 'img', styles: {
 				'float': 'right', 
 				'margin': '0 0 20px 20px'
-			}}
+			}},
+			{	title: 'Red', inline: 'span', classes: 'red' },
+			{	title: 'Green', inline: 'span', classes: 'green' }
 		
 		],
 	
@@ -564,18 +550,19 @@ tpjc.modal_ajax_submit_handler = function(modalID, callback) {
 	this.tLog('- modal_ajax_submit_handler()');
 	
 	var self = this;
-	var form = $( '#' + modalID).children('form');
-	var action = form.attr('action');
+	var $form = $( '#' + modalID + 'Form')
+	var action = $form.attr('action');
 	
 	self.show_modal_loading(modalID);
 			
-	var data = form.serialize()+'&isAjax=1';
+	var data = form.serialize()+'&xhr=1';
 		
 	$.ajax({
 		type: "POST",
 		url: action,
 		data: data,
-		dataType: 'json',
+		dataType: ($.browser.msie) ? "text" : "json",
+		accepts: { text: "application/json" },
 		cache: false,
 		success: function(json) {
 			
@@ -586,7 +573,7 @@ tpjc.modal_ajax_submit_handler = function(modalID, callback) {
 				
 				self.hide_modal_loading(modalID);
 				
-				self.reset_form(modalID);
+				self.tLog('- - json success');
 				
 				callback(json);
 				
@@ -603,6 +590,7 @@ tpjc.modal_ajax_submit_handler = function(modalID, callback) {
 		},
 		error: function(xhr) {
 			alert('An error occured while sending your message');
+			
 			self.hide_modal_loading(modalID);
 		}
 		
@@ -610,23 +598,6 @@ tpjc.modal_ajax_submit_handler = function(modalID, callback) {
 	
 };
 
-
-
-/* 	POPOVERS
-	----------------------------------------------------------------------------- */
-tpjc.attach_popovers = function() {
-	
-	this.tLog('- popovers attached, selector = ".popOverButton"');
-	
-	$('.popOverButton').popover();
-	 
-	$('.popOverButton').on('click', function (e) {
-																						
-		$('.popOverButton').not(this).popover('hide');
-		
-	});
-	
-};
 
 
 tpjc.attach_remove_gallery_image = function() {
@@ -641,7 +612,8 @@ tpjc.attach_remove_gallery_image = function() {
 tpjc.show_message = function(level, message) {
 	
 	var html = this.format_alert_message(level, message);
-	$('#messageContainer').html(html).alert();
+	
+	$('#tpjc_alert').html(html).alert();
 	
 };
 
@@ -649,7 +621,9 @@ tpjc.show_message = function(level, message) {
 tpjc.show_modal_loading = function(modalID) {
 	
 	var modal = $( '#' + modalID );
+	
 	modal.find('input[type=submit]').attr('disabled','disabled');
+	
 	modal.find('.modal-body').prepend('<div class="loadingOverlay"></div>').show();
 	
 };
@@ -658,7 +632,9 @@ tpjc.show_modal_loading = function(modalID) {
 tpjc.hide_modal_loading = function(modalID) {
 	
 	var modal = $( '#' + modalID );
+	
 	modal.find('input[type=submit]').attr('disabled','false');
+	
 	modal.find('.loadingOverlay').remove();
 	
 };
@@ -668,7 +644,7 @@ tpjc.show_modal_message = function(modalID, level, message) {
 	
 	var html = this.format_alert_message(level, message);
 	
-	$( '#' + modalID ).find('.modalMessageContainer').html(html).alert();
+	$( '#' + modalID ).find('.tpjc_modalAlert').html(html).alert();
 	
 };
 
@@ -676,9 +652,12 @@ tpjc.show_modal_message = function(modalID, level, message) {
 tpjc.reset_form = function(modalID) {
 	
 	var modal = $( '#' + modalID );
+	
 	modal.find('input:text, input:password, input:file, select, textarea').val('');
+	
 	modal.find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
-	modal.find('.modalMessageContainer').html('');
+	
+	modal.find('.tpjc_modalAlert').html('');
 };
 
 
@@ -762,24 +741,30 @@ tpjc.attach_sortable = function() {
 	
 	var self = this;
 	
-	$("#sortable").sortable({
-														
-		placeholder: "dropZone",
-		
-		update: function(event, ui) {
+	if($("#sortable").length){
+	
+		$("#sortable").sortable({
+															
+			placeholder: "dropZone",
 			
-			$.ajax({
-				type: "POST",
-				url: "ajax/editRank.php",
-				data: $("#sortable").sortable('serialize')+'&model=' + self.options.model,
-				success: function(message){
+			update: function(event, ui) {
+				
+				$.ajax({
+					type: "POST",
+					url: "ajax/editRank.php",
+					data: $("#sortable").sortable('serialize')+'&model=' + self.options.model,
+					success: function(message){
+			
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown){
+						alert(errorThrown);
+					}
+				});
+			}
+		});
 		
-				},
-				error: function(XMLHttpRequest, textStatus, errorThrown){
-					alert(errorThrown);
-				}
-			});
-		}
-	});
+	} else {
+		self.tLog('WARNING - Nothing to sort');
+	}
 	
 };

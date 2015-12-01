@@ -23,3 +23,7 @@ $container['App\AdminController\PageVersionController'] = function ($c) {
 $container['App\AdminController\PageBlockController'] = function ($c) {
 	return new App\AdminController\PageBlockController($c->get('view'), $c->get('logger'), array('flash' => $c->get('flash')));
 };
+
+$container['App\AdminController\PageVersionBlockController'] = function ($c) {
+	return new App\AdminController\PageVersionBlockController($c->get('view'), $c->get('logger'), array('flash' => $c->get('flash')));
+};

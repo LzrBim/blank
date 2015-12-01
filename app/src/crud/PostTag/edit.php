@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($postTag->_id, $postTag->getId());
+echo $form->hidden($postTag->_id, $postTag->id());
 
 $title = 'Edit Tag';
 

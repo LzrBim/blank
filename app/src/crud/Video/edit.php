@@ -10,7 +10,7 @@ echo $form->open();
 
 /* HIDDEN*/
 echo $form->hidden('mode', 'update');
-echo $form->hidden($video->_id, $video->getId());
+echo $form->hidden($video->_id, $video->id());
 
 /* FIRST SECTION */
 $title = 'Edit '.$video->_title;

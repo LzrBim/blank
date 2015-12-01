@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'insert');
-echo $form->hidden('galleryID', $gallery->getId());
+echo $form->hidden('galleryID', $gallery->id());
 
 /* FIRST SECTION */
 

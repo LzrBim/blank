@@ -1,3 +1,8 @@
+/*-----------------------------------------------------------------------------
+ * SITE:
+ * FILE: /public/admin_js/page.js
+----------------------------------------------------------------------------- */
+
 var tpjc = tpjc || {};
 
 /* 	PAGE VERSION BLOCKS
@@ -37,9 +42,9 @@ tpjc.attach_add_page_version_block_modal = function() {
 	
 	var modalID = 'addPageVersionBlockModal';
 	
-	$( '#' + modalID ).children('form').validate({
-		
-		/* IF BLOCK IS REUSABLE REQUIRE A TITLE*/
+	var formID = modalID + 'Form'
+	
+	$( '#' + formID ).validate({
 					
 		submitHandler: function(form) {
 			
@@ -48,10 +53,14 @@ tpjc.attach_add_page_version_block_modal = function() {
 				//SHOULD BE REDIRECT STRAIGHT TO EDIT IF IT'S A REGULAR BLOCK 					
 				if(typeof(json.isModule) != 'undefined' && json.isModule === 0){
 					
-			window.location.href = 'pageVersionBlock.php?mode=edit&pageVersionBlockID='+json.pageVersionBlockID+'&pageVersionID='+json.pageVersionID;
+					var redirect = '/admin/pageVersionBlock/edit/'+json.pageVersionBlockID+'?pageVersionID='+json.pageVersionID;
+					
+					window.location.href = redirect;
 					
 				} else {
+					
 					self.append_page_version_block(json.pageVersionBlockID, json.pageVersionID);
+					
 				}					
 			
 			});
@@ -187,30 +196,37 @@ tpjc.attach_page_version_block_sortable = function() {
 	
 	var self = this;
 	
-	$("#sortable").sortable({
-														
-		placeholder: "dropZone", 
-		items: "> .panel",
-		handle: ".tpjc_dragHandle",
+	if($("#sortable").length > 1){
 	
-		update: function(event, ui) {
-
-			//self.tLog($("#sortable").sortable('serialize'));
-			var pageVersionID = $("#editForm").find('input[name="pageVersionID"]').val();
-			var data = $("#sortable").sortable('serialize')+'&pageVersionID='+pageVersionID;
-			
-			$.ajax({
-				type: "POST",
-				url: "ajax/editPageVersionBlockRank.php",
-				data: data,
-				success: function(message){
+		$("#sortable").sortable({
+															
+			placeholder: "dropZone", 
+			items: "> .panel",
+			handle: ".tpjc_dragHandle",
 		
-				},
-				error: function(XMLHttpRequest, textStatus, errorThrown){
-					alert(errorThrown);
-				}
-			});
-		}
-	});
+			update: function(event, ui) {
+	
+				//self.tLog($("#sortable").sortable('serialize'));
+				var pageVersionID = $("#editForm").find('input[name="pageVersionID"]').val();
+				var data = $("#sortable").sortable('serialize')+'&pageVersionID='+pageVersionID;
+				
+				$.ajax({
+					type: "POST",
+					url: "ajax/editPageVersionBlockRank.php",
+					data: data,
+					success: function(message){
+			
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown){
+						alert(errorThrown);
+					}
+				});
+			}
+		});
+		
+	} else {
+		
+		self.tLog('WARNING - nothing to sort');
+	}
 
 };

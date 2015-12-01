@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($faq->_id, $faq->getId());
+echo $form->hidden($faq->_id, $faq->id());
 
 /* FIRST SECTION */
 
@@ -29,7 +29,7 @@ echo $form->simpleEditor('description', 'Answer', $faq->description, array(
 	'rows' => 8 )
 ); 
   
-$selectTagOptions = $faq->tag->getSelectOptionArray($faq->getId());
+$selectTagOptions = $faq->tag->getSelectOptionArray($faq->id());
 
 $addTagButton = $adminView->get_button(array(
 	'text' 	=> 'Add New Tag', 

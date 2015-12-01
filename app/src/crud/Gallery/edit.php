@@ -10,7 +10,7 @@ echo $form->open();
 
 /* HIDDEN*/
 echo $form->hidden('mode', 'update');
-echo $form->hidden($gallery->_id, $gallery->getId());
+echo $form->hidden($gallery->_id, $gallery->id());
 
 /* FIRST SECTION */
 $title = 'Edit '.$gallery->_title;
@@ -66,7 +66,7 @@ if($imageCount) {
 
 	$opts['buttons'][] = array(
 		'text' 	=> 'Edit Images', 
-		'href' 	=> 'galleryImage.php?mode=index&amp;galleryID='.$gallery->getId(), 
+		'href' 	=> 'galleryImage.php?mode=index&amp;galleryID='.$gallery->id(), 
 		'class' => 'primary', 
 		'size'	=> 'xs',
 		'icon' 	=> 'pencil',

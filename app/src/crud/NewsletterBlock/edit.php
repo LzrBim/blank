@@ -10,7 +10,7 @@ echo $form->open();
 
 /* HIDDEN*/
 echo $form->hidden('mode', 'update');
-echo $form->hidden($newsletterBlock->_id, $newsletterBlock->getId());
+echo $form->hidden($newsletterBlock->_id, $newsletterBlock->id());
 echo $form->hidden('status', $newsletterBlock->status);
 
 /* SECOND SECTION */

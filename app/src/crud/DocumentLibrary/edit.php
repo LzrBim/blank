@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($documentLibrary->_id, $documentLibrary->getId());
+echo $form->hidden($documentLibrary->_id, $documentLibrary->id());
 echo $form->hidden('documentID', $documentLibrary->documentID);
 
 

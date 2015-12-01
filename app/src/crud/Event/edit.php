@@ -8,7 +8,7 @@ $form = new \App\Lib\AdminForm();
 
 echo $form->open();
 echo $form->hidden('mode', 'update');
-echo $form->hidden($event->_id, $event->getId());
+echo $form->hidden($event->_id, $event->id());
 echo $form->hidden('imageID', $event->imageID);
 
 /* FIRST SECTION */
@@ -28,7 +28,7 @@ echo $form->input('title', 'Title', $event->title, array(
 
 echo $form->editor('description', 'Body', $event->description);
 
-$selectCategoryOptions = $event->eventCategory->getSelectOptionArray($event->getId());
+$selectCategoryOptions = $event->eventCategory->getSelectOptionArray($event->id());
 
 $addCategoryButton = $adminView->get_button(array(
 	'text' 	=> 'Add New Category', 
@@ -112,7 +112,7 @@ if($event->image->isLoaded()){
 				'class' => 'danger', 
 				'size'	=> 'xs',
 				'icon' 	=> 'remove',
-				'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$event->getId().'"'
+				'data' 	=> 'data-tpjc-action="removeImage" data-tpjc-id="'.$event->id().'"'
 			)
 		)
 	);
@@ -135,7 +135,7 @@ $opts = array(
 	'buttons' => array(
 		array(
 			'text' 	=> 'Add Image', 
-			'href' 	=> 'eventImage.php?mode=add&eventID='.$event->getId(), 
+			'href' 	=> 'eventImage.php?mode=add&eventID='.$event->id(), 
 			'class' => 'success', 
 			'size'	=> 'xs',
 			'icon' 	=> 'plus',
@@ -150,7 +150,7 @@ if($imageCount) {
 
 	$opts['buttons'][] = array(
 		'text' 	=> 'Edit Images', 
-		'href' 	=> 'eventImage.php?mode=index&amp;eventID='.$event->getId(), 
+		'href' 	=> 'eventImage.php?mode=index&amp;eventID='.$event->id(), 
 		'class' => 'primary', 
 		'size'	=> 'xs',
 		'icon' 	=> 'pencil',

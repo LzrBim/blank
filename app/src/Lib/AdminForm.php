@@ -121,7 +121,7 @@ class AdminForm extends Form {
         	<img src="<?= $mainSrc; ?>?t=<?= time(); ?>" class="img-responsive" />	
             
 					<div class="hoverControls">
-						<a data-model="<?= get_class($model); ?>" data-id="<?= $model->getId(); ?>" data-type="main" class="btn btn-default tpjc_cropButton" href="#">Crop Image</a> 
+						<a data-model="<?= get_class($model); ?>" data-id="<?= $model->id(); ?>" data-type="main" class="btn btn-default tpjc_cropButton" href="#">Crop Image</a> 
 					</div>
 				</div><?
 				
@@ -142,7 +142,7 @@ class AdminForm extends Form {
 				<div id="editImage_thumb" class="hoverControlsContainer">
 					<img src="<?= $mainSrc; ?>?t=<?= time(); ?>" class="img-responsive" />
 					<div class="hoverControls">
-						<a data-model="<?= get_class($model); ?>" data-id="<?= $model->getId(); ?>" data-type="thumb" class="btn btn-default tpjc_cropButton" href="#">Crop Image</a>
+						<a data-model="<?= get_class($model); ?>" data-id="<?= $model->id(); ?>" data-type="thumb" class="btn btn-default tpjc_cropButton" href="#">Crop Image</a>
 					</div>
 				</div><?
 				
@@ -181,7 +181,7 @@ class AdminForm extends Form {
 		
 		foreach($collection as $collectionImage){ ?>
     
-    	<li id="galleryImage_<?= $collectionImage->getId(); ?>">
+    	<li id="galleryImage_<?= $collectionImage->id(); ?>">
 			
 				<div class="hoverControlsContainer">
 			
@@ -189,9 +189,9 @@ class AdminForm extends Form {
           
         	<div class="hoverControls">
           
-						<a class="btn btn-default btn-xs" data-tpjc-action="formChangeMonitorButton" href="<?= $editPage; ?>?mode=edit&<?= $parent->_id; ?>=<?= $parent->getId(); ?>&<?= $collectionImage->_id; ?>=<?= $collectionImage->getId(); ?>"><i class="glyphicon glyphicon-pencil"></i></a> 
+						<a class="btn btn-default btn-xs" data-tpjc-action="formChangeMonitorButton" href="<?= $editPage; ?>?mode=edit&<?= $parent->_id; ?>=<?= $parent->id(); ?>&<?= $collectionImage->_id; ?>=<?= $collectionImage->id(); ?>"><i class="glyphicon glyphicon-pencil"></i></a> 
             
-            <a class="btn btn-default btn-xs tpjc_removeGalleryImage" data-tpjc-action="remove_gallery_image" data-tpjc-id="<?= $collectionImage->getId(); ?>" data-tpjc-model="<?= get_class($collectionImage); ?>" href="#"><i class="glyphicon glyphicon-trash"></i></a>  
+            <a class="btn btn-default btn-xs tpjc_removeGalleryImage" data-tpjc-action="remove_gallery_image" data-tpjc-id="<?= $collectionImage->id(); ?>" data-tpjc-model="<?= get_class($collectionImage); ?>" href="#"><i class="glyphicon glyphicon-trash"></i></a>  
             
 					</div>
           

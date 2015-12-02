@@ -65,7 +65,14 @@ gulp.task('adminCss', function() {
 ----------------------------------------------------------------------------- */
 gulp.task('lintAdminScript', function() {
 	return gulp.src([
-		'public/admin_js/main.js'	
+		'public/admin_js/main.js',
+		'public/admin_js/admin_common.js',
+		'public/admin_js/dashboard.js',
+		'public/admin_js/faq.js',
+		'public/admin_js/image.js',
+		'public/admin_js/menu.js',
+		'public/admin_js/page.js',
+		'public/admin_js/user.js'
 	])
 	.pipe(jshint())
 	.pipe(jshint.reporter('default'));
@@ -77,6 +84,13 @@ gulp.task('adminScript', function() {
 		'public/admin_js/main.js',
 		'public/admin_js/plugins/jquery.validate.min.js',
 		'public/admin_js/plugins/metisMenu.min.js',
+		'public/admin_js/admin_common.js',
+		'public/admin_js/dashboard.js',
+		'public/admin_js/faq.js',
+		'public/admin_js/image.js',
+		'public/admin_js/menu.js',
+		'public/admin_js/page.js',
+		'public/admin_js/user.js'
 	])
 	.pipe(concat('all.concat.js'))
 	.pipe(gulp.dest('public/admin_js/'))
@@ -109,6 +123,13 @@ gulp.task('watch', function() {
 	//ADMIN	JS
 	gulp.watch([
 		'public/admin_js/main.js',
+		'public/admin_js/admin_common.js',
+		'public/admin_js/dashboard.js',
+		'public/admin_js/faq.js',
+		'public/admin_js/image.js',
+		'public/admin_js/menu.js',
+		'public/admin_js/page.js',
+		'public/admin_js/user.js'
 	], ['lintAdminScript', 'adminScript']);
 		
 	

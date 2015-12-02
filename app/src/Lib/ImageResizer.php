@@ -3,8 +3,14 @@
  * SITE:
  * FILE: app/lib/ImageResizer.php
 ----------------------------------------------------------------------------- */
+namespace App\Lib;
+
+use Psr\Log\LoggerInterface;
+use App\Lib\File;
 
 class ImageResizer {
+	
+	private $logger;
 
 	private $fileSource;
 	private $fileDestination;
@@ -15,17 +21,22 @@ class ImageResizer {
 	private $useImagick;
 	
 	private $imageType; /* from getimagesize, 1 = gif, 2= jpg, 3=png */
+	
+	public function __construct(LoggerInterface $logger){
+		
+		$this->logger = $logger;
+		
+	}
 
-	public function __construct($fileSource, $fileDestination = ''){  
+	public function init($fileSource, $fileDestination = ''){  
 		
 		if(empty($fileSource)){
-			wLog(3, 'No fileSource supplied'); 
-			return false;
+			$this->logger->error('No fileSource supplied'); 
 		} 
 		
 		if(!defined('ASSET_BASE_PATH')) {
-			wLog(4, 'ASSET_BASE_PATH undefined');
-			die('Uploader::__construct() - ASSET_BASE_PATH undefined');
+			$this->logger->error('ASSET_BASE_PATH undefined');
+			die('NO ASSET BASE BATH');
 		}
 		
 		$this->fileSource = $fileSource;
@@ -40,8 +51,8 @@ class ImageResizer {
 		
 		/* VALIDATE DESTINATION IN BASE PATH */
 		if(strpos($this->fileDestination, ASSET_BASE_PATH) === false){
-			wLog(4, 'fileDestination did not contain ASSET_BASE_PATH');
-			die('ImageResizer::__construct() - fileDestination did not contain ASSET_BASE_PATH');
+			$this->logger->error('fileDestination did not contain ASSET_BASE_PATH');
+			die('ImageResizer - fileDestination did not contain ASSET_BASE_PATH');
 		}
 		
 		/* POPULATE IMAGE ATTRIBUTES */
@@ -72,24 +83,23 @@ class ImageResizer {
 	public function boxFit($maxWidth, $maxHeight, $forceOut = FALSE, $messages = TRUE){
 		
 		if(empty($this->width) || empty($this->height)){
-			wLog(3, get_class($this).'->'.__FUNCTION__.'() - Empty width or height'); 
+			$this->logger->error('Empty width or height'); 
 			return false;
 		}
 		
 		if( $this->width <= $maxWidth && $this->height <= $maxHeight && !$forceOut ) {
 			
 			if( $this->fileSource == $this->fileDestination ) {
-				if($messages){ addMessage("success","The image did not require a resize."); }
+				$this->logger->debug("The image did not require a resize.");
 				return true;
 				
 			} else {
 				if(copy($this->fileSource, $this->fileDestination)) {
-					if($messages){ addMessage("success","The image was copied to new destination, no resize was necessary"); }
+					$this->logger->debug("The image was copied to new destination, no resize was necessary");
 					return true;
 					
 				} else {
-					wLog(2, 'Copy from source to destination failed'); 
-					addMessage("error","Copy from source to destination failed");	
+					$this->logger->error('Copy from source to destination failed');
 					return false;	
 				}
 			}
@@ -97,7 +107,7 @@ class ImageResizer {
 		
 		if($this->useImagick){ /* USE IMAGICK */
 		
-			wLog(1, 'boxFit using Imagick');
+			$this->logger->debug('boxFit using Imagick');
 			
 			try {
 				
@@ -111,18 +121,18 @@ class ImageResizer {
 				
 			} catch (ImagickException $e){
 				
-        wLog(3, 'Imagick Exception Caught: '.$e->getMessage()); 
-				addMessage("error",$e->getMessage());
+        $this->logger->error('Imagick Exception Caught: '.$e->getMessage()); 
 				return false;
+				
 			}
 			
-			addMessage("success","The image was resized");
+			$this->logger->debug("The image was resized");
 			return true;
 			
 		
 		} else { /* USE GD */
 		
-			wLog(1, 'boxFit using GD');
+			$this->logger->debug('boxFit using GD');
 			
 			$imageRatio = $this->width/$this->height;
 			
@@ -144,8 +154,7 @@ class ImageResizer {
 				$tempImage = imagecreatetruecolor($newWidth,$newHeight);
 				
 			} else {
-				wLog(2, 'Problem comparing image ratios'); 
-				addMessage("error","Problem comparing image ratios");
+				$this->logger->debug('Problem comparing image ratios'); 
 				return false;
 			}
 		
@@ -155,13 +164,12 @@ class ImageResizer {
 				
 				if(imagecopyresampled($tempImage,$imageFromSource,0,0,0,0,$newWidth,$newHeight,$this->width, $this->height)){
 					
-					if($messages){ 
-						addMessage("success","The image was resized from (".$this->width."x".$this->height.") to (".ceil($newWidth)."x".ceil($newHeight).")"); 
-					}
+					$this->logger->debug("success","The image was resized from (".$this->width."x".$this->height.") to (".ceil($newWidth)."x".ceil($newHeight).")"); 
+					
 					
 					if (file_exists($this->fileDestination)){
 						if(!unlink($this->fileDestination)){
-							addMessage("warning","Problem deleting the previous destination file");
+							$this->logger->error("Problem deleting the previous destination file");
 						}
 					}
 					
@@ -171,13 +179,11 @@ class ImageResizer {
 					return $success;
 					
 				} else {
-					wLog(2, 'Problem copying the resampled image');
-					addMessage("error","Problem copying the resampled image");
+					$this->logger->error("Problem copying the resampled image");
 					return false;
 				}
 			} else {
-				addMessage("error","Problem creating GD Image");
-				wLog(2, 'Problem creating GD Image');
+				$this->logger->error('Problem creating GD Image');
 				return false;
 			}
 		
@@ -189,7 +195,7 @@ class ImageResizer {
 	public function boxCrop($targetWidth, $targetHeight, $messages = TRUE){
 		
 		if(empty($this->width) || empty($this->height)){
-			wLog(3, 'Empty width or height'); 
+			$this->logger->debug('Empty width or height'); 
 			return false;
 		}
 	
@@ -198,7 +204,7 @@ class ImageResizer {
 		//CASE ONE - Exact Same Ratio - Send it to box fit.
 		if( $this->aspect == $targetAspect ) {
 			
-			wLog(1,'Weird, exact same ratio');
+			$this->logger->debug('Weird, exact same ratio');
 		
 			return $this->boxFit($targetWidth, $targetHeight);
 		
@@ -222,7 +228,7 @@ class ImageResizer {
 			return $this->crop($x, $y, $w, $h, $targetWidth, $targetHeight);
 			
 		} else {
-			wLog(4, 'This should never happen'); 
+			$this->logger->debug('This should never happen'); 
 			return false;
 		}
 			
@@ -230,11 +236,11 @@ class ImageResizer {
 
 	public function crop($x, $y, $w, $h, $dst_w, $dst_h){
 		
-		wLog(1, 'crop('.$x.', '.$y.', '.$w.', '.$h.', '.$dst_w.', '.$dst_h.')');
+		$this->logger->debug('crop('.$x.', '.$y.', '.$w.', '.$h.', '.$dst_w.', '.$dst_h.')');
 		
 		if($this->useImagick){ /* USE IMAGICK */
 		
-			wLog(1, 'Crop using Imagick');
+			$this->logger->debug('Crop using Imagick');
 			
 			try {
 				
@@ -248,18 +254,18 @@ class ImageResizer {
 				
 			} catch (ImagickException $e){
 				
-        wLog(3, 'Imagick Exception Caught: '.$e->getMessage()); 
-				addMessage("error",$e->getMessage());
+        $this->logger->error('Imagick Exception Caught: '.$e->getMessage()); 
 				return false;
+				
 			}
 			
-			addMessage("success","The image was cropped");
+			$this->logger->debug("The image was cropped");
 			return true;
 			
 		
 		} else { /* USE GD */
 		
-			wLog(1, 'Crop using GD');
+			$this->logger->debug('Crop using GD');
 
 			$tempImage = imagecreatetruecolor($dst_w, $dst_h); 		
 			
@@ -273,10 +279,9 @@ class ImageResizer {
 						
 						if(!unlink($this->fileDestination)){
 							
-							addMessage("warning","Problem deleting the previous destination file");
-							
-							wLog(3, 'Problem deleting the previous destination file');
+							$this->logger->error("Problem deleting the previous destination file");
 							return false;
+							
 						}
 					}
 					
@@ -290,16 +295,14 @@ class ImageResizer {
 					
 				} else {
 					
-					addMessage("error","Problem copying the resampled image");
-					wLog(3, 'Problem copying the resampled image');
+					$this->logger->debug('Problem copying the resampled image');
 					return false;
 					
 				}
 				
 			} else {
 				
-				addMessage("error","Problem creating GD Image");
-				wLog(3, 'Error in imageCreate()');
+				$this->logger->debug('Error in imageCreate()');
 				return false;
 			}
 			
@@ -307,135 +310,6 @@ class ImageResizer {
 	
 	}
 	
-	public function watermark(){
-			
-		$watermarkFile = BASE_PATH.'public_html/images/placeholder/cavan-images-watermark.png';	
-		
-		/* CALCULATE GRAVITY */
-		list($watermarkWidth, $watermarkHeight, $watermarkType) = getimagesize($watermarkFile);
-		
-		$x = $this->width - $watermarkWidth;
-		$y = ($this->height  - $watermarkHeight) - 40;			
-
-		//wLog(1, 'Base image width='.$this->width.', height='.$this->height);
-		//wLog(1, 'Watermark image width='.$watermarkWidth.', height='.$watermarkHeight);	
-		//wLog(1, 'Watermark x='.$x.', y='.$y);
-
-		/* RENDER */
-		
-		if($this->useImagick){ /* USE IMAGICK */
-		
-			wLog(1, 'Watermark using Imagick');
-			
-			try {
-				
-				$im = new Imagick();
-				$im->readImage($this->fileSource);
-				$watermarkIm = new Imagick();
-				$watermarkIm->readImage($watermarkFile);
-				$im->compositeImage($watermarkIm, imagick::COMPOSITE_OVER, $x, $y);
-				$im->writeImage($this->fileDestination);
-				$im->clear();
-				$im->destroy();
-				$watermarkIm->clear();
-				$watermarkIm->destroy();
-				unset($im);
-				unset($watermarkIm);
-				
-			} catch (ImagickException $e){
-				
-        wLog(3, 'Imagick Exception Caught: '.$e->getMessage()); 
-				addMessage("error",$e->getMessage());
-				return false;
-			}
-			
-			addMessage("success","The image was watermarked");
-			return true;
-			
-		
-		} else { /* USE GD */
-		
-			wLog(1, 'Watermark using GD');
-		
-			$image = $this->imageCreate();
-			$watermarkImage = imagecreatefrompng($watermarkFile);
-			
-			imagealphablending($image, true);
-			imagealphablending($watermarkImage, true);
-			
-			imagecopy($image, $watermarkImage, $x, $y, 0, 0, $watermarkWidth, $watermarkHeight);
-			
-			$success = $this->imageWrite($image);
-			
-			imagedestroy($image);
-			imagedestroy($watermarkImage);
-			
-			return $success;
-			
-		}
-	
-	}
-	
-	/*$textX = $x + 312;
-		$textY = $y + 62;*/
-	
-	public function text($string = '', $x, $y){
-		
-		$font = BASE_PATH.'public_html/images/placeholder/ARIALN.TTF';
-		$fontSize = 13;
-		
-		/* RENDER */		
-		if($this->useImagick){ /* USE IMAGICK */
-		
-			wLog(1, 'Text using Imagick');
-			
-			try {
-				
-				$im = new Imagick();
-				$draw = new ImagickDraw();				
-				$im->readImage($this->fileSource);
-				
-				$draw->setFillColor('white');
-				$draw->setFont($font);
-				$draw->setFontSize($fontSize);	
-				$draw->setTextAlignment (imagick::ALIGN_LEFT);			
-				
-				$im->annotateImage($draw, $x, $y, 0, $string);
-				
-				$im->writeImage($this->fileDestination);
-				$im->clear();
-				$im->destroy();
-				unset($im);
-				
-			} catch (ImagickException $e){
-				
-        wLog(3, 'Imagick Exception Caught: '.$e->getMessage()); 
-				addMessage("error",$e->getMessage());
-				return false;
-			}
-			
-			addMessage("success","The image text was overlaid");
-			return true;
-			
-		
-		} else { /* USE GD */
-		
-			wLog(1, 'Text using GD');
-		
-			$image = $this->imageCreate();
-			$white = imagecolorallocate($image, 255, 255, 255);
-			
-			imagettftext($image, $fontSize, 0, $x, $y, $white, $font, $string);
-			
-			$success = $this->imageWrite($image);
-			
-			imagedestroy($image);
-			
-			return $success;
-			
-		}
-	
-	}
 	
 	/*	PRIVATE METHODS - MOSTLY FOR GD 
 	----------------------------------------------------------------------------- */
@@ -460,7 +334,7 @@ class ImageResizer {
 			return @imagecreatefrompng($this->fileSource);
 			
 		} else {
-			wLog(3, 'Undefined imageType');
+			$this->logger->error('Undefined imageType');
 			return false;
 		}
 	}
@@ -471,8 +345,7 @@ class ImageResizer {
 			if(imagegif($tempImage, $this->fileDestination, 100)){
 				return true;
 			} else {
-				addMessage("error","Could not write GIF to disk");
-				wLog(3, 'Could not write GIF to disk');
+				$this->logger->debug('Could not write GIF to disk');
 				return false;
 			}
 			
@@ -480,8 +353,7 @@ class ImageResizer {
 			if(imagejpeg($tempImage, $this->fileDestination, 100)){
 				return true;
 			} else {
-				addMessage("error","Could not write JPG to disk");
-				wLog(3, 'Could not write JPG to disk');
+				$this->logger->debug('Could not write JPG to disk');
 				return false;
 			}
 			
@@ -489,13 +361,12 @@ class ImageResizer {
 			if(imagepng($tempImage, $this->fileDestination)){
 				return true;
 			} else {
-				addMessage("error","Could not write PNG to disk");
-				wLog(3, 'Could not write PNG to disk');
+				$this->logger->debug('Could not write PNG to disk');
 				return false;
 			}
 			
 		} else {
-			wLog(3, 'undefined imageType');
+			$this->logger->debug('undefined imageType');
 			return false;
 		}
 		

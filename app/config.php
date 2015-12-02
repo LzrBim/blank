@@ -4,6 +4,13 @@ define('MYSQL_HOST', '127.0.0.1');
 define('MYSQL_USER', 'root'); 
 define('MYSQL_PASS', '');  
 define('MYSQL_DB', 'blank_db_local'); 
+
+define('HTTP_PATH', 'http://local.blank.com/');
+define('BASE_PATH', '/Users/crossmj/Sites/Blank/Home/');
+
+define('ASSET_BASE_PATH', BASE_PATH.'public/assets/');
+define('ASSET_HTTP_PATH', HTTP_PATH.'assets/');
+
 	
 error_reporting(E_ALL);
 

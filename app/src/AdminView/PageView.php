@@ -190,7 +190,8 @@ class PageView {
 					
 					echo $this->pageVersionBlock($pageVersionBlock);
 				
-				} else { //DO CUSTOM DISPLAYS FOR MODULES INSIDE PANELS
+				//DO CUSTOM DISPLAYS FOR MODULES INSIDE PANELS
+				} else { 
 					
 					if(!empty($pageVersionBlock->galleryID)){ 
 			

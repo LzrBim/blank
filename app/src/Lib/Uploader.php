@@ -4,128 +4,61 @@
  * FILE: /app/lib/Uploader.php
 ----------------------------------------------------------------------------- */
 
-/* USAGE:
+namespace App\Lib;
 
-Simple
-$uploader = new Uploader('uploadFile', 'images/');
-
-Full
-$uploader = new Uploader('uploadFile', 'images/', array( 
-	'targetFileName' 	=> '', 				// ABOVE ASSET_BASE_PATH - NO FILE EXTENSION
-	'allowedList' 		=> '', 				// jpg,gif,png 
-	'restrictToMime' 	=> true, 			// RESTRICT TO GLOBAL MIME LIST
-	'overwrite' 			=> false,     // SHOULD IT OVERWRITE PRE-EXISTING FILE
-	'useHashPrevent'	=> true,			// IN THE EVENT OF PRE-EXISTING FILE - APPEND HASH, IF FALSE IT WILL FAIL
-	'maxFileSize' 		=> 40971520 	// 40MB
-)); 
-
-*/
+use Psr\Log\LoggerInterface;
+use Slim\Flash;
+use App\Lib\File;
 
 class Uploader {
 
-	private $uploadKey; 
-	
-	private $targetDirectory; 
-	
-	private $opts = array(
-		'targetFileName' 	=> '', 				/* ABOVE ASSET_BASE_PATH - NO FILE EXTENSION - THIS REPLACES USER SUPPLIED FILE NAME */
-		'allowedList' 		=> '', 				/* jpg,gif,png */
-		'restrictToMime' 	=> true, 			/* RESTRICT TO GLOBAL MIME LIST */
-		'overwrite' 			=> false,     /* SHOULD IT OVERWRITE PRE-EXISTING FILE */
-		'useHashPrevent'	=> true,			/* IN THE EVENT OF PRE-EXISTING FILE - APPEND HASH, IF FALSE IT WILL FAIL */
-		'maxFileSize' 		=> 40971520 	/* 40MB */	
-	);
-	
-	private $fileArrayIndex;
-	
+	//PRIVATE
+	private $uploadKey = 'uploadFile';
+	private $targetDir = ''; 
+	private $fileArrayIndex = -1;
 	private $files = array('name' => '','type' => '', 'tmp_name' => '', 'error' => '', 'size' => '');
+	
+	private $logger;
+	private $flash;
 	
 	//POST UPLOAD VARS
 	private $fileName = ''; 				/* FULL FILE NAME WITH EXTENSION - title.jpg */
 	private $fileRelativePath = ''; /* RELATIVE PATH TO FILE - assets/images/title.jpg */
-	private $fileHttpPath = ''; 		/* FULL PATH TO FILE INCLUDING ASSET_HTTP_PATH - http://www.thirdperspective.com/assets/images/title.jpg */
 	private $fileBasePath = ''; 		/* FULL PATH TO FILE INCLUDING ASSET_BASE_PATH - WEBROOT/blanksite.com/public_html/assets/images/title.jpg */
 	private $fileExt = '';  				/* NO PERIOD - jpg */
 	
-	private $mimes = array(
-											 
-		'image/gif' => 'gif',
-		'image/jpeg' => 'jpg', 
-		'image/pjpeg' => 'jpg',
-		'image/png' => 'png', 
-		'image/tiff' => 'tif',
-		
-		'application/msword' => 'doc',
-		'application/pdf' => 'pdf',
-		'application/vnd.ms-powerpoint' => 'ppt',
-		'application/vnd.ms-excel' => 'xls',
-		'application/rtf' => 'rtf',
-		
-		'text/plain' => 'txt',
-		'text/csv' => 'csv',
-		'text/html' => 'html',
-		'text/vcard' => 'vcf',
-		'text/xml' => 'xml',
-		
-		'video/mpeg' => 'mpeg',
-		'video/mp4' => 'mp4',
-		'video/quicktime' => 'mov',
-		'video/x-ms-wmv' => 'wmv',
-		'video/msvideo' => 'wmv',
-		'video/avi' => 'avi', 
-		'video/x-msvideo' => 'wmv',
-		'video/x-flv' => 'flv',
-		'application/x-shockwave-flash' => 'swf',
-		
-		'application/xml' => 'xml',
-		'application/zip' => 'zip',
-		'application/gzip' => 'gz',
-		
-		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
-		'application/vnd.openxmlformats-officedocument.spreadsheetml.template' => 'xltx',
-		'application/vnd.openxmlformats-officedocument.presentationml.template' => 'potx',
-		'application/vnd.openxmlformats-officedocument.presentationml.slideshow' => 'ppsx',
-		'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
-		'application/vnd.openxmlformats-officedocument.presentationml.slide' => 'sldx',
-		'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-		'application/vnd.openxmlformats-officedocument.wordprocessingml.template' => 'dotx'
 	
-	);
-	
-	
-	public function __construct($uploadKey, $targetDirectory, $opts = array(), $fileArrayIndex = 0){
+	public function __construct(LoggerInterface $logger, $flash){
 		
 		if(!defined('ASSET_BASE_PATH')) {
-			wLog(4, 'ASSET_BASE_PATH undefined');
 			die('Uploader::__construct() - ASSET_BASE_PATH undefined');
 		}
 		
-		if(!defined('ASSET_HTTP_PATH')) {
-			wLog(4, 'ASSET_HTTP_PATH undefined');
-			die('Uploader::__construct() - ASSET_HTTP_PATH undefined');
-		}
+		$this->logger = $logger;
 		
-		if(empty($uploadKey) || empty($targetDirectory)){
-			wLog(4, 'Empty arguments');
-			die('Uploader::__construct() - empty arguments');
-		}
+		$this->flash = $flash;
 		
-		if(!is_writable(ASSET_BASE_PATH.$targetDirectory)){
-			wLog(4, 'Error opening directory for writing - '.$this->targetDirectory);
-			die('Uploader::__construct() - Error opening directory for writing');
-		}
+		$this->setDefaults();
 		
-		$this->uploadKey = $uploadKey;
+		$this->formatFileArr();
 		
-		$this->targetDirectory = $targetDirectory;
+		$this->mimes = File::getValidUploadMime();
 		
-		/* HANDLE OPTIONS */
-		if(!empty($opts)){
-			$this->opts = array_merge($this->opts, $opts);
-		}
+	}
+	
+	private function setDefaults(){
+		
+		/* OPTIONS */
+		$this->opts = array(
+			'targetFileName' 	=> '', 				/* ABOVE ASSET_BASE_PATH - NO FILE EXTENSION - THIS REPLACES USER SUPPLIED FILE NAME */
+			'allowedList' 		=> '', 				/* jpg,gif,png */
+			'restrictToMime' 	=> true, 			/* RESTRICT TO GLOBAL MIME LIST */
+			'overwrite' 			=> false,     /* SHOULD IT OVERWRITE PRE-EXISTING FILE */
+			'useHashPrevent'	=> true,			/* IN THE EVENT OF PRE-EXISTING FILE - APPEND HASH, IF FALSE IT WILL FAIL */
+			'maxFileSize' 		=> 40971520 	/* 40MB */	
+		);
 		
 		/* INSERT HANDLING FOR .JPEG */
-		
 		if(!empty($this->opts['allowedList'])){
 			
 			if(strpos($this->opts['allowedList'], 'jpg') !== false){
@@ -133,30 +66,104 @@ class Uploader {
 			}
 			
 		}
+	}
+	
+	//OPTION SETTERS
+	
+	public function setKey($key){
+	
+		$this->uploadKey = $key;
 		
-		/* HANDLE MULTIPLE */
-		$this->fileArrayIndex = $fileArrayIndex;
-		
-		/* SETUP THE FILE ARRAY */
-		if(array_key_exists($this->uploadKey, $_FILES)){
-			
-			foreach($this->files as $key => $val){
-				
-				if(is_array($_FILES[$this->uploadKey][$key])){
-					$this->files[$key] = $_FILES[$this->uploadKey][$key][$this->fileArrayIndex];
-					
-				} else {
-					
-					$this->files[$key] = $_FILES[$this->uploadKey][$key];
-				}
-			}
-		}		
-		
+		//reset file array
+		$this->formatFileArr();
+		return $this;
 		
 	}
 	
-	/* MAIN ROUTINE */
+	public function setTargetDir($targetDir){
+		
+		$this->targetDir = $targetDir;
+		return $this;
+		
+	}
+	
+	public function setIndex($index){
+	
+		$this->fileArrayIndex = $index;
+		//reset file array
+		$this->formatFileArr();
+		return $this;
+		
+	}
+	
+	public function setTargetFileName($fileName){
+	
+		$this->opts['targetFileName'] = $fileName;
+		return $this;
+		
+	}
+	
+	public function setAllowedList($allowedList){
+	
+		$this->opts['allowedList'] = $allowedList;
+		return $this;
+		
+	}
+	
+	public function disableMimeCheck(){
+	
+		$this->opts['restrictToMime'] = false;
+		return $this;
+		
+	}
+	
+	public function enableOverwrite(){
+	
+		$this->opts['overwrite'] = true;
+		return $this;
+		
+	}
+	
+	public function disableHashPrevent(){
+	
+		$this->opts['useHashPrevent'] = false;
+		return $this;
+		
+	}
+	
+	public function setMaxFileSize($size){
+	
+		$this->opts['maxFileSize'] = $size;
+		return $this;
+		
+	}
+	
+	/* PUBLIC GETTERS */
+	public function getFileName(){ /* title.jpg */
+		return $this->fileName;
+	}
+	
+	public function getFileExtension(){ /* jpg */
+		return $this->fileExt;
+	}
+	
+	public function getFileRelativePath(){ /* /assets/images/title.jpg */
+		return $this->fileRelativePath;
+	}
+	
+	public function getFileBasePath(){ /* WEBROOT/blanksite.com/public_html/assets/images/title.jpg */
+		return $this->fileBasePath;
+	}
+	
+	
+	/* UPLOAD
+	----------------------------------------------------------------------------- */
+
 	public function upload(){
+		
+		if(!is_writable(ASSET_BASE_PATH.$this->targetDir)){
+			die('Uploader::__construct() - Error opening directory for writing');
+		}
 		
 		/* MANDATORY CHECKS */
 		if( !$this->_checkPhpErrorCode() ) { return false; }
@@ -174,16 +181,19 @@ class Uploader {
 							
 		/* POPULATES fileName, fileXXXXPaths, fileExt */
 		if( !$this->_buildFileNameAndPath() ){ 
-			wLog(3, 'Error building file name and path');
-			return false; 
+		
+			$this->logger->error('Error building file name and path');
+			return false;
+			
 		} 
 		
 		
 		/* OPTIONAL CHECKS */
 		if( !empty($this->opts['allowedList']) ) {
 			
-			if( !$this->_checkAllowedMimeType($this->fileExt) ) { 
-				wLog(2, 'not in allowedList');
+			if( !$this->_checkAllowedMimeType($this->fileExt) ) {
+				
+				$this->logger->warning('not in allowedList');
 				return false; 
 			
 			}
@@ -195,45 +205,42 @@ class Uploader {
 			
 			if(move_uploaded_file($this->files['tmp_name'], $this->fileBasePath)) {
 				
-				addMessage("success", "The file ".$this->files['name']." (".File::getFormattedFileSize($this->files['size']).") was uploaded successfully");
-				wLog(1, "The file ".$this->files['name']." (".File::getFormattedFileSize($this->files['size']).") was uploaded successfully");
+				$this->logger->info("The file ".$this->files['name']." (".File::getFormattedFileSize($this->files['size']).") was uploaded successfully");
 				return true;
 				
 			} else {
-				addMessage('There was an error while moving the uploaded file');
-				wLog(4, "Error during move_uploaded_file");
+				$this->logger->warning("Error during move_uploaded_file");
 				return false;
 			}
 			
 		} else {
-			addMessage("error", "Error resolving base path");
-			wLog(4, "Error resolving base path");
+			$this->logger->warning("Error resolving base path");
 			return false;
 		} 
 			
 		
 	}
 	
- 	/* PUBLIC GETTERS */
-	public function getFileName(){ /* title.jpg */
-		return $this->fileName;
+	private function formatFileArr(){
+		
+		/* SETUP THE FILE ARRAY */
+		if(array_key_exists($this->uploadKey, $_FILES)){
+			
+			foreach($this->files as $key => $val){
+				
+				if(is_array($_FILES[$this->uploadKey][$key])){
+					$this->files[$key] = $_FILES[$this->uploadKey][$key][$this->fileArrayIndex];
+					
+				} else {
+					
+					$this->files[$key] = $_FILES[$this->uploadKey][$key];
+				}
+			}
+		}
+		
 	}
 	
-	public function getFileExtension(){ /* jpg */
-		return $this->fileExt;
-	}
-	
-	public function getRelativeFilePath(){ /* assets/images/title.jpg */
-		return $this->fileRelativePath;
-	}
-	
-	public function getHttpFilePath(){ /* http://www.thirdperspective.com/assets/images/title.jpg */
-		return $this->fileHttpPath;
-	}
-	
-	public function getBaseFilePath(){ /* WEBROOT/blanksite.com/public_html/assets/images/title.jpg */
-		return $this->fileBasePath;
-	}
+ 	
 	
 	
 	
@@ -247,12 +254,11 @@ class Uploader {
 			if(is_uploaded_file($this->files['tmp_name'] )){
 				return true;
 			} else {
-				//wLog(1, print_r($_FILES, true));
 				return false;
 			}
 
 		} else {
-			wLog(1, 'FILE was not populated with key specified');
+			$this->logger->debug('FILE was not populated with key specified');
 		}
 	}
 	
@@ -263,9 +269,13 @@ class Uploader {
 			foreach($_FILES as $key => $val){
 				
 				if(is_array($_FILES[$key]['name'])){
+					
 					return count($_FILES[$key]['name']);
+					
 				} else {
+					
 					return 0;
+					
 				}
 			}			
 		}		
@@ -281,8 +291,10 @@ class Uploader {
 		$this->fileExt = $this->_mimeToExtension($this->files['type']);
 		
 		if(empty($this->fileExt) && $this->opts['restrictToMime']){
-			addMessage("error", "Invalid Mime Type.<br>You uploaded a file of type:  ".$this->files['type']);
-			wLog(4, "Invalid Mime Type - this shouldnt happen");
+			
+			$this->flash->addMessage("error", "Invalid Mime Type.<br>You uploaded a file of type:  ".$this->files['type']);
+			$this->logger->error("Invalid Mime Type - this shouldnt happen");
+			
 			return false;
 		
 		} else { /* USE WHATEVER THE STRING FILE EXTENSION IS */
@@ -293,8 +305,8 @@ class Uploader {
 				$this->fileExt = $ext;	
 				
 			} else {
-				addMessage("error", "The file you uploaded had no file extension");
-				wLog(2,"The file had no extension");
+				$this->flash->addMessage("error", "The file you uploaded had no file extension");
+				$this->logger->error("The file had no extension");
 				return false;
 			}
 		}
@@ -313,14 +325,11 @@ class Uploader {
 				
 			} else {
 				$this->fileName = time().'.'.$this->fileExt;
-				wLog(1, 'No name was supplied by local filesystem, generating hash');
 			}
 		}
 		
 		/* BUILD FILE NAME VARS */
-		$this->fileRelativePath =  ASSET_RELATIVE_PATH.$this->targetDirectory.$this->fileName;
-		$this->fileHttpPath = ASSET_HTTP_PATH.$this->targetDirectory.$this->fileName; 
-		$this->fileBasePath = ASSET_BASE_PATH.$this->targetDirectory.$this->fileName; 
+		$this->fileBasePath = ASSET_BASE_PATH.$this->targetDir.$this->fileName; 
 		
 		
 		/* OVERWRITE CASES */
@@ -328,17 +337,15 @@ class Uploader {
 			
 			if($this->opts['useHashPrevent']){
 				
-				wLog(2, "hashPrevent");
 				$hash = time();
 				
 				$this->fileName = $hash.'-'.$this->fileName;
-				$this->fileRelativePath =  ASSET_RELATIVE_PATH.$this->targetDirectory.$this->fileName;
-				$this->fileHttpPath = ASSET_HTTP_PATH.$this->targetDirectory.$this->fileName; 
-				$this->fileBasePath = ASSET_BASE_PATH.$this->targetDirectory.$this->fileName; 
+				$this->fileRelativePath =  'assets/'.$this->targetDir.$this->fileName;
+				$this->fileBasePath = ASSET_BASE_PATH.$this->targetDir.$this->fileName; 
 				
 			} else {
-				addMessage("error", "This file already exists");
-				wLog(2, "This file already exists and overwrite is set to false");
+				$this->flash->addMessage('error',"This file already exists");
+				$this->logger->error("This file already exists and overwrite is set to false");
 				return false;
 			}	
 		}
@@ -357,7 +364,7 @@ class Uploader {
 				return true;
 				
 			} else {
-				addMessage("error", "Invalid File Extension.<br>Acceptable file types are:  "
+				$this->flash->addMessage("error", "Invalid File Extension.<br>Acceptable file types are:  "
 					.implode(', ',$allowedArr)."<br>You uploaded a file of type:  ".$this->files['type']);
 				return false; 
 			}
@@ -383,12 +390,12 @@ class Uploader {
 		if($errorCode !== UPLOAD_ERR_OK) {
 			
 			if(isset($uploadErrors[$errorCode])) {
-			   	addMessage('error', $uploadErrors[$errorCode]);
+			   	$this->flash->addMessage('error', $uploadErrors[$errorCode]);
 			   	return false;
 					
 			} else {
-				addMessage('error', 'An unknown php error code was found');
-				wLog(2, 'An unknown php error code was found');
+				$this->flash->addMessage('error', 'An unknown php error code was found');
+				$this->logger->error('An unknown php error code was found');
 				return false;
 				
 			}
@@ -404,7 +411,7 @@ class Uploader {
 			return true;
 			
 		} else {
-			addMessage("warning","Sorry, the file you uploaded is too large.<br>Your file was:  "
+			$this->flash->addMessage("warning","Sorry, the file you uploaded is too large.<br>Your file was:  "
 				.File::getFormattedFileSize($this->files['size'])
 				.", and the limit is set to:  "
 				.File::getFormattedFileSize($this->opts['maxFileSize']));
@@ -412,9 +419,10 @@ class Uploader {
 	}
 	
 	private function getUrlMimeType($url) {
-			$buffer = file_get_contents($url);
-			$finfo = new finfo(FILEINFO_MIME_TYPE);
-			return $finfo->buffer($buffer);
+		
+		$buffer = file_get_contents($url);
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		return $finfo->buffer($buffer);
 	}
 	
 	
@@ -425,8 +433,7 @@ class Uploader {
 			return $this->mimes[$mimeType];
 			
 		} else {
-			addMessage("error","Error converting mime type to extension");
-			wLog(2, 'Mime Extension not found: '.$mimeType);
+			$this->logger->error('Mime Extension not found: '.$mimeType.'.  Please double check file has a valid extension.');
 			return false;
 		}	
 	}
@@ -437,8 +444,8 @@ class Uploader {
 			return true;
 			
 		} else {
-			addMessage("error","Invalid Mime Type.<br>You uploaded a file of type:  ".$this->files['type']);
-			wLog(2, 'Invalid Mime Type: '.$this->files['type']);
+			$this->flash->addMessage("error", "Invalid File Type.<br>You uploaded a file of type:  ".$this->files['type']);
+			$this->logger->error('Invalid Mime Type: '.$this->files['type']);
 			return false;
 		}	
 		

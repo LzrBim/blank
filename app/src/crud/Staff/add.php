@@ -7,13 +7,6 @@
 $form = new \App\Lib\AdminForm();
 
 echo $form->open();
-echo $form->hidden('mode', 'insert');
-
-$title = 'Add Staff';
-
-$content = '';
-
-ob_start();
 
 echo $form->status('active'); ?>
 
@@ -21,17 +14,17 @@ echo $form->status('active'); ?>
 
 	<div class="col-sm-6"><? 
   
-  	echo $form->input('firstName', 'First Name', repop('firstName'), array(
+  	echo $form->input('firstName', 'First Name', '', array(
 			'required' => true )
 		); 
 		
-		echo $form->input('middleName', 'Middle Name', repop('middleName')); 
+		echo $form->input('middleName', 'Middle Name',''); 
 		
-		echo $form->input('lastName', 'Last Name', repop('lastName'), array(
+		echo $form->input('lastName', 'Last Name', '', array(
 			'required' => true )
 		);
 		
-		echo $form->input('suffix', 'Suffix', repop('suffix')); 
+		echo $form->input('suffix', 'Suffix', ''); 
 		
 		?>
   
@@ -39,25 +32,25 @@ echo $form->status('active'); ?>
   
   <div class="col-sm-6"><? 
   
-  	echo $form->input('email', 'Email', repop('email')); 
+  	echo $form->input('email', 'Email', ''); 
 		
-		echo $form->input('title', 'Job Title', repop('title'));
+		echo $form->input('title', 'Job Title', '');
 		
-		echo $form->select('staffCategoryID', 'Category', $staff->category->getSelectOptionArray());
+		//echo $form->select('staffCategoryID', 'Category', $staff->category->getSelectOptionArray());
 		
-		echo $form->phone('mobilePhone', 'Mobile Phone', repop('mobilePhone')); ?>
+		echo $form->phone('mobilePhone', 'Mobile Phone', ''); ?>
     
     <div class="row">
 
       <div class="col-xs-8"><?
 			
-				echo $form->phone('officePhone', 'Office Phone', repop('officePhone')); ?>
+				echo $form->phone('officePhone', 'Office Phone', ''); ?>
       
       </div><!-- /.col -->
       
       <div class="col-xs-4"><?
 			
-				echo $form->input('officePhoneExtension', 'Extension', repop('officePhoneExtension')); ?>
+				echo $form->input('officePhoneExtension', 'Extension', ''); ?>
       
       </div><!-- /.col -->
       
@@ -67,7 +60,7 @@ echo $form->status('active'); ?>
   
 </div><!-- /.row --><? 
 
-echo $form->editor('description', 'Biography', repop('description'), array(
+echo $form->editor('description', 'Biography', '', array(
 	'rows' => 8)
 ); ?>
 
@@ -75,29 +68,25 @@ echo $form->editor('description', 'Biography', repop('description'), array(
 
 	<div class="col-sm-4"><?
 
-		echo $form->input('facebook', 'Facebook', repop('facebook'));  ?>
+		echo $form->input('facebook', 'Facebook', '');  ?>
   
   </div><!-- /.col -->
   
   <div class="col-sm-4"><?
 	
-		echo $form->input('twitter', 'Twitter', repop('twitter')); ?>
+		echo $form->input('twitter', 'Twitter', ''); ?>
   
   </div><!-- /.col -->
   
   <div class="col-sm-4"><?
 	
-		echo $form->input('linkedIn', 'Linked In', repop('linkedIn'));  ?>
+		echo $form->input('linkedIn', 'Linked In', '');  ?>
   
   </div><!-- /.col -->
   
 </div><!-- /.row --><? 
 
 echo $form->fileInput('uploadFile', 'Upload Photo'); 
-
-$content = ob_get_clean();
-
-$adminView->box($title, $content);
 
 echo $form->buttonsAdd();
 

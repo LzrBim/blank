@@ -9,30 +9,28 @@ class PageVersionBlockController extends BaseController {
 	
 	public function index($request, $response, $args){
 	
-	
-	
 	}
-	
-	
 	
 	public function insert($request, $response, $args){
 	
 		$this->logger->debug("Admin PageVersion Insert");
 		
-		$pageVersion = new PageVersion();
-		$pageVersion->loadByData($request->getParsedBody());
+		$pageVersionBlock = new PageVersionBlock();
+		$pageVersionBlock->loadByData($request->getParsedBody());
 		
-		if($pageVersion->insert()){
+		if($pageVersionBlock->insert()){
+			
+			$pageVersionBlock->insertLink($pageVersionBlock->id(), $request->getParam('pageVersionID'));
 		
-			$this->flash->addMessage('success', 'PageVersion saved');
+			$this->flash->addMessage('success', 'Block saved');
 		
-			return $response->withRedirect('/admin/pageVersion/edit/'.$pageVersion->id());
+			return $response->withRedirect('/admin/pageVersionBlock/edit/'.$pageVersionBlock->id());
 			
 		} else {
 			
-			$this->flash->addMessage('error', 'Error saving version');
+			$this->flash->addMessage('error', 'Error saving block');
 		
-			return $response->withRedirect('/admin/pageVersion/add/'.$pageVersion->pageID);
+			return $response->withRedirect('/admin/pageVersion/edit/'.$pageVersion->pageID);
 			
 		}
 	
@@ -93,23 +91,33 @@ class PageVersionBlockController extends BaseController {
 	}
 	
 	
-	public function copy($request, $response, $args){
+	public function delete($request, $response, $args){
 	
-		$this->logger->debug("Copy PageVersion");
+		$this->logger->debug("Admin Page Version Block Delete");
 		
-		$pageVersion = new PageVersion();
-		$copy = $pageVersion->makeCopy($args['id']);
-		if($copy){
-			
-			$this->flash->addMessage('success', 'Version copied');
-			
-		} else {
-			
-			$this->flash->addMessage('error', 'Error creating copy');
+		$pageVersionBlockID = $request->getParam('pageVersionBlockID');
+		$pageVersionID = $request->getParam('pageVersionBlockID');		
+		
+		$pageVersionBlock = new PageVersionBlock();
+		
+		if($pageVersionBlock->deleteLink($pageVersionBlockID, $pageVersionID)){
+		
+			if($pageVersionBlock->delete()){
+		
+				return $response->write(json_encode([
+					'success' => 1,
+					'message' => 'Block removed'
+				]));
+						
+			} 
 		
 		}
 		
-		return $response->withRedirect('/admin/pageVersion/index/'.$copy->pageID);
+		return $response->write(json_encode([
+			'success' => 0,
+			'message' => 'Error removing Block'
+		]));
 	
 	}
+	
 }

@@ -1,5 +1,8 @@
 <?php
-
+/*-----------------------------------------------------------------------------
+ * SITE:
+ * FILE: /public/index.php
+----------------------------------------------------------------------------- */
 session_start();
 
 if (PHP_SAPI == 'cli-server') {
@@ -19,11 +22,14 @@ require __DIR__ . '/../vendor/autoload.php';
 
 //BOOT APP
 $app = new \Slim\App($settings); 
+
+//CONFIGURE
 $app->config('debug', true);
-$app->config('displayErrorDetails', true);
+$app->config('displayErrorDetails', true); 
 
 //DI DEPENDENCIES
 require __DIR__ . '/../app/dependencies.php'; 
+require __DIR__ . '/../app/front_dependencies.php'; 
 require __DIR__ . '/../app/admin_dependencies.php'; 
 
 //EVIRONMENT

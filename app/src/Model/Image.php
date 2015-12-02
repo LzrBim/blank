@@ -6,6 +6,10 @@
 
 namespace App\Model;
 
+use App\Lib\Uploader;
+use App\Lib\ImageResizer;
+use App\Lib\Sanitize;
+
 class Image extends BaseModel {
 		
 	/* ATTRIBUTES */
@@ -22,24 +26,11 @@ class Image extends BaseModel {
 	public $dateAdded;
 	public $dateModified; 
 	
-	
-	/* UPLOADER SETTINGS */	
-	private $_uploaderSettings = array(
-		'targetFileName' 	=> '',
-		'allowedList' 		=> 'jpg,gif,png',
-		'restrictToMime' 	=> true,
-		'overwrite' 			=> false,
-		'useHashPrevent' 	=> true,
-		'maxFileSize' 		=> 20971520
-	);
-
-	
 	/* SETTINGS */
-	private $_settings = array(
+	public $settings = array(
 														 											 
  		/* FILE */
-		'uploadMode' => 'hashInsertOverWriteUpdate',  //hashInsertOverWriteUpdate, overwrite,	hash
-		'targetDirectory' => '', 
+		'targetDir' => '', 
 		'targetFileName' => '',
 		'inputName' => 'uploadFile',
 		
@@ -74,62 +65,42 @@ class Image extends BaseModel {
 	----------------------------------------------------------------------------- */
 	public function __construct($settings = array()){
 			
-		$this->_settings = array_merge($this->_settings, $settings);
+		$this->settings = array_merge($this->settings, $settings);
 		
 		parent::__construct();
 		
 	}
 	
-	
 	/* CRUD
 	----------------------------------------------------------------------------- */
 	
-	public function insert($fileArrayIndex = 0){
+	public function insert(){
 		
-		if($this->upload('insert', $fileArrayIndex)){
-				
-			$insert = sprintf("INSERT INTO ".$this->_table." 
-					(fileNameOriginal, fileNameMain, fileNameThumb, fileNameSystem, dateAdded) 
-					VALUES (%s, %s, %s, %s, NOW())",
-				Sanitize::input($this->fileNameOriginal, "text"),
-				Sanitize::input($this->fileNameMain, "text"),
-				Sanitize::input($this->fileNameThumb, "text"),
-				Sanitize::input($this->fileNameSystem, "text"));
-			
-			if($this->query($insert)){ 
-				$this->setInsertId();
-				return true;
-				
-			} else { 
-				addMessage('error','Error inserting '.$this->_title);
-				return false;
-			} 
-		}
-		return false;
+		$insert = sprintf("INSERT INTO ".$this->_table." 
+				(fileNameOriginal, fileNameMain, fileNameThumb, fileNameSystem, dateAdded) 
+				VALUES (%s, %s, %s, %s, NOW())",
+			Sanitize::input($this->fileNameOriginal, "text"),
+			Sanitize::input($this->fileNameMain, "text"),
+			Sanitize::input($this->fileNameThumb, "text"),
+			Sanitize::input($this->fileNameSystem, "text"));
+		
+		return $this->queryInsert($insert);
+		
 	}
 	
 	public function update(){
+	
+		$update = sprintf("UPDATE ".$this->_table."
+				SET fileNameOriginal=%s, fileNameMain=%s, fileNameThumb=%s, fileNameSystem=%s
+				WHERE ".$this->_id."=%d",
+			Sanitize::input($this->fileNameOriginal, "text"),
+			Sanitize::input($this->fileNameMain, "text"),
+			Sanitize::input($this->fileNameThumb, "text"),
+			Sanitize::input($this->fileNameSystem, "text"),
+			Sanitize::input($this->id(), "int"));
 		
-		if($this->upload('update')){
-		
-			$update = sprintf("UPDATE ".$this->_table."
-					SET fileNameOriginal=%s, fileNameMain=%s, fileNameThumb=%s, fileNameSystem=%s
-					WHERE ".$this->_id."=%d",
-				Sanitize::input($this->fileNameOriginal, "text"),
-				Sanitize::input($this->fileNameMain, "text"),
-				Sanitize::input($this->fileNameThumb, "text"),
-				Sanitize::input($this->fileNameSystem, "text"),
-				Sanitize::input($this->id(), "int"));
-		
-			if($this->query($update)){ 
-				addMessage('success', $this->_title.' was saved successfully');
-				return true;
-				
-			} else { 
-				addMessage('error','Error saving '.$this->_title);
-				return false;
-			}
-		} 
+		return $this->query($update);
+	
 	}
 	
 	public function remove($verbose = TRUE){
@@ -169,10 +140,15 @@ class Image extends BaseModel {
 	private function deleteImageFiles(){
 		
 		foreach($this->_versions as $version){
+			
 			$path = $this->getBasePath($version);
+			
 			if($path){
+				
 				if(!unlink($path)){
-					wLog(3, 'This should NEVER happen');
+					
+					//ehm log?
+					
 				}
 			}
 		}
@@ -181,132 +157,7 @@ class Image extends BaseModel {
 	
 	/* HELPERS */
 	
-	public function upload($action, $fileArrayIndex = -1){
-		
-		//synthesize the uploader settings based on uploaderMode
-		if($action == 'insert'){
-			
-			if($this->_settings['uploadMode'] == 'hashInsertOverWriteUpdate'){
-				$this->_uploaderSettings['overwrite'] = false;
-				$this->_uploaderSettings['useHashPrevent'] = true;
-
-			} elseif($this->_settings['uploadMode'] == 'hash'){
-				
-				$this->_uploaderSettings['overwrite'] = false;
-				$this->_uploaderSettings['useHashPrevent'] = true;
-				
-			} elseif($this->_settings['uploadMode'] == 'overwrite'){
-				
-				$this->_uploaderSettings['overwrite'] = true;
-				
-			} else {
-				wLog(2, 'Image::upload(insert) - invalid setting uploadMode');
-			}
-			
-		} else { /* update */
-			
-			if($this->_settings['uploadMode'] == 'hashInsertOverWriteUpdate'){
-				$this->_uploaderSettings['overwrite'] = true;
-
-			} elseif($this->_settings['uploadMode'] == 'hash'){
-				
-				$this->_uploaderSettings['overwrite'] = false;
-				$this->_uploaderSettings['useHashPrevent'] = true;
-				
-			} elseif($this->_settings['uploadMode'] == 'overwrite'){
-				
-				$this->_uploaderSettings['overwrite'] = true;
-				
-			} else {
-				wLog(2, 'Image::upload(update) - invalid setting uploadMode');
-			}
-			
-			/* if we're overwriting and there's already a file... */
-			if($this->_uploaderSettings['overwrite'] == true && !empty($this->fileNameMain)){ 
-			
-				$info = pathinfo($this->fileNameMain);
-				$this->_uploaderSettings['targetFileName'] = $info['filename'];
-				$this->_uploaderSettings['allowedList'] = $info['extension'];
-			}
-
-		}
-		
-		$uploader = new Uploader($this->_settings['inputName'], $this->_settings['targetDirectory'], $this->_uploaderSettings, $fileArrayIndex);
-		
-		if($uploader->isUploaded()){
-
-			if($uploader->upload()){
-				
-				$this->fileNameMain = $this->_settings['targetDirectory'].$uploader->getFileName();
-			
-				$info = pathinfo($uploader->getBaseFilePath());
-				$originalName = $info['filename'].'_o.'.$info['extension'];
-				$thumbName = $info['filename'].'_t.'.$info['extension'];
-				$systemName = $info['filename'].'_st.'.$info['extension'];
-				
-				$originalPath = $info['dirname'].'/'.$originalName;
-				$thumbPath = $info['dirname'].'/'.$thumbName;
-				$systemPath = $info['dirname'].'/'.$systemName;
-				
-				/* box fit the original to a manageable size from settings and rename it _o suffix */
-				$imageResizer = new ImageResizer($uploader->getBaseFilePath(), $originalPath);
-				
-				wLog(1, 'Image Upload - boxFit original');
-				if($imageResizer->boxFit($this->_settings['originalWidth'], $this->_settings['originalHeight'], FALSE, TRUE)){
-					
-					$this->fileNameOriginal = $this->_settings['targetDirectory'].$originalName;
-					
-					/* box fit the main image */
-					
-					$imageResizer = new ImageResizer($uploader->getBaseFilePath());
-					
-					wLog(1, 'Image Upload - boxFit main');
-					
-					if($imageResizer->boxFit($this->_settings['mainWidth'], $this->_settings['mainHeight'], FALSE, FALSE)){
-						
-						wLog(1, 'Main image was boxFit successfully');
-					
-						if($this->_settings['hasThumb']){
-											
-							$imageResizer = new ImageResizer($uploader->getBaseFilePath(), $thumbPath);
 	
-							wLog(1, 'Image Upload - boxCrop thumb');
-							
-							if($imageResizer->boxCrop($this->_settings['thumbWidth'], $this->_settings['thumbHeight'], FALSE)){
-								
-								$this->fileNameThumb = $this->_settings['targetDirectory'].$thumbName;
-								
-							  wLog(1, 'Thumb image was boxCrop successfully');
-								
-							} else {
-								wLog(1, 'box fitting thumb failed');
-							}
-						}
-						
-						/* Generate the system thumb  100 x 100*/
-						$imageResizer = new ImageResizer($uploader->getBaseFilePath(), $systemPath);
-						
-						wLog(1, 'Image Upload - boxCrop System thumb');
-						
-						if($imageResizer->boxCrop($this->_systemWidth, $this->_systemHeight, FALSE, FALSE)){
-							$this->fileNameSystem = $this->_settings['targetDirectory'].$systemName;
-							wLog(1, 'System image was boxCrop successfully');
-						}
-					
-					}
-				}
-				
-				return true;
-				
-			} else {
-				wLog(1, 'Upload() failed');
-				return false;
-			}
-		}	else {
-			wLog(1, 'No picture uploaded');
-			return false;
-		}
-	}
 	
 	
 	
@@ -390,11 +241,17 @@ class Image extends BaseModel {
 	}
 	
 	protected function _getSrc($imagePath, $useAbsolutePath){
+		
 		if (file_exists(ASSET_BASE_PATH.$imagePath)) {
+			
 			if($useAbsolutePath){
+				
 				$imagePath = ASSET_HTTP_PATH.$imagePath;
+				
 			} else {
+				
 				$imagePath = ASSET_RELATIVE_PATH.$imagePath;
+				
 			}
       return $imagePath;
 		} else {
@@ -417,13 +274,13 @@ class Image extends BaseModel {
 	public function getWidthSetting($type = 'main'){
 		
 		if($type == 'main'){
-			return $this->_settings['mainWidth'];
+			return $this->settings['mainWidth'];
 			
 		} elseif($type == 'thumb'){
-			return $this->_settings['thumbWidth'];
+			return $this->settings['thumbWidth'];
 			
 		} elseif($type == 'original'){
-			return $this->_settings['originalWidth'];
+			return $this->settings['originalWidth'];
 			
 		} else {
 			wLog(1, get_class($this).'->'.__FUNCTION__.'() - Invalid image type');
@@ -447,13 +304,13 @@ class Image extends BaseModel {
 	public function getHeightSetting($type = 'main'){
 		
 		if($type == 'main'){
-			return $this->_settings['mainHeight'];
+			return $this->settings['mainHeight'];
 			
 		} elseif($type == 'thumb'){
-			return $this->_settings['thumbHeight'];
+			return $this->settings['thumbHeight'];
 			
 		} elseif($type == 'original'){
-			return $this->_settings['originalHeight'];
+			return $this->settings['originalHeight'];
 			
 		} else {
 			wLog(3, 'Invalid image type');
@@ -478,7 +335,7 @@ class Image extends BaseModel {
 	
 	public function hasThumbImage(){ 
 	
-		if($this->_settings['hasThumb']){
+		if($this->settings['hasThumb']){
 			//wLog(1, 'yes, settings thumb');
 			
 			if($this->fileNameThumb && file_exists(ASSET_BASE_PATH.$this->fileNameThumb)){
@@ -545,10 +402,10 @@ class Image extends BaseModel {
 	public function isAspectLocked($type = 'main'){
 		
 		if($type == 'main'){
-			return $this->_settings['lockMainAspectRatio'];
+			return $this->settings['lockMainAspectRatio'];
 			
 		} elseif($type == 'thumb'){
-			return $this->_settings['lockThumbAspectRatio'];
+			return $this->settings['lockThumbAspectRatio'];
 			
 		} else {
 			wLog(3, 'Invalid image type');
@@ -560,10 +417,10 @@ class Image extends BaseModel {
 	public function isForceOut($type = 'main'){
 		
 		if($type == 'main'){
-			return $this->_settings['forceOutMain'];
+			return $this->settings['forceOutMain'];
 			
 		} elseif($type == 'thumb'){
-			return $this->_settings['forceOutThumb'];
+			return $this->settings['forceOutThumb'];
 			
 		} else {
 			wLog(3, 'Invalid image type');
@@ -577,10 +434,10 @@ class Image extends BaseModel {
 	public function getAspectRatio($type = 'main'){
 		
 		if($type == 'main'){
-			return $this->_settings['mainWidth']/$this->_settings['mainHeight'];
+			return $this->settings['mainWidth']/$this->settings['mainHeight'];
 			
 		} elseif($type == 'thumb'){
-			return $this->_settings['thumbWidth']/$this->_settings['thumbHeight'];
+			return $this->settings['thumbWidth']/$this->settings['thumbHeight'];
 			
 		} else {
 			wLog(3, 'Invalid image type');

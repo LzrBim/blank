@@ -550,7 +550,7 @@ tpjc.modal_ajax_submit_handler = function(modalID, callback) {
 	this.tLog('- modal_ajax_submit_handler()');
 	
 	var self = this;
-	var $form = $( '#' + modalID + 'Form')
+	var $form = $( '#' + modalID + 'Form'); 
 	var action = $form.attr('action');
 	
 	self.show_modal_loading(modalID);

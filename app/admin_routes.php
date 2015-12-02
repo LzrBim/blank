@@ -14,11 +14,9 @@ $app->group('/admin', function () use ($app) {
 	$app->get('/page/index', 'App\AdminController\PageController:index');	
 	
 		$app->get('/page/add', 'App\AdminController\PageController:add');
-		
 		$app->post('/page/add', 'App\AdminController\PageController:insert');
 	
 		$app->get('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:edit');
-		
 		$app->post('/page/edit/{id:[0-9]+}', 'App\AdminController\PageController:update');
 		
 		$app->get('/page/delete/{id:[0-9]+}', 'App\AdminController\PageController:delete');
@@ -35,6 +33,7 @@ $app->group('/admin', function () use ($app) {
 		
 		$app->post('/pageVersion/edit/{id:[0-9]+}', 'App\AdminController\PageVersionController:update');
 	
+		
 		//EXTRA METHODS
 		$app->get('/pageVersion/copy/{id:[0-9]+}', 'App\AdminController\PageVersionController:copy');
 		
@@ -42,12 +41,15 @@ $app->group('/admin', function () use ($app) {
 		
 		$app->get('/pageVersion/preview/{id:[0-9]+}', 'App\AdminController\PageVersionController:preview');
 		
+		
 		//VERSION BLOCKS
 		$app->get('/pageVersionBlock/edit/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:edit');
 		
-		$app->post('/pageVersionBlock/insert/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:insert');
+		$app->post('/pageVersionBlock/insert', 'App\AdminController\PageVersionBlockController:insert');
 		
-		$app->post('/pageVersionBlock/insertLink/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:insertLink');
+		$app->post('/pageVersionBlock/insertLink', 'App\AdminController\PageVersionBlockController:insertLink');
+		
+		$app->post('/pageVersionBlock/delete/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:delete');
 		
 		$app->get('/pageVersionBlock/preview/{id:[0-9]+}', 'App\AdminController\PageVersionBlockController:preview');
 		
@@ -58,6 +60,17 @@ $app->group('/admin', function () use ($app) {
 		$app->get('/gallery/add', 'App\AdminController\GalleryController:add');
 	
 		$app->get('/gallery/edit', 'App\AdminController\GalleryController:edit');
+		
+	//GALLERY
+	$app->get('/staff/index', 'App\AdminController\StaffController:index');	
+	
+		$app->get('/staff/add', 'App\AdminController\StaffController:add');
+		$app->post('/staff/add', 'App\AdminController\StaffController:insert');
+	
+		$app->get('/staff/edit/{id:[0-9]+}', 'App\AdminController\StaffController:edit');
+		$app->post('/staff/edit/{id:[0-9]+}', 'App\AdminController\StaffController:update');
+		
+		$app->get('/staff/delete/{id:[0-9]+}', 'App\AdminController\StaffController:delete');
 
 		
 })->add( 'adminGuard' );

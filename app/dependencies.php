@@ -35,7 +35,9 @@ $container['flash'] = function ($c) {
 };
 
 
-//CSRF PROTECTED ROUTES
+// -----------------------------------------------------------------------------
+// CSRF
+// -----------------------------------------------------------------------------
 $container['csrf'] = function ($c) {
 	return new \Slim\Csrf\Guard;
 };
@@ -58,7 +60,28 @@ $container['logger'] = function ($c) {
 	
 };
 
-//Override the default Not Found Handler
+// -----------------------------------------------------------------------------
+// UPLOADER
+// -----------------------------------------------------------------------------
+$container['uploader'] = function ($c) {
+	
+	return new App\Lib\Uploader($c->get('logger'), $c->get('flash'));
+	
+};
+
+// -----------------------------------------------------------------------------
+// IMAGE RESIZER
+// -----------------------------------------------------------------------------
+$container['imageResizer'] = function ($c) {
+	
+	return new App\Lib\ImageResizer($c->get('logger'));
+	
+};
+
+
+// -----------------------------------------------------------------------------
+// 404 HANDLER
+// -----------------------------------------------------------------------------
 $container['notFoundHandler'] = function ($c) {
 	
 	return function ($request, $response) use ($c) {
@@ -74,49 +97,8 @@ $container['notFoundHandler'] = function ($c) {
 // -----------------------------------------------------------------------------
 // MIDDLEWARE
 // -----------------------------------------------------------------------------
-
 $container['adminGuard'] = function ($c) {
 	
 	return new App\Middleware\AdminGuard($c->get('logger'));
 	
-};
-
-
-// -----------------------------------------------------------------------------
-// CONTROLLERS
-// -----------------------------------------------------------------------------
-
-//VIEW ONLY
-$container['App\Controller\HomeController'] = function ($c) {	
-	return new App\Controller\HomeController($c->get('view'), $c->get('logger'));	 
-};
-
-$container['App\Controller\PageController'] = function ($c) {
-	return new App\Controller\PageController($c->get('view'), $c->get('logger'), array(
-		'notFoundHandler' => $c['notFoundHandler']
-	));
-};
-
-$container['App\Controller\GalleryController'] = function ($c) {
-	return new App\Controller\GalleryController($c->get('view'), $c->get('logger'));
-};
-
-
-//WITH FLASH - ACTIONS
-$container['App\Controller\ContactController'] = function ($c) {
-	return new App\Controller\ContactController($c->get('view'), $c->get('logger'), array('flash' => $c['flash']));
-};
-
-$container['App\Controller\AuthController'] = function ($c) {
-	return new App\Controller\AuthController($c->get('view'), $c->get('logger'), array('flash' => $c['flash']));
-};
-
-
-//FRONT ACTIONS
-$container['App\Action\ContactAction'] = function ($c) {
-	return new App\Action\ContactAction($c->get('logger'), array('flash' => $c['flash']));
-};
-
-$container['App\Action\AuthAction'] = function ($c) {
-	return new App\Action\AuthAction($c->get('logger'), array('flash' => $c['flash']));
 };

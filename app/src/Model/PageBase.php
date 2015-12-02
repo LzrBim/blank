@@ -49,13 +49,13 @@ class PageBase extends BaseModel {
 		
 	}
 	
-	public function _update(){
+	public function update(){
 	
 		$update = sprintf("UPDATE ".$this->_table."
-			SET title=%s, permalink=%s, metaTitle=%s, metaDescription=%s, metaKeywords=%s, status=%s
+			SET title=%s, slug=%s, metaTitle=%s, metaDescription=%s, metaKeywords=%s, status=%s
 			WHERE ".$this->_id."=%d",
 			Sanitize::input($this->title, "text"),
-			Sanitize::input($this->permalink, "text"),
+			Sanitize::input($this->slug, "text"),
 			Sanitize::input($this->metaTitle, "text"),
 			Sanitize::input($this->metaDescription, "text"), 
 			Sanitize::input($this->metaKeywords, "text"),

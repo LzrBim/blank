@@ -1,3 +1,11 @@
+ul.crumbs {
+	margin:0; padding:0;
+	list-style:none;
+}
+
+	ul.crumbs li {
+		float:left;
+	}
 
 .mainButton {
 	margin-top:16px;

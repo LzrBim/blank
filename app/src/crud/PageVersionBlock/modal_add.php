@@ -14,8 +14,6 @@ use App\AdminView\ModalView;
 
 ob_start(); 
 
-echo $form->hidden('mode', 'insert');
-
 echo $form->hidden('pageVersionID', $pageVersion->id()); ?>
 
 <!-- Nav tabs -->

@@ -323,7 +323,7 @@ tinymce.PluginManager.add('image', function(editor) {
 		
 		generalFormItems.push({
 													
-			type: 'container',
+			/*type: 'container',*/
 			label: 'Sizes', 
 			name: 'tpjc_sizes', 
 			layout: 'flex', 

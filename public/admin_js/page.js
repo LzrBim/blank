@@ -42,11 +42,13 @@ tpjc.attach_add_page_version_block_modal = function() {
 	
 	var modalID = 'addPageVersionBlockModal';
 	
-	var formID = modalID + 'Form'
+	var formID = modalID + 'Form';
 	
 	$( '#' + formID ).validate({
 					
 		submitHandler: function(form) {
+			
+			self.tLog('- - - add block submit');
 			
 			self.modal_ajax_submit_handler(modalID, function(json){
 																											 

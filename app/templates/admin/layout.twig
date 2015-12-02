@@ -51,7 +51,6 @@
     	<li>1</li>
       <li>2</li>
       
-      
 		</ul>
 
 		<ul class="nav navbar-top-links navbar-right">
@@ -85,21 +84,7 @@
       
     </div><!-- /.row -->
 		
-		{% for type, messages in flash %}
-
-			{% for message in messages %}
-			
-				{%if type == 'error'%} {% set type = 'danger' %} {%endif%}
-				
-				<div class="alert alert-{{ type }}">
-			
-					{{ message|raw }}
-			
-				</div>
-			
-			{% endfor %}
-				
-		{% endfor %}
+		{% include 'admin/util/flash.twig' %}
   
     {% block content %}{% endblock %}
 

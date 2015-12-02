@@ -21,9 +21,7 @@ class AdminGuard {
 		
 		$uri = $request->getUri();
 		
-		$this->logger->debug('Guarding ');
-		
-		//die(print_r($uri, true));
+		//$this->logger->debug('Guarding ');
 		
 		if(!User::isAuthorized('admin')){
 			

@@ -29,6 +29,7 @@ class CommonController extends BaseController {
 	
 	}
 	
+	
 	public function update($request, $response, $args){
 	
 		$this->logger->debug("Admin Page Edit");

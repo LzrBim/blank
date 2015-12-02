@@ -4,7 +4,10 @@
  * FILE: /app/models/StaffCategory.php
 ----------------------------------------------------------------------------- */
 
-class StaffCategory extends Standard {
+namespace App\Model;
+use \App\Lib\Sanitize;
+
+class StaffCategory extends BaseModel {
 	
 	//ATTRIBUTES
 	public $_title = 'Staff Category';

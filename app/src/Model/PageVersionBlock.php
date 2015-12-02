@@ -6,6 +6,8 @@
 
 namespace App\Model;
 
+use App\Lib\Sanitize;
+
 class PageVersionBlock extends BaseModel {
 	
 	//ATTRIBUTES
@@ -221,7 +223,7 @@ class PageVersionBlock extends BaseModel {
 		
 	}
 	
-	public function deletePageVersionBlockLink($pageVersionBlockID, $pageVersionID){
+	public function deleteLink($pageVersionBlockID, $pageVersionID){
 		
 		//HARD ERRORS
 		if(empty($pageVersionBlockID) || empty($pageVersionID)){

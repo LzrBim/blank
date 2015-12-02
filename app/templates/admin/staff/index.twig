@@ -1,0 +1,31 @@
+{% extends 'admin/layout.twig' %}
+
+{% block head %}
+
+    {{ parent() }}
+    
+{% endblock %}
+
+{% block content %}
+    
+    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped indexTable">
+    <thead>
+    <tr>
+    <th class="control"></th>
+    <th class="title">Name</th>
+    <th>Status</th>
+    <th class="control"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for staff in staffs %}
+      <tr>
+      <td><a href="/admin/staff/edit/{{staff.staffID}}"><i class="glyphicon glyphicon-pencil"></i></a></td>
+      <td><a href="/admin/staff/edit/{{staff.staffID}}">{{staff.lastName}}, {{staff.firstName}}</a></td>
+      <td>{{m.status(staff.status)}}</td>
+      <td><a href="/admin/staff/delete/{{staff.staffID}}"><i class="glyphicon glyphicon-trash red"></i></a></td>
+      </tr>
+    {% endfor %}
+    </table>
+    
+{% endblock %}

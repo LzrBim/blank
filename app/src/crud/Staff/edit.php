@@ -7,17 +7,10 @@
 $form = new \App\Lib\AdminForm();
 
 echo $form->open();
-echo $form->hidden('mode', 'update');
 echo $form->hidden($staff->_id, $staff->id());
 echo $form->hidden('imageID', $staff->imageID);
 
 /* FIRST SECTION */
-
-$title = 'Edit Staff';
-
-$content = '';
-
-ob_start();
 
 echo $form->status('active'); ?>
 
@@ -46,7 +39,7 @@ echo $form->status('active'); ?>
 		
 		echo $form->input('title', 'Job Title', $staff->title); 
 		
-		echo $form->select('staffCategoryID', 'Category', $staff->category->getSelectOptionArray($staff->staffCategoryID));
+		//echo $form->select('staffCategoryID', 'Category', $staff->category->getSelectOptionArray($staff->staffCategoryID));
 		
 		echo $form->phone('mobilePhone', 'Mobile Phone', $staff->mobilePhone); ?>
     
@@ -96,26 +89,15 @@ echo $form->editor('description', 'Biography', $staff->description, array(
   
 </div><!-- /.row --><? 
 
-$content = ob_get_clean();
-
-$adminView->box($title, $content);
-
-/* SECOND SECTION FOR IMAGE */
-
-$title = 'Staff Photo';
-
-$content = '';
-
-ob_start(); 
-
 if($staff->image->isLoaded()){
+	
 	echo $form->image($staff); 
+	
 }
 
 echo $form->fileInput('uploadFile', 'Upload Image', array('help' => 'This will replace the existing image'));
 
-$content = ob_get_clean();
-
+/*
 $opts = array();
 if($staff->image->isLoaded()){
 	$opts = array(
@@ -131,8 +113,7 @@ if($staff->image->isLoaded()){
 		)
 	);
 }
-
-$adminView->box($title, $content, $opts); 
+*/
 
 echo $form->buttonsEdit();
 
